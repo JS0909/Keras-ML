@@ -93,8 +93,8 @@ model = Model(inputs=input1, outputs=output1)
 
 # 3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam', metrics=['mae'])
-Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=128, restore_best_weights=True)
-log = model.fit(x_train, y_train, epochs=2000, batch_size=128, callbacks=[Es], validation_split=0.25)
+Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=300, restore_best_weights=True)
+log = model.fit(x_train, y_train, epochs=3000, batch_size=128, callbacks=[Es], validation_split=0.25)
 model.save('./_save/keras32.msw')
 
 # model = load_model('./_save/keras32.msw')
@@ -112,18 +112,14 @@ rmse = RMSE(y_predict, y_test)
 print('rmse: ', rmse)
 
 # 5. 제출 준비
-# submission = pd.read_csv(path + 'submission.csv', index_col=0)
+submission = pd.read_csv(path + 'submission.csv', index_col=0)
 test_set = test_set.astype(np.float32)
 y_submit = model.predict(test_set)
 # 에러: Failed to convert a NumPy array to a Tensor (Unsupported object type int).
 # 변수명 = 변수명.astype(np.float32) 해주면 해결은 됨
 print(y_submit.shape)
-# submission['Weekly_Sales'] = y_submit
-# submission.to_csv(path + 'submission.csv', index=True)
-
-# loss:  [175242412032.0, 312922.40625]
-# r2:  0.45777688143409023
-# rmse:  418619.62794955465
+submission['Weekly_Sales'] = y_submit
+submission.to_csv(path + 'submission.csv', index=True)
 
 # loss:  [229574115328.0, 384410.6875]
 # r2:  0.28966727198096065
