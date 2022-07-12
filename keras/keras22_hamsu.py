@@ -1,6 +1,4 @@
 import numpy as np
-from tensorflow.python.keras.models import Sequential
-from tensorflow.python.keras.layers import Dense
 
 # 1. 데이터
 x = np.array([[1,2,3,4,5,6,7,8,9,10],
@@ -13,18 +11,34 @@ x = x.T # 행렬 전환
 print(x.shape) # (10, 3)
 
 # 2. 모델구성
-model = Sequential()
-# model.add(Dense(10, input_dim=3))
-model.add(Dense(10, input_shape=(3,))) # 행 무시하고 나머지를 열로 보고 입력하면 됨
-model.add(Dense(5))
-model.add(Dense(3))
-model.add(Dense(1))
+from tensorflow.python.keras.models import Sequential, Model
+from tensorflow.python.keras.layers import Dense, Input
+
+# 시퀀셜 모델 구성
+# model = Sequential()
+# # model.add(Dense(10, input_dim=3))
+# model.add(Dense(10, input_shape=(3,))) # 행 무시하고 나머지를 열로 보고 입력하면 됨
+# model.add(Dense(5, activation='relu'))
+# model.add(Dense(3, activation='sigmoid'))
+# model.add(Dense(1))
+# model.summary()
+
+# 함수형 모델 구성 / 레이어 재사용이 쉽다 갖다 이름만 붙여 바꿔주면 됨
+input1 = Input(shape=(3,))
+dense1 = Dense(10)(input1)
+dense2 = Dense(5, activation='relu')(dense1)
+dense3 = Dense(3, activation='sigmoid')(dense2)
+output1 = Dense(1)(dense3)
+model = Model(inputs=input1, outputs=output1)
+
 model.summary()
 
-# Model: "sequential"
+# Model: "model"
 # _________________________________________________________________
 # Layer (type)                 Output Shape              Param #
 # =================================================================
+# input_1 (InputLayer)         [(None, 3)]               0
+# _________________________________________________________________
 # dense (Dense)                (None, 10)                40
 # _________________________________________________________________
 # dense_1 (Dense)              (None, 5)                 55
@@ -37,3 +51,8 @@ model.summary()
 # Trainable params: 117
 # Non-trainable params: 0
 # _________________________________________________________________
+
+
+# 3. 컴파일, 훈련
+model.compile(loss='mse', optimizer='adam')
+model.fit(x, y, epochs=10, batch_size=1)
