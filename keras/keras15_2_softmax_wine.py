@@ -13,7 +13,6 @@ from tensorflow.python.keras.callbacks import EarlyStopping
 datasets = load_wine()
 x = datasets.data
 y = datasets.target
-print(y)
 print(x.shape, y.shape) # (178, 13) (178,)
 print(np.unique(y, return_counts=True))
 # (array([0, 1, 2]), array([59, 71, 48], dtype=int64))

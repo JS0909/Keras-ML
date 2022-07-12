@@ -1,5 +1,6 @@
 # Dacon 따릉이 문제풀이
-import pandas as pd
+import numpy as np
+import pandas as pd 
 from pandas import DataFrame 
 from sklearn.datasets import fetch_california_housing
 from tensorflow.python.keras.models import Sequential

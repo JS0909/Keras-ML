@@ -40,15 +40,15 @@ print('y의 라벨값: ', np.unique(y))
 #===========================================================================================================================
 
 #==========================================OneHotEncoder====================================================================
-# from sklearn.preprocessing import OneHotEncoder
-# oh = OneHotEncoder()
-# print(y.shape) # (581012,)
-# y = datasets.target.reshape(-1,1) # reshape 전은 벡터로, reshape 후에 행렬로
-# print(y.shape) # (581012, 1)
-# oh.fit(y)
-# y = oh.transform(y).toarray()
-# print(y)
-# print(y.shape)
+from sklearn.preprocessing import OneHotEncoder
+oh = OneHotEncoder()
+print(y.shape) # (581012,)
+y = datasets.target.reshape(-1,1) # reshape 전은 벡터로, reshape 후에 행렬로
+print(y.shape) # (581012, 1)
+oh.fit(y)
+y = oh.transform(y).toarray()
+print(y)
+print(y.shape)
 #===========================================================================================================================
 
 #==========================================pandas.get_dummies===============================================================

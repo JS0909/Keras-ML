@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.preprocessing import MaxAbsScaler, RobustScaler
 import numpy as np
-from tensorflow.python.keras.models import Sequential, Model, load_model
+from tensorflow.python.keras.models import Sequential, Model
 from tensorflow.python.keras.layers import Dense, Input
 from sklearn.metrics import r2_score
 import time

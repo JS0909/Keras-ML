@@ -1,0 +1,11 @@
+레지스트리 편집기
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem
+LongPathsEnabled 이거 우클릭 후 1로 수정, 재부팅
+
+특정 가상환경에서 pip 안될 때
+가상환경에 들어가서
+>curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+
+>python get-pip.py
+
+이후 pip list로 확인해보면 설치 되어있음

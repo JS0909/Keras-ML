@@ -47,22 +47,3 @@ print('loss: ', loss)
 y_predict = model.predict(x_test)
 r2 = r2_score(y_test, y_predict)
 print('r2:', r2)
-
-'''
-print("============== 2. load_model 출력 ==================")
-model2 = load_model('./_save/keras24_3_save_model.h5')
-loss2 = model2.evaluate(x_test, y_test)
-print('loss2: ', loss2)
-y_predict2 = model.predict(x_test)
-r2 = r2_score(y_test, y_predict2)
-print('r2:', r2)
-
-print("============== 3. ModelCheckPoint 출력 ==================")
-model3 = load_model('./_ModelCheckPoint/keras24_ModelCheckPoint3.hdf5')
-loss3 = model3.evaluate(x_test, y_test)
-print('loss3: ', loss3)
-y_predict2 = model.predict(x_test)
-r2 = r2_score(y_test, y_predict2)
-print('r2:', r2)
-
-'''

@@ -1,11 +1,7 @@
 # Kaggle Bike_sharing
-from operator import index
-import numpy as np
 import pandas as pd 
-from pandas import DataFrame 
-from sklearn.datasets import fetch_california_housing
 from tensorflow.python.keras.models import Sequential
-from tensorflow.python.keras.layers import Dense
+from tensorflow.python.keras.layers import Dense, Dropout
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
 from tensorflow.python.keras.callbacks import EarlyStopping
@@ -55,8 +51,10 @@ model = Sequential()
 model.add(Dense(10, input_dim=12))
 model.add(Dense(30, activation='relu'))
 model.add(Dense(30, activation='relu'))
+model.add(Dropout(0.1))
 model.add(Dense(30))
 model.add(Dense(50, activation='relu'))
+model.add(Dropout(0.1))
 model.add(Dense(20, activation='relu'))
 model.add(Dense(1))
 
@@ -65,6 +63,7 @@ model.compile(loss='mse', optimizer='adam', metrics=['mae'])
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=50, restore_best_weights=True)
 log = model.fit(x_train, y_train, epochs=1000, batch_size=50, callbacks=[Es], validation_split=0.25)
 
+
 # 4. 평가, 예측
 loss = model.evaluate(x_test, y_test)
 print('loss: ', loss)
@@ -72,48 +71,12 @@ y_predict = model.predict(x_test)
 r2 = r2_score(y_test, y_predict)
 print('r2: ', r2)
 
-'''
-#======그래프======
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import matplotlib.font_manager as fm
+# # 5. 제출 준비
+# submission = pd.read_csv(path + 'submission.csv', index_col=0)
+# y_submit = model.predict(test_set)
+# submission['count'] = np.abs(y_submit) # 마이너스 나오는거 절대값 처리
 
-mpl.rcParams['font.family'] = 'malgun gothic'
-mpl.rcParams['axes.unicode_minus'] = False
+# submission.to_csv(path + 'submission.csv', index=True)
 
-plt.figure(figsize=(9,6))
-plt.plot(log.history['loss'], marker='.', c='red', label='loss')
-plt.plot(log.history['val_loss'], marker='.', c='blue', label='val_loss')
-plt.grid()
-plt.title('캐글 바이크//로스와 발리데이션 로스')
-plt.ylabel('loss')
-plt.xlabel('epochs')
-plt.legend()
-plt.show()
-#======그래프======
-'''
-
-# 5. 제출 준비
-submission = pd.read_csv(path + 'submission.csv', index_col=0)
-y_submit = model.predict(test_set)
-submission['count'] = np.abs(y_submit) # 마이너스 나오는거 절대값 처리
-
-submission.to_csv(path + 'submission.csv', index=True)
-
-# linear only
-# loss:  [mse: 21339.32421875, mae: 109.42781066894531]
-# r2:  0.3916957657818575
-
-# with 2 relu
-# loss:  [2070.903076171875, 30.01389503479004]
-# r2:  0.9353254005377757
-
-# with 3 relu
-# loss:  [mse: 1768.896484375, mae: 26.64974021911621]
-# r2:  0.9469869764493036
-
-# with 4 relu
-# loss:  [mse: 2206.21435546875, mae: 30.686269760131836]
-# r2:  0.9347932518442085
-
-# relu를 세번정도 섞어줬더니 성능이 비약적으로 좋아지는 것을 확인했다
+# loss:  [2595.39208984375, 33.217010498046875]
+# r2:  0.9150003307702571

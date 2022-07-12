@@ -30,6 +30,7 @@ x_test = scaler.transform(x_test)
 # log = model.fit(x_train, y_train, epochs=1000, batch_size=1, callbacks=[es, mcp], validation_split=0.2, verbose=1)
 
 model = load_model('./_ModelCheckPoint/keras24_ModelCheckPoint.hdf5')
+# 모델체크포인트로 세이브한 내용은 모델과 핏 후 저장된 weight값까지 저장됨
 
 # 4. 평가, 예측
 loss = model.evaluate(x_test, y_test)

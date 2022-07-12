@@ -23,13 +23,10 @@ y = datasets['target']
 scaler = MinMaxScaler() # 각 열에서 가장 작은 값을 0, 큰 값을 1로 잡고 나머지를 비율로 표시
 # scaler = StandardScaler() # 평균을 0으로 잡고 표준편차로 나눠줌
 # scaler = MaxAbsScaler() # 각 열에서 가장 큰 값을 1로 잡고 나머지를 비율로 표시
-# scaler = RobustScaler() #  25th~75th의 데이터와 중앙값으로 표준 정규화 (standard scaling)
-
+# scaler = RobustScaler() # 표준 정규화 : 중앙값을 사용함 동떨어진 데이터는 드롭함
 x_train, x_test, y_train, y_test =  train_test_split(x, y, train_size=0.8, shuffle=True, random_state=66)
-
-# scaler.fit(x_train)
-# x_train = scaler.transform(x_train)
-x_train = scaler.fit_transform(x_train) # 위에 두줄이 한줄로 가능
+scaler.fit(x_train)
+x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 print(np.min(x_train)) # 0.0
 print(np.max(x_train)) # 1.0

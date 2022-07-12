@@ -32,7 +32,7 @@ model.add(Dense(1))
 
 # model.load_weights('./_save/keras23_05_save_weights1.h5') # keras23_05_save_weights 파일에서 랜덤한 가중치 저장시킨 파일
 model.load_weights('./_save/keras23_05_save_weights2.h5') # keras23_05_save_weights 파일에서 훈련시켜 구한 가중치 저장시킨 파일
-
+# 컴파일 전에 weight값 불러와서 컴파일 함
 
 # 3. 컴파일, 훈련
 model.compile(loss = 'mse', optimizer='adam')

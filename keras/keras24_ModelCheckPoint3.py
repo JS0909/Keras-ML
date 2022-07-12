@@ -29,8 +29,6 @@ mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1,
                       save_best_only=True, filepath='./_ModelCheckPoint/keras24_ModelCheckPoint3.hdf5')
 log = model.fit(x_train, y_train, epochs=1000, batch_size=1, callbacks=[es, mcp], validation_split=0.2, verbose=1)
 
-model.save('./_save/keras24_3_save_model.h5')
-
 # 4. 평가, 예측
 print("============== 1. 기본 출력 ==================")
 loss = model.evaluate(x_test, y_test)
