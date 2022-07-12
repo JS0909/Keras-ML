@@ -5,8 +5,7 @@
 #       카테고리 id 별로 그대로 정리
 '''
 y = pd.get_dummies(y)
-print(y.shape)
-print(y)
+y['a'] = pd.get_dummies(y, columns=['a'])
 '''
 
 

@@ -49,9 +49,9 @@ test_set = test_set.drop(['Weekly_Sales'], axis=1)
 #---------------------------------------------------------------------
 print(train_set.shape, test_set.shape)
 
-train_set['Store'] = pd.get_dummies(train_set['Store'])
-test_set['Store'] = pd.get_dummies(test_set['Store'])
-print(train_set.shape, test_set.shape)
+train_set = pd.get_dummies(train_set, columns=['Store'])
+test_set = pd.get_dummies(test_set, columns=['Store'])
+print(train_set.shape, test_set.shape) # (6255, 58) (180, 57)
 
 x = train_set.drop(['Weekly_Sales'], axis=1)
 y = train_set['Weekly_Sales']
@@ -79,7 +79,7 @@ print(x_train.shape, y_train.shape) # (5004, 13) (5004,)
 # model.add(Dense(1))
 
 # 함수형
-input1 = Input(shape=(13,))
+input1 = Input(shape=(57,))
 dense1 = Dense(50,activation='swish')(input1)
 batchnorm1 = BatchNormalization()(dense1)
 dense2 = Dense(100)(batchnorm1)
@@ -95,7 +95,7 @@ model = Model(inputs=input1, outputs=output1)
 # 3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam', metrics=['mae'])
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=128, restore_best_weights=True)
-log = model.fit(x_train, y_train, epochs=1, batch_size=128, callbacks=[Es], validation_split=0.25)
+log = model.fit(x_train, y_train, epochs=2000, batch_size=128, callbacks=[Es], validation_split=0.25)
 model.save('./_save/keras32.msw')
 
 # model = load_model('./_save/keras32.msw')
@@ -129,3 +129,7 @@ print(y_submit.shape)
 # loss:  [229574115328.0, 384410.6875]
 # r2:  0.28966727198096065
 # rmse:  479138.95858055534
+
+# loss:  [16499713024.0, 70918.6328125]
+# r2:  0.9489477113062993
+# rmse:  128451.20429720446
