@@ -65,7 +65,6 @@ scaler.fit(x_train)
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 print(x_train.shape, y_train.shape) # (5004, 13) (5004,)
-# 11123122312312
 
 # # 2. 모델 구성
 # 시퀀셜
