@@ -39,7 +39,7 @@ print(np.unique(y, return_counts=True)) # [1 2 3 4 5 6 7]
 #==========================================pandas.get_dummies===============================================================
 y = pd.get_dummies(y)
 print(y.shape)
-print(y)
+print(type(y)) # <class 'pandas.core.frame.DataFrame'>
 #===========================================================================================================================
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8,shuffle=True, random_state=9)
 

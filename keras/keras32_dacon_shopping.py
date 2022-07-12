@@ -8,7 +8,6 @@ import numpy as np
 from tensorflow.python.keras.callbacks import EarlyStopping
 from sklearn.preprocessing import MinMaxScaler, RobustScaler
 from keras.layers import BatchNormalization
-import datetime
 
 # 1. 데이터
 path = './_data/dacon_shopping/'

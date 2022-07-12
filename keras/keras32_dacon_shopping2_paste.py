@@ -121,20 +121,18 @@ batchnorm4 = BatchNormalization()(dense4)
 activ4 = Activation('relu')(batchnorm4)
 drp7 = Dropout(0.2)(activ4)
 output1 = Dense(1)(drp7)
-model = Model(inputs=input1, outputs=output1)   
+model = Model(inputs=input1, outputs=output1) 
 
 
 #3. 컴파일, 훈련
-
-
 model.compile(loss='mse', optimizer='adam', metrics=['mae'])
 
-from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint
+from tensorflow.python.keras.callbacks import EarlyStopping
 
 earlyStopping = EarlyStopping(monitor='val_loss', patience=300, mode='auto', verbose=1, 
                               restore_best_weights=True)        
 
-hist = model.fit(x_train, y_train, epochs=10000, batch_size=64,
+hist = model.fit(x_train, y_train, epochs=2000, batch_size=128,
                  validation_split=0.3,
                  callbacks=[earlyStopping],
                  verbose=1)
@@ -183,5 +181,9 @@ submission_set.to_csv(path + 'submission.csv', index = True)
 # loss :  [10323171328.0, 59649.91015625]
 # RMSE :  101603.00622509912
 # r2스코어 :  0.9693010986384939
+
+# loss :  [10702969856.0, 59387.4765625]
+# RMSE :  103455.16215286315
+# r2스코어 :  0.9681716555890509
 
 # 안결님 코드
