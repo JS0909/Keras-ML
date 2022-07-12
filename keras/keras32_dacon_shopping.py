@@ -32,11 +32,14 @@ test_set['year'] = test_set['Date'].dt.strftime('%Y')
 test_set['month'] = test_set['Date'].dt.strftime('%m')
 test_set['day'] = test_set['Date'].dt.strftime('%d')
 test_set = test_set.drop(['Date'], axis=1)
+# 년도와 일자에 따른 변화가 크게 없어서 월만 뺌
 
 # 트레인과 테스트에 있는 연월일들의 종류가 달라서 한꺼번에 인코딩 해야됨
 train_test = pd.concat([train_set, test_set])
 # Weekly_Sales를 포함한 채로 합치면 라벨 인코딩을 통해 test_set에도 Weekly_Sales 칼럼이 생김
-cols = ['month', 'day', 'year']
+cols = ['month'
+        , 'day', 'year'
+        ]
 for col in cols:
     le = LabelEncoder()
     train_test[col] = le.fit_transform(train_test[col])
@@ -51,20 +54,20 @@ print(train_set.shape, test_set.shape)
 
 train_set = pd.get_dummies(train_set, columns=['Store'])
 test_set = pd.get_dummies(test_set, columns=['Store'])
-print(train_set.shape, test_set.shape) # (6255, 58) (180, 57)
+print(train_set.shape, test_set.shape)
 
 x = train_set.drop(['Weekly_Sales'], axis=1)
 y = train_set['Weekly_Sales']
 
 print(x.shape,y.shape)
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, random_state=9)
-print(x_train.shape) # (5004, 13)
+print(x_train.shape)
 
 scaler = MinMaxScaler()
 scaler.fit(x_train)
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
-print(x_train.shape, y_train.shape) # (5004, 13) (5004,)
+print(x_train.shape, y_train.shape)
 
 # # 2. 모델 구성
 # 시퀀셜
@@ -132,3 +135,4 @@ submission.to_csv(path + 'submission.csv', index=True)
 # loss:  [15136667648.0, 68047.1640625]
 # r2:  0.9531651491124695
 # rmse:  123031.16688203003
+
