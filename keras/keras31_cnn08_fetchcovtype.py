@@ -41,9 +41,9 @@ model.add(Conv2D(filters=80, kernel_size=(1,1), strides=1, padding='same', input
 model.add(MaxPool2D((1,1), padding='same'))
 model.add(Conv2D(100, (1,1),padding='valid', activation='swish'))
 model.add(Dropout(0.2))
-model.add(Conv2D(90, (1,1),padding='same', activation='relu'))
+model.add(Conv2D(90, (1,1),padding='same', activation='swish'))
 model.add(Dropout(0.1))
-model.add(Conv2D(70, (1,1),padding='valid', activation='relu'))
+model.add(Conv2D(70, (1,1),padding='valid', activation='swish'))
 model.add(Flatten())
 model.add(Dense(20, activation='relu'))
 model.add(Dense(7, activation='softmax'))
@@ -51,7 +51,7 @@ model.add(Dense(7, activation='softmax'))
 #3. 컴파일, 훈련
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=50, restore_best_weights=True)
-log = model.fit(x_train, y_train, epochs=128, batch_size=128, callbacks=[Es], validation_split=0.2)
+log = model.fit(x_train, y_train, epochs=300, batch_size=128, callbacks=[Es], validation_split=0.2)
 
 
 #4. 평가, 예측
