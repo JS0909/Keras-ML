@@ -91,7 +91,9 @@ drop2 = Dropout(0.1)(dense4)
 batchnorm2 = BatchNormalization()(drop2)
 dense5 = Dense(100, activation='swish')(batchnorm2)
 drop3 = Dropout(0.2)(dense5)
-output1 = Dense(1)(drop3)
+dense6 = Dense(100, activation='relu')(drop3)
+drop4 = Dropout(0.2)(dense6)
+output1 = Dense(1)(drop4)
 model = Model(inputs=input1, outputs=output1)
 
 # 3. 컴파일, 훈련
@@ -124,9 +126,6 @@ print(y_submit.shape)
 submission['Weekly_Sales'] = y_submit
 submission.to_csv(path + 'submission.csv', index=True)
 
-# loss:  [229574115328.0, 384410.6875]
-# r2:  0.28966727198096065
-# rmse:  479138.95858055534
 
 # loss:  [16499713024.0, 70918.6328125]
 # r2:  0.9489477113062993
@@ -136,3 +135,10 @@ submission.to_csv(path + 'submission.csv', index=True)
 # r2:  0.9531651491124695
 # rmse:  123031.16688203003
 
+# loss:  [15622782976.0, 68504.734375]
+# r2:  0.9516610353194097
+# rmse:  124991.1443911953
+
+# loss:  [17436723200.0, 73562.3359375]
+# r2:  0.9460484868792954
+# rmse:  132048.16998412146
