@@ -17,8 +17,9 @@ x = x.reshape(7, 3, 1)
 print(x.shape) # (7, 3, 1)
 
 # 2. 모델구성
-model = Sequential()                                           # input_dim
-model.add(SimpleRNN(10, input_shape=(3,1))) # [batch, timesteps, feature]
+model = Sequential()                                             # input_dim
+# model.add(SimpleRNN(10, input_shape=(3,1))) # [batch, timesteps, feature]
+model.add(SimpleRNN(units=10, input_length=3, input_dim=1)) # 인풋쉐입을 분리해서 쓸 수 있다
 model.add(Dense(5, activation='swish'))
 model.add(Dense(1))
 model.summary()
