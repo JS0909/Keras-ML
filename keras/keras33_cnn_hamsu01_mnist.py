@@ -14,8 +14,8 @@ print(x_train.shape, y_train.shape) # (60000, 28, 28) (60000,)
 print(x_test.shape, y_test.shape) # (10000, 28, 28) (10000,)
 # 데이터 순서대로 즉 총 곱셈값이 변하지 않으면 됨 : reshape
 
-x_train = x_train.reshape(60000, 28*28) # 데이터의 갯수자체는 성능과 큰 상관이 없을 수 있다
-x_test = x_test.reshape(10000, 28*28)
+x_train = x_train.reshape(60000, 28, 28) # 데이터의 갯수자체는 성능과 큰 상관이 없을 수 있다
+x_test = x_test.reshape(10000, 28, 28)
 print(x_train.shape)
 
 print(np.unique(y_train, return_counts=True))
@@ -39,14 +39,15 @@ print(y_train.shape) # (60000, 10) // output 10개 = 라벨값
 # model.add(Dense(10, activation='softmax'))
 # model.summary() # (None, 28, 28, 64) ... 데이터 갯수 = None
 
-input1 = Input(shape=(28*28*1,))
-dense1 = Dense(10)(input1)
-dense2 = Dense(30, activation='relu')(dense1)
-dense3 = Dense(30, activation='relu')(dense2)
-dense4 = Dense(30)(dense3)
-dense4 = Dense(50)(dense3)
-dense4 = Dense(20, activation='relu')(dense3)
-output1 = Dense(10, activation='softmax')(dense4)
+input1 = Input(shape=(28,28,1))
+conv1 = Conv2D(10, kernel_size=(3,3), strides=1, padding='same')(input1)
+conv2 = Conv2D(30, kernel_size=(2,2), activation='relu')(conv1)
+conv3 = Conv2D(30, kernel_size=(1,1), padding='same', activation='relu')(conv2)
+conv4 = Conv2D(30, kernel_size=(1,1))(conv3)
+conv5 = Conv2D(50, kernel_size=(1,1))(conv4)
+flat = Flatten()(conv5)
+dense7 = Dense(32, activation='relu')(flat)
+output1 = Dense(10, activation='softmax')(dense7)
 model = Model(inputs=input1,outputs=output1)
 
 
@@ -69,6 +70,6 @@ print('acc스코어 : ', acc_sc)
 # loss :  [0.06552130728960037, 0.9810000061988831]
 # acc스코어 :  0.981
 
-# 함수
-# loss :  [0.1826883852481842, 0.9508000016212463]
-# acc스코어 :  0.9508
+# CNN 함수화
+# loss :  [0.09861575067043304, 0.9746000170707703]
+# acc스코어 :  0.9746
