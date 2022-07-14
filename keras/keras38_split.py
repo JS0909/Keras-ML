@@ -17,6 +17,6 @@ print(bbb)
 print(bbb.shape) # (6, 5)
 
 x =  bbb[:, :-1]
-y =  bbb[:, :-1]
+y =  bbb[:, -1]
 print(x, y)
-print(x.shape, y.shape) #(6, 4) (6, 4)
+print(x.shape, y.shape) # (6, 4) (6,)
