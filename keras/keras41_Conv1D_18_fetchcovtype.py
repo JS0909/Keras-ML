@@ -2,7 +2,7 @@
 
 from sklearn.datasets import fetch_covtype
 from tensorflow.python.keras.models import Sequential
-from tensorflow.python.keras.layers import Dense, Dropout, LSTM
+from tensorflow.python.keras.layers import Dense, Dropout, Conv1D, Flatten
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import numpy as np
@@ -37,7 +37,8 @@ x_test = x_test.reshape(116203, 54, 1)
 
 #2. 모델구성
 model = Sequential()
-model.add(LSTM(10, input_shape=(54, 1), activation='relu'))
+model.add(Conv1D(10, 2, input_shape=(54, 1), activation='relu'))
+model.add(Flatten())
 model.add(Dense(20))
 model.add(Dense(15))
 model.add(Dense(30, activation='relu'))
@@ -62,9 +63,12 @@ y_test = tf.argmax(y_test, axis=1)
 
 acc_sc = accuracy_score(y_test, y_predict)
 print('acc스코어 : ', acc_sc)
+print('fetchcovtype')
 
 # DNN
 # loss :  0.6437365412712097
 # acc스코어 :  0.7107303598013821
 
 # LSTM (오래걸려서 나중에 돌리자)
+
+# Conv1D 나중에 돌려

@@ -1,6 +1,6 @@
 # [실습]
 from tensorflow.python.keras.models import Sequential
-from tensorflow.python.keras.layers import Dense, Dropout, LSTM
+from tensorflow.python.keras.layers import Dense, Dropout, Conv1D, Flatten
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import numpy as np
@@ -55,7 +55,8 @@ x_test = x_test.reshape(179, 7, 1)
 
 #2. 모델구성
 model = Sequential()
-model.add(LSTM(80, input_shape=(7,1)))
+model.add(Conv1D(80, input_shape=(7,1)))
+model.add(Flatten())
 model.add(Dense(100))
 model.add(Dropout(0.3))
 model.add(Dense(90, activation='relu'))
@@ -100,3 +101,7 @@ print('acc스코어 : ', acc_sc)
 # LSTM
 # loss :  0.6273670792579651
 # acc스코어 :  0.6368715083798883
+
+# Conv1D
+# loss :  [1189381248.0, 25974.0234375]
+# r2스코어 :  0.7415976806929669

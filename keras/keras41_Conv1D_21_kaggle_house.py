@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from collections import Counter
 from tensorflow.python.keras.models import Sequential
-from tensorflow.python.keras.layers import Dense, Dropout, LSTM
+from tensorflow.python.keras.layers import Dense, Dropout, Conv1D, Flatten
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
 from tensorflow.python.keras.callbacks import EarlyStopping
@@ -199,7 +199,8 @@ x_test = x_test.reshape(335, 12, 1)
 
 #2. 모델구성
 model = Sequential()
-model.add(LSTM(80, input_shape=(12,1), activation='relu'))
+model.add(Conv1D(80, 2, input_shape=(12,1), activation='relu'))
+model.add(Flatten())
 model.add(Dense(100))
 model.add(Dropout(0.4))
 model.add(Dense(90))
@@ -224,6 +225,8 @@ y_predict = model.predict(x_test)
 r2 = r2_score(y_test, y_predict)
 print('r2스코어 : ', r2)
 
+print('캐글하우스')
+
 # 5. 제출 준비
 # y_submit = model.predict(test_set)
 # submission_set = pd.read_csv(path + 'submission.csv', index_col=0) # index_col=n n번째 컬럼을 인덱스로 인식
@@ -238,3 +241,7 @@ print('r2스코어 : ', r2)
 # LSTM
 # loss :  [1653597312.0, 30386.294921875]
 # r2스코어 :  0.640743169053483
+
+# Conv1D
+# loss :  [1189381248.0, 25974.0234375]
+# r2스코어 :  0.7415976806929669
