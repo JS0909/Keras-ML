@@ -71,4 +71,4 @@ print('fetchcovtype')
 
 # LSTM (오래걸려서 나중에 돌리자)
 
-# Conv1D 나중에 돌려
+# Conv1D
