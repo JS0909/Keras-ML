@@ -63,8 +63,10 @@ y_test = tf.argmax(y_test, axis=1)
 acc_sc = accuracy_score(y_test, y_predict)
 print('acc스코어 : ', acc_sc)
 
+print('fetchcovtype')
+
 # DNN
 # loss :  0.6437365412712097
 # acc스코어 :  0.7107303598013821
 
-# LSTM (오래걸려서 나중에 돌리자)
+# LSTM
