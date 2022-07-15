@@ -57,9 +57,10 @@ gru1 = GRU(10, activation='swish')(re1)
 dense1 = Dense(16)(gru1)
 re2 = Reshape(target_shape=(4, 4, 1))(dense1)
 conv2_1 = Conv2D(16, 3)(re2)
-re3 = Reshape(target_shape=(64,1))(conv2_1)
+re3 = Reshape(target_shape=(8,8))(conv2_1)
 re4 = Reshape(target_shape=(64,))(re3)
-output1 = Dense(10)(re4)
+flatten1 = Flatten()(re4)
+output1 = Dense(10)(flatten1)
 model = Model(inputs=input1, outputs=output1)
 model.summary()
 
@@ -81,9 +82,11 @@ model.summary()
 # _________________________________________________________________
 # conv2d (Conv2D)              (None, 2, 2, 16)          160
 # _________________________________________________________________
-# reshape_2 (Reshape)          (None, 64, 1)             0
+# reshape_2 (Reshape)          (None, 8, 8)              0
 # _________________________________________________________________
 # reshape_3 (Reshape)          (None, 64)                0
+# _________________________________________________________________
+# flatten (Flatten)            (None, 64)                0
 # _________________________________________________________________
 # dense_1 (Dense)              (None, 10)                650
 # =================================================================
@@ -91,7 +94,6 @@ model.summary()
 # Trainable params: 1,646
 # Non-trainable params: 0
 # _________________________________________________________________
-
 
 
 # 3. 컴파일, 훈련

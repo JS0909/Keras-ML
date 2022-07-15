@@ -46,7 +46,7 @@ y = np.array(y).reshape(-1, 1) # 벡터로 표시되어 있는 y데이터를 행
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8,shuffle=True, random_state=9)
 print(x_train.shape, x_test.shape)
 
-x_train = np.array(x_train)
+x_train = np.array(x_train) 
 x_test = np.array(x_test)
 
 x_train = x_train.reshape(712, 7, 1)
