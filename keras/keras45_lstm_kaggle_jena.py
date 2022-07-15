@@ -62,6 +62,9 @@ bbb = split_x(datasets, 5)
 # print(bbb)
 print(bbb.shape) # (420547, 5, 18)
 
+########### 칼럼 재구성 필요해보임
+
+
 x =  bbb[:, :-1]
 y =  bbb[:, -1]
 # print(x, y)
@@ -71,11 +74,11 @@ x_train, x_test, y_train, y_test =  train_test_split(x, y, train_size=0.8, shuff
 
 # 2. 모델구성
 model = Sequential()
-model.add(Conv1D(1, 2, input_shape=(4,18)))
-model.add(GRU(1))
-model.add(Dense(1, activation = 'relu'))
-model.add(Dense(1, activation = 'relu'))
-model.add(Dense(1, activation = 'relu'))
+model.add(Conv1D(64, 2, input_shape=(4,18)))
+model.add(GRU(128))
+model.add(Dense(128, activation = 'relu'))
+model.add(Dense(64, activation = 'relu'))
+model.add(Dense(32, activation = 'relu'))
 model.add(Dense(1))
 
 # model.summary()
@@ -84,7 +87,7 @@ model.add(Dense(1))
 model.compile(loss='mse', optimizer='adam')
 start_time = time.time()
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=500, restore_best_weights=True)
-model.fit(x_train, y_train, epochs=1, callbacks=[Es], validation_split=0.1)
+model.fit(x_train, y_train, epochs=1000, callbacks=[Es], validation_split=0.1)
 end_time = time.time()
 
 # 4. 평가, 예측
