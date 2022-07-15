@@ -38,15 +38,11 @@ output1 = Dense(100, activation='relu', name='out_d1')(dense3)
 
 # 2-2. 모델2
 input2 = Input(shape=(3,))
-dense11 = Dense(100, activation='relu')(input2)
-re1 = Reshape(target_shape=(25, 2, 2))(dense11)
-dense12 = Conv1D(100, 2, activation='swish', padding='same')(re1)
-dense13 = Dense(100, activation='relu')(dense12)
-dense14 = Conv2D(100, 2, activation='relu')(dense13)
-re2 = Reshape(target_shape=(600, 4))(dense14)
-dense15 = GRU(100, activation='relu')(re2)
-output2 = Dense(100, activation='relu', name='out_d2')(dense15)
-# 심심해서 섞어봄 근데 개 느리니까 돌리지 마라;
+dense11 = Dense(100, activation='relu', name='d11')(input2)
+dense12 = Dense(100, activation='swish', name='d12')(dense11)
+dense13 = Dense(100, activation='relu', name='d13')(dense12)
+dense14 = Dense(100, activation='relu', name='d14')(dense13)
+output2 = Dense(100, activation='relu', name='out_d2')(dense14)
 
 # 2-3. 모델3
 input3 = Input(shape=(2,))
@@ -56,25 +52,30 @@ dense17 = Dense(100, activation='relu', name='d17')(dense16)
 dense18 = Dense(100, activation='relu', name='d18')(dense17)
 output3 = Dense(100, activation='relu', name='out3')(dense18)
 
+# Concatenate
 from tensorflow.python.keras.layers import concatenate, Concatenate
-merge1 = concatenate([output1, output2, output3], name='m1')
-
-# 2-4. y모델4
+# merge1 = concatenate([output1, output2, output3], name='m1')
+merge1 = Concatenate(axis=0)([output1, output2, output3])
 merge2 = Dense(100, activation='relu', name='mg2')(merge1)
 merge3 = Dense(100, name='mg3')(merge2)
-last_output1 = Dense(1, name='last1')(merge3)
+last_output = Dense(1, name='last1')(merge3)
 
-# 2-5. y모델5
-merge4 = Dense(100, activation='relu')(merge1)
-merge5 = Dense(100)(merge4)
-last_output2 = Dense(1, name='last2')(merge5)
+# 2-4. output모델1
+output41 = Dense(10)(last_output)
+output42 = Dense(10)(output41)
+last_output1 = Dense(1)(output42)
+
+# 2-5. output모델2
+output51 = Dense(10)(last_output)
+output52 = Dense(10)(output51)
+last_output2 = Dense(1)(output52)
 
 model = Model(inputs=[input1, input2, input3], outputs=[last_output1, last_output2])
 
 model.summary()
 
 # 3. 컴파일, 훈련
-model.compile(loss='mse', optimizer='adam', metrics=['mae'])
+model.compile(loss='mse', optimizer='adam')
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=50, restore_best_weights=True)
 log = model.fit([x1_train, x2_train, x3_train], [y1_train, y2_train], epochs=10, batch_size=1, callbacks=[Es], validation_split=0.25)
 
@@ -83,22 +84,13 @@ loss1 = model.evaluate([x1_test, x2_test, x3_test], y1_test)
 loss2 = model.evaluate([x1_test, x2_test, x3_test], y2_test)
 print('loss1: ', loss1)
 print('loss2: ', loss2)
-y_predict1, y_predict2 = model.predict([x1_test, x2_test, x3_test])
-print(y_predict1.shape)
-r2_1 = r2_score(y1_test, y_predict1)
-r2_2 = r2_score(y2_test, y_predict2)
-print('r2_1: ', r2_1)
-print('r2_2: ', r2_2)
+y_predict = model.predict([x1_test, x2_test, x3_test])
+r2 = r2_score(y1_test, y_predict[0])
+r2_2 = r2_score(y2_test, y_predict[1])
+print('r2: ', r2, r2_2)
 print('ensemble3')
 
-# y모델 분화 안한 것
-# loss1:  [3239456.0, 0.012645941227674484, 3239456.0, 0.10090331733226776, 1799.8489990234375]
-# loss2:  [3240120.0, 3240120.0, 0.0305319856852293, 1800.0333251953125, 0.151081845164299]
-# r2_1:  0.9999797360895613
-# r2_2:  0.9999510754116319
+# loss1:  [합친로스: 3177313.0, out1: 185.37435913085938, out2: 3177127.75]
+# loss2:  [3277505.25, 3276769.0, 736.2474975585938]
+# r2:  0.7029553272660707 -0.17976629411611644
 
-# y모델 분화
-# loss1:  [3240038.25, 0.0087300855666399, 3240038.25, 0.08511149138212204, 1800.0106201171875]
-# loss2:  [3239699.25, 3239699.25, 0.00020341604249551892, 1799.9163818359375, 0.01277058944106102]
-# r2_1:  0.9999860108737827
-# r2_2:  0.9999996740452488
