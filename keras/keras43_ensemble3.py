@@ -17,8 +17,10 @@ print(x1.shape, x2.shape, x3.shape) # (100, 2) (100, 3) (100, 2)
 y1 = np.array(range(2001, 2101)) # 금리
 y2 = np.array(range(201, 301)) # 환율
 
-x1_train, x1_test, x2_train, x2_test, x3_train, x3_test, y1_train, y1_test, y2_train, y2_test = train_test_split(x1, x2, x3, y1, y2, 
-                                                                                            train_size=0.7, shuffle=True, random_state=9)
+x1_train, x1_test, x2_train, x2_test,\
+    x3_train, x3_test, y1_train, y1_test, y2_train, y2_test = train_test_split(
+    x1, x2, x3, y1, y2, train_size=0.7, shuffle=True, random_state=9)
+    
 print(x1_train.shape, x1_test.shape) # (70, 2) (30, 2)
 print(x2_train.shape, x2_test.shape) # (70, 3) (30, 3)
 print(x3_train.shape, x3_test.shape) # (70, 2) (30, 2)
