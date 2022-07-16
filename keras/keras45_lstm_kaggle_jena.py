@@ -62,7 +62,7 @@ bbb = split_x(datasets, 5)
 # print(bbb)
 print(bbb.shape) # (420547, 5, 18)
 
-########### 칼럼 재구성 필요해보임
+########### 칼럼 재구성
 
 
 x =  bbb[:, :-1]
