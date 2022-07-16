@@ -7,12 +7,18 @@ from tensorflow.python.keras.callbacks import EarlyStopping
 import tensorflow as tf
 import time
 import datetime as dt
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, MinMaxScaler
 import pandas as pd
 
 # 1. 데이터
 path = './_data/kaggle_jena/'
 datasets = pd.read_csv(path + 'jena_climate_2009_2016.csv')
+
+# 데이터 정규화
+scaler = MinMaxScaler()    
+scale_col = ["p (mbar)","T (degC)","Tpot (K)","Tdew (degC)","rh (%)","VPmax (mbar)",
+             "VPact (mbar)","VPdef (mbar)","sh (g/kg)","H2OC (mmol/mol)",
+             "rho (g/m**3)","wv (m/s)","max. wv (m/s)","wd (deg)"]
 
 # print(datasets.info())
 # <class 'pandas.core.frame.DataFrame'>
@@ -61,8 +67,6 @@ def split_x(dataset, size):
 bbb = split_x(datasets, 5)
 # print(bbb)
 print(bbb.shape) # (420547, 5, 18)
-
-########### 칼럼 재구성
 
 
 x =  bbb[:, :-1]
