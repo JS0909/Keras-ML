@@ -63,21 +63,20 @@ def split_x(dataset, size):
     aaa = []
     for i in range(len(dataset) - size + 1):
         subset = dataset[i : (i + size)]
-        aaa.append(subset) # 하나하나 리스트 형태로 추가함
+        aaa.append(subset)
     return np.array(aaa)
 
 bbb = split_x(dataset, 5)
 # print(bbb)
 print(bbb.shape) # (420547, 5, 18)
-print(bbb)
 # bbb = pd.DataFrame(bbb, columns=['month', 'date', 'year', 'hour', "p (mbar)","T (degC)","Tpot (K)","Tdew (degC)","rh (%)",
 #                                  "VPmax (mbar)","VPact (mbar)","VPdef (mbar)","sh (g/kg)","H2OC (mmol/mol)",
 #                                  "rho (g/m**3)","wv (m/s)","max. wv (m/s)","wd (deg)"])
 # 오류 메세지 Must pass 2-d input. shape=(420547, 5, 18)
 
 # 인덱스 슬라이싱 찾아서 수정하자...
-# x =  bbb[]
-# y =  bbb[]
+x =  bbb[:, :-1]
+y =  bbb[:, -1]
 
 # print(x, y)
 print(x.shape, y.shape) # (420547, 4, 15) (420547, 15)
