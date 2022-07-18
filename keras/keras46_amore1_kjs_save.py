@@ -1,8 +1,7 @@
 import numpy as np
 from sklearn import datasets
 from tensorflow.python.keras.models import Sequential, Model
-from tensorflow.python.keras.layers import Input
-from tensorflow.python.keras.layers import Dense, LSTM, Conv1D
+from tensorflow.python.keras.layers import Input, Dense, LSTM, Conv1D
 from sklearn.model_selection import train_test_split
 from tensorflow.python.keras.callbacks import EarlyStopping
 import time
@@ -19,23 +18,6 @@ dataset_amo = pd.read_csv(path + '아모레220718.csv', thousands=',', encoding=
 dataset_sam = dataset_sam.drop(['전일비','금액(백만)','신용비','개인','외인(수량)','프로그램','외인비'], axis=1)
 dataset_amo = dataset_amo.drop(['전일비','금액(백만)','신용비','개인','외인(수량)','프로그램','외인비'], axis=1)
 
-
-dataset_sam['일자'] = pd.to_datetime(dataset_sam['일자'], format='%Y/%m/%d')
-# dataset_sam['연도']=dataset_sam['일자'].dt.year
-
-dataset_amo['일자'] = pd.to_datetime(dataset_amo['일자'], format='%Y/%m/%d')
-# dataset_amo['연도']=dataset_amo['일자'].dt.year
-
-'''
-# 거래량 시각화, 확인
-import matplotlib.pyplot as plt
-import seaborn as sns
-plt.figure(figsize=(16, 9))
-sns.lineplot(y=dataset_sam['종가'], x=dataset_sam['일자'])
-plt.xlabel('time')
-plt.ylabel('price')
-plt.show()
-'''
 # dataset_amo.info()
 # dataset_sam.info()
 dataset_sam = dataset_sam.fillna(0)
