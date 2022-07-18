@@ -2,7 +2,7 @@ import numpy as np
 from sklearn import datasets
 from tensorflow.python.keras.models import Sequential, Model
 from tensorflow.python.keras.layers import Input
-from tensorflow.python.keras.layers import Dense, GRU, Conv1D
+from tensorflow.python.keras.layers import Dense, LSTM, Conv1D
 from sklearn.model_selection import train_test_split
 from tensorflow.python.keras.callbacks import EarlyStopping
 import time
@@ -45,6 +45,10 @@ dataset_sam = dataset_sam.loc[dataset_sam['일자']>="2018/05/04"] # 액면분�
 dataset_amo = dataset_sam.loc[dataset_sam['일자']>="2018/05/04"] # 삼성의 액면분할 날짜 이후의 행개수에 맞춰줌
 print(dataset_amo.shape, dataset_sam.shape) # (1035, 11) (1035, 11)
 
+# 프레딕트용 7월 18일
+dataset_sam_pred = dataset_sam.loc[dataset_sam['일자']>="2022/07/18"]
+dataset_amo_pred = dataset_amo.loc[dataset_sam['일자']>="2022/07/18"]
+
 # dataset_amo.sort_index(ascending=False).reset_index(drop=True)
 # 데이터 스케일링
 scaler = MinMaxScaler()
@@ -72,23 +76,21 @@ SIZE = 20
 x1 = split_x(df_scaled_a[feature_cols], SIZE)
 y = split_x(df_scaled_a[label_cols], SIZE)
 x2 = split_x(df_scaled_s[feature_cols], SIZE)
-print(x1.shape, x2.shape, y.shape) # (1016, 20, 7) (1016, 20, 7) (1016, 20, 1)
 
 x1_train, x1_test, x2_train, x2_test, y_train, y_test = train_test_split(x1, x2, y, test_size=0.2, shuffle=False)
-# x1_train, x1_test, y_train, y_test = train_test_split(x1, y, test_size=0.2, shuffle=False)
 
 # 2. 모델구성
 # 2-1. 모델1
 input1 = Input(shape=(20,7))
 dense1 = Conv1D(64, 2, activation='relu', name='d1')(input1)
-dense2 = GRU(128, activation='relu', name='d2')(dense1)
+dense2 = LSTM(128, activation='relu', name='d2')(dense1)
 dense3 = Dense(64, activation='relu', name='d3')(dense2)
 output1 = Dense(32, activation='relu', name='out_d1')(dense3)
 
 # 2-2. 모델2
 input2 = Input(shape=(20, 7))
 dense11 = Conv1D(64, 2, activation='relu', name='d11')(input2)
-dense12 = GRU(128, activation='swish', name='d12')(dense11)
+dense12 = LSTM(128, activation='swish', name='d12')(dense11)
 dense13 = Dense(64, activation='relu', name='d13')(dense12)
 dense14 = Dense(32, activation='relu', name='d14')(dense13)
 output2 = Dense(16, activation='relu', name='out_d2')(dense14)
@@ -105,12 +107,16 @@ model = Model(inputs=[input1, input2], outputs=[last_output])
 model.compile(loss='mse', optimizer='adam')
 start_time = time.time()
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=500, restore_best_weights=True)
-fit_log = model.fit([x1_train, x2], y_train, epochs=1, batch_size=64, callbacks=[Es], validation_split=0.1)
+fit_log = model.fit([x1_train, x2_train], y_train, epochs=1, batch_size=64, callbacks=[Es], validation_split=0.1)
 end_time = time.time()
 
 # 4. 평가, 예측
-loss = model.evaluate([x1_test, x2], y_test)
-predict = model.predict([x1_test, x2])
+loss = model.evaluate([x1_test, x2_test], y_test)
+# predict = model.predict([x1_test, x2_test])
+predict = model.predict([dataset_amo_pred, dataset_sam_pred])
+# Failed to convert a NumPy array to a Tensor (Unsupported object type Timestamp).
+print(predict.shape) # (204, 1)
 print('loss: ', loss)
 print('prdict: ', predict)
 print('걸린 시간: ', end_time-start_time)
+
