@@ -127,3 +127,7 @@ predict = model.predict([x1_test, x2_test])
 print('loss: ', loss)
 print('prdict: ', predict)
 print('걸린 시간: ', end_time-start_time)
+
+# loss:  177372560.0
+# 116177.74
+# 걸린 시간:  461.01603627204895
