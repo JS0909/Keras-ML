@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from tensorflow.python.keras.callbacks import EarlyStopping
 import time
 import datetime as dt
-from sklearn.preprocessing import LabelEncoder, MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 
@@ -23,8 +23,8 @@ dataset_amo = dataset_amo.drop(['전일비','금액(백만)','신용비','개인
 dataset_sam['일자'] = pd.to_datetime(dataset_sam['일자'], format='%Y/%m/%d')
 dataset_sam['연도']=dataset_sam['일자'].dt.year
 
-dataset_amo['일자'] = pd.to_datetime(dataset_sam['일자'], format='%Y/%m/%d')
-dataset_amo['연도']=dataset_sam['일자'].dt.year
+dataset_amo['일자'] = pd.to_datetime(dataset_amo['일자'], format='%Y/%m/%d')
+dataset_amo['연도']=dataset_amo['일자'].dt.year
 
 '''
 # 거래량 시각화, 확인
@@ -38,28 +38,12 @@ plt.show()
 '''
 # dataset_amo.info()
 # dataset_sam.info()
-dataset_sam = dataset_sam.dropna()
-dataset_amo = dataset_amo.dropna()
+dataset_sam = dataset_sam.fillna(0)
+dataset_amo = dataset_amo.fillna(0)
 
 dataset_sam = dataset_sam.loc[dataset_sam['일자']>="2018/05/04"] # 액면분할 이후 데이터만 사용
-dataset_amo = dataset_sam.loc[dataset_sam['일자']>="2018/05/04"] # 삼성의 액면분할 날짜 이후의 행개수에 맞춰줌
+dataset_amo = dataset_amo.loc[dataset_amo['일자']>="2018/05/04"] # 삼성의 액면분할 날짜 이후의 행개수에 맞춰줌
 print(dataset_amo.shape, dataset_sam.shape) # (1035, 11) (1035, 11)
-
-# 프레딕트용 7월 18일
-dataset_sam_pred = dataset_sam.loc[dataset_sam['일자']>="2022/07/18"]
-dataset_amo_pred = dataset_amo.loc[dataset_sam['일자']>="2022/07/18"]
-
-# dataset_amo.sort_index(ascending=False).reset_index(drop=True)
-# 데이터 스케일링
-scaler = MinMaxScaler()
-scale_cols = ['시가', '고가', '저가', '종가', '거래량', '기관', '외국계']
-df_scaled_a = scaler.fit_transform(dataset_amo[scale_cols])
-df_scaled_a = pd.DataFrame(df_scaled_a)
-df_scaled_a.columns = scale_cols
-
-df_scaled_s = scaler.fit_transform(dataset_sam[scale_cols])
-df_scaled_s = pd.DataFrame(df_scaled_s)
-df_scaled_s.columns = scale_cols
 
 feature_cols = ['시가', '고가', '저가', '거래량', '기관', '외국계', '종가']
 label_cols = ['시가']
@@ -73,15 +57,45 @@ def split_x(dataset, size):
     return np.array(aaa)
 
 SIZE = 20
-x1 = split_x(df_scaled_a[feature_cols], SIZE)
-y = split_x(df_scaled_a[label_cols], SIZE)
-x2 = split_x(df_scaled_s[feature_cols], SIZE)
+x1 = split_x(dataset_amo[feature_cols], SIZE)
+y = split_x(dataset_amo[label_cols], SIZE)
+x2 = split_x(dataset_sam[feature_cols], SIZE)
 
 x1_train, x1_test, x2_train, x2_test, y_train, y_test = train_test_split(x1, x2, y, test_size=0.2, shuffle=False)
 
+# data 스케일링
+scaler = MinMaxScaler()
+print(x1_train.shape, x1_test.shape) # (812, 20, 7) (204, 20, 7)
+print(x2_train.shape, x2_test.shape) # (812, 20, 7) (204, 20, 7)
+print(y_train.shape, y_test.shape) # (812, 20, 1) (204, 20, 1)
+
+x1_train = x1_train.reshape(812*20,7)
+x1_train = scaler.fit_transform(x1_train)
+x1_test = x1_test.reshape(204*20,7)
+x1_test = scaler.transform(x1_test)
+
+x2_train = x2_train.reshape(812*20,7)
+x2_train = scaler.fit_transform(x2_train)
+x2_test = x2_test.reshape(204*20,7)
+x2_test = scaler.transform(x2_test)
+
+y_train = y_train.reshape(812*20,1)
+y_train = scaler.fit_transform(y_train)
+y_test = y_test.reshape(204*20,1)
+y_test = scaler.transform(y_test)
+
+# Conv1D에 넣기 위해 3차원화
+x1_train = x1_train.reshape(812, 20, 7)
+x1_test = x1_test.reshape(204, 20, 7)
+x2_train = x2_train.reshape(812, 20, 7)
+x2_test = x2_test.reshape(204, 20, 7)
+y_train = y_train.reshape(812, 20, 1)
+y_test = y_test.reshape(204, 20, 1)
+
+
 # 2. 모델구성
 # 2-1. 모델1
-input1 = Input(shape=(20,7))
+input1 = Input(shape=(20, 7))
 dense1 = Conv1D(64, 2, activation='relu', name='d1')(input1)
 dense2 = LSTM(128, activation='relu', name='d2')(dense1)
 dense3 = Dense(64, activation='relu', name='d3')(dense2)
@@ -112,11 +126,7 @@ end_time = time.time()
 
 # 4. 평가, 예측
 loss = model.evaluate([x1_test, x2_test], y_test)
-# predict = model.predict([x1_test, x2_test])
-predict = model.predict([dataset_amo_pred, dataset_sam_pred])
-# Failed to convert a NumPy array to a Tensor (Unsupported object type Timestamp).
-print(predict.shape) # (204, 1)
+predict = model.predict([x1_test, x2_test])
 print('loss: ', loss)
 print('prdict: ', predict)
 print('걸린 시간: ', end_time-start_time)
-
