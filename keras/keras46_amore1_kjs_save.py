@@ -21,10 +21,10 @@ dataset_amo = dataset_amo.drop(['전일비','금액(백만)','신용비','개인
 
 
 dataset_sam['일자'] = pd.to_datetime(dataset_sam['일자'], format='%Y/%m/%d')
-dataset_sam['연도']=dataset_sam['일자'].dt.year
+# dataset_sam['연도']=dataset_sam['일자'].dt.year
 
 dataset_amo['일자'] = pd.to_datetime(dataset_amo['일자'], format='%Y/%m/%d')
-dataset_amo['연도']=dataset_amo['일자'].dt.year
+# dataset_amo['연도']=dataset_amo['일자'].dt.year
 
 '''
 # 거래량 시각화, 확인
@@ -45,6 +45,10 @@ dataset_sam = dataset_sam.loc[dataset_sam['일자']>="2018/05/04"] # 액면분�
 dataset_amo = dataset_amo.loc[dataset_amo['일자']>="2018/05/04"] # 삼성의 액면분할 날짜 이후의 행개수에 맞춰줌
 print(dataset_amo.shape, dataset_sam.shape) # (1035, 11) (1035, 11)
 
+dataset_sam = dataset_sam.sort_values(by=['일자'], axis=0) # 오름차순 정렬
+dataset_amo = dataset_amo.sort_values(by=['일자'], axis=0)
+print(dataset_amo.head) # 앞 다섯개만 보기
+
 feature_cols = ['시가', '고가', '저가', '거래량', '기관', '외국계', '종가']
 label_cols = ['시가']
 
@@ -58,8 +62,8 @@ def split_x(dataset, size):
 
 SIZE = 20
 x1 = split_x(dataset_amo[feature_cols], SIZE)
-y = split_x(dataset_amo[label_cols], SIZE)
 x2 = split_x(dataset_sam[feature_cols], SIZE)
+y = split_x(dataset_amo[label_cols], SIZE)
 
 x1_train, x1_test, x2_train, x2_test, y_train, y_test = train_test_split(x1, x2, y, test_size=0.2, shuffle=False)
 
@@ -79,19 +83,11 @@ x2_train = scaler.fit_transform(x2_train)
 x2_test = x2_test.reshape(204*20,7)
 x2_test = scaler.transform(x2_test)
 
-y_train = y_train.reshape(812*20,1)
-y_train = scaler.fit_transform(y_train)
-y_test = y_test.reshape(204*20,1)
-y_test = scaler.transform(y_test)
-
 # Conv1D에 넣기 위해 3차원화
 x1_train = x1_train.reshape(812, 20, 7)
 x1_test = x1_test.reshape(204, 20, 7)
 x2_train = x2_train.reshape(812, 20, 7)
 x2_test = x2_test.reshape(204, 20, 7)
-y_train = y_train.reshape(812, 20, 1)
-y_test = y_test.reshape(204, 20, 1)
-
 
 # 2. 모델구성
 # 2-1. 모델1
@@ -121,8 +117,9 @@ model = Model(inputs=[input1, input2], outputs=[last_output])
 model.compile(loss='mse', optimizer='adam')
 start_time = time.time()
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=500, restore_best_weights=True)
-fit_log = model.fit([x1_train, x2_train], y_train, epochs=1, batch_size=64, callbacks=[Es], validation_split=0.1)
+fit_log = model.fit([x1_train, x2_train], y_train, epochs=100, batch_size=64, callbacks=[Es], validation_split=0.1)
 end_time = time.time()
+model.save('./_save/keras46_siga.h5')
 
 # 4. 평가, 예측
 loss = model.evaluate([x1_test, x2_test], y_test)
