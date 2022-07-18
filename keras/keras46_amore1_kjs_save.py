@@ -27,8 +27,8 @@ dataset_sam = dataset_sam.loc[dataset_sam['일자']>="2018/05/04"] # 액면분�
 dataset_amo = dataset_amo.loc[dataset_amo['일자']>="2018/05/04"] # 삼성의 액면분할 날짜 이후의 행개수에 맞춰줌
 print(dataset_amo.shape, dataset_sam.shape) # (1035, 11) (1035, 11)
 
-dataset_sam = dataset_sam.sort_values(by=['일자'], axis=0) # 오름차순 정렬
-dataset_amo = dataset_amo.sort_values(by=['일자'], axis=0)
+dataset_sam = dataset_sam.sort_values(by=['일자'], axis=0, ascending=True) # 오름차순 정렬
+dataset_amo = dataset_amo.sort_values(by=['일자'], axis=0, ascending=True)
 print(dataset_amo.head) # 앞 다섯개만 보기
 
 feature_cols = ['시가', '고가', '저가', '거래량', '기관', '외국계', '종가']
@@ -101,15 +101,15 @@ start_time = time.time()
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=500, restore_best_weights=True)
 fit_log = model.fit([x1_train, x2_train], y_train, epochs=100, batch_size=64, callbacks=[Es], validation_split=0.1)
 end_time = time.time()
-model.save('./_save/keras46_siga.h5')
+model.save('./_save/keras46_siga2.h5')
 
 # 4. 평가, 예측
 loss = model.evaluate([x1_test, x2_test], y_test)
 predict = model.predict([x1_test, x2_test])
 print('loss: ', loss)
-print('prdict: ', predict)
+print('prdict: ', predict[-1:])
 print('걸린 시간: ', end_time-start_time)
 
-# loss:  177372560.0
-# 116177.74
-# 걸린 시간:  461.01603627204895
+# loss:  179939504.0
+# 133839.45
+# 걸린 시간:  464.8620798587799
