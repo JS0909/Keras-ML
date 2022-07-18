@@ -1,10 +1,10 @@
 # RNN, CNN 1개 이상씩 사용
 import numpy as np
+from sklearn import datasets
 from tensorflow.python.keras.models import Sequential
 from tensorflow.python.keras.layers import Dense, GRU, Conv1D, Flatten, Reshape
 from sklearn.model_selection import train_test_split
 from tensorflow.python.keras.callbacks import EarlyStopping
-import tensorflow as tf
 import time
 import datetime as dt
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler
@@ -57,8 +57,9 @@ for col in cols:
     le = LabelEncoder()
     dataset[col] = le.fit_transform(dataset[col])
 
-train_data = dataset.drop(['T (degC)'], axis=1)
-target_data = dataset['T (degC)']
+target_data = scaled_dataset['T (degC)']
+train_data = scaled_dataset[:-200]
+target_data = scaled_dataset[-200:]
 
 def split_x(dataset, size):
     aaa = []
@@ -67,10 +68,10 @@ def split_x(dataset, size):
         aaa.append(subset)
     return np.array(aaa)
 
-train_data = split_x(train_data, 10)
-target_data = split_x(target_data, 10)
+train_data = split_x(train_data, 20)
+target_data = split_x(target_data, 20)
 # print(bbb)
-print(train_data.shape) # (420542, 10, 17)
+print(train_data.shape) # (420542, 10, 18)
 print(target_data.shape) # (420542, 10)
 # bbb = pd.DataFrame(bbb, columns=['month', 'date', 'year', 'hour', "p (mbar)","T (degC)","Tpot (K)","Tdew (degC)","rh (%)",
 #                                  "VPmax (mbar)","VPact (mbar)","VPdef (mbar)","sh (g/kg)","H2OC (mmol/mol)",
@@ -81,7 +82,7 @@ x_train, x_test, y_train, y_test =  train_test_split(train_data, target_data, tr
 
 # 2. 모델구성
 model = Sequential()
-model.add(Conv1D(64, 2, input_shape=(10,17)))
+model.add(Conv1D(64, 2, input_shape=(20,18)))
 model.add(GRU(128))
 model.add(Dense(128, activation = 'relu'))
 model.add(Dense(64, activation = 'relu'))
@@ -94,7 +95,7 @@ model.add(Dense(1))
 model.compile(loss='mse', optimizer='adam')
 start_time = time.time()
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=500, restore_best_weights=True)
-fit_log = model.fit(x_train, y_train, epochs=1, callbacks=[Es], validation_split=0.1)
+fit_log = model.fit(x_train, y_train, epochs=1, batch_size=64, callbacks=[Es], validation_split=0.1)
 end_time = time.time()
 
 # 4. 평가, 예측
