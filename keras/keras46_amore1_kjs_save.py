@@ -98,10 +98,10 @@ model = Model(inputs=[input1, input2], outputs=[last_output])
 # 3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam')
 start_time = time.time()
-Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=500, restore_best_weights=True)
-fit_log = model.fit([x1_train, x2_train], y_train, epochs=100, batch_size=64, callbacks=[Es], validation_split=0.1)
+Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=100, restore_best_weights=True)
+fit_log = model.fit([x1_train, x2_train], y_train, epochs=500, batch_size=64, callbacks=[Es], validation_split=0.1)
 end_time = time.time()
-model.save('./_save/keras46_siga2.h5')
+model.save('./_save/keras46_siga3.h5')
 
 # 4. 평가, 예측
 loss = model.evaluate([x1_test, x2_test], y_test)

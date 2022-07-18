@@ -114,3 +114,4 @@ print('prdict: ', predict[-1:])
 
 # loss:  179939504.0
 # 133839.45
+# model = load_model('./_save/keras46_siga2.h5')
