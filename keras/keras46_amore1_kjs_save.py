@@ -12,15 +12,16 @@ from sklearn.preprocessing import MinMaxScaler
 
 # 1. 데이터
 path = './_data/test_amore_0718/'
-dataset_sam = pd.read_csv(path + '삼성전자220718.csv', thousands=',', encoding='cp949')
+dataset_sam = pd.read_csv(path + '삼성전자220718.csv', thousands=',', encoding='cp949') # 공문서는 cp949 인코딩을 해서 불러와야 안깨지고 열린다
 dataset_amo = pd.read_csv(path + '아모레220718.csv', thousands=',', encoding='cp949')
 
+# 안쓰는 칼럼 드랍
 dataset_sam = dataset_sam.drop(['전일비','금액(백만)','신용비','개인','외인(수량)','프로그램','외인비'], axis=1)
 dataset_amo = dataset_amo.drop(['전일비','금액(백만)','신용비','개인','외인(수량)','프로그램','외인비'], axis=1)
 
 # dataset_amo.info()
 # dataset_sam.info()
-dataset_sam = dataset_sam.fillna(0)
+dataset_sam = dataset_sam.fillna(0) # Nan값 0으로 채우기
 dataset_amo = dataset_amo.fillna(0)
 
 dataset_sam = dataset_sam.loc[dataset_sam['일자']>="2018/05/04"] # 액면분할 이후 데이터만 사용
@@ -51,9 +52,9 @@ x1_train, x1_test, x2_train, x2_test, y_train, y_test = train_test_split(x1, x2,
 
 # data 스케일링
 scaler = MinMaxScaler()
-print(x1_train.shape, x1_test.shape) # (812, 20, 7) (204, 20, 7)
-print(x2_train.shape, x2_test.shape) # (812, 20, 7) (204, 20, 7)
-print(y_train.shape, y_test.shape) # (812, 20, 1) (204, 20, 1)
+# print(x1_train.shape, x1_test.shape) # (812, 20, 7) (204, 20, 7)
+# print(x2_train.shape, x2_test.shape) # (812, 20, 7) (204, 20, 7)
+# print(y_train.shape, y_test.shape) # (812, 20, 1) (204, 20, 1)
 
 x1_train = x1_train.reshape(812*20,7)
 x1_train = scaler.fit_transform(x1_train)
@@ -94,6 +95,13 @@ merge3 = Dense(100, name='mg3')(merge2)
 last_output = Dense(1, name='last')(merge3)
 
 model = Model(inputs=[input1, input2], outputs=[last_output])
+
+# 3. 컴파일, 훈련
+model.compile(loss='mse', optimizer='adam')
+start_time = time.time()
+Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=500, restore_best_weights=True)
+fit_log = model.fit([x1_train, x2_train], y_train, epochs=100, batch_size=64, callbacks=[Es], validation_split=0.1)
+end_time = time.time()
 
 # 3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam')

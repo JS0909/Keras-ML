@@ -8,6 +8,8 @@ dataset = np.array([1, 3, 5, 10, 7, 6, 4])
 x = np.array([[1,3,5], [3, 5, 10], [5, 10, 7], [10, 7, 6]])
 y = np.array([10, 7, 6, 4])
 
+print(len(x))
+
 print(x.shape, y.shape) # (4, 3) (4,)
 x = x.reshape(4, 3, 1) # [batch, timesteps, feature]
 
