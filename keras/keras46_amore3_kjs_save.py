@@ -27,12 +27,12 @@ dataset_sam = dataset_sam.loc[dataset_sam['일자']>="2018/05/04"] # 액면분�
 dataset_amo = dataset_amo.loc[dataset_amo['일자']>="2018/05/04"] # 삼성의 액면분할 날짜 이후의 행개수에 맞춰줌
 print(dataset_amo.shape, dataset_sam.shape) # (1035, 11) (1035, 11)
 
-dataset_sam = dataset_sam.sort_values(by=['일자'], axis=0) # 오름차순 정렬
-dataset_amo = dataset_amo.sort_values(by=['일자'], axis=0)
+dataset_sam = dataset_sam.sort_values(by=['일자'], axis=0, ascending=True) # 오름차순 정렬
+dataset_amo = dataset_amo.sort_values(by=['일자'], axis=0, ascending=True)
 print(dataset_amo.head) # 앞 다섯개만 보기
 
 feature_cols = ['시가', '고가', '저가', '거래량', '기관', '외국계', '종가']
-label_cols = ['시가']
+label_cols = ['종가']
 
 # 시계열 데이터 만드는 함수
 def split_x(dataset, size):
@@ -46,8 +46,6 @@ SIZE = 20
 x1 = split_x(dataset_amo[feature_cols], SIZE)
 x2 = split_x(dataset_sam[feature_cols], SIZE)
 y = split_x(dataset_amo[label_cols], SIZE)
-pred_a = split_x(dataset_amo[:-1], 1)
-pred_s = split_x(dataset_sam[:-1], 1)
 
 x1_train, x1_test, x2_train, x2_test, y_train, y_test = train_test_split(x1, x2, y, test_size=0.2, shuffle=False)
 
@@ -100,19 +98,24 @@ model = Model(inputs=[input1, input2], outputs=[last_output])
 # 3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam')
 start_time = time.time()
-Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=500, restore_best_weights=True)
-fit_log = model.fit([x1_train, x2_train], y_train, epochs=1, batch_size=64, callbacks=[Es], validation_split=0.1)
+Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=100, restore_best_weights=True)
+fit_log = model.fit([x1_train, x2_train], y_train, epochs=300, batch_size=64, callbacks=[Es], validation_split=0.1)
 end_time = time.time()
-# model.save('./_save/keras46_siga.h5')
+model.save('./_save/keras46_jongga1.h5')
 
 # 4. 평가, 예측
 loss = model.evaluate([x1_test, x2_test], y_test)
-# predict = model.predict([x1_test, x2_test])
-predict = model.predict([pred_a, pred_s])
+predict = model.predict([x1_test, x2_test])
 print('loss: ', loss)
-print('prdict: ', predict)
+print('prdict: ', predict[-1:])
 print('걸린 시간: ', end_time-start_time)
 
-# loss:  177372560.0
-# 116177.74
-# 걸린 시간:  461.01603627204895
+# ./_save/keras46_siga3.h5
+# loss:  208862736.0
+# prdict:  [[131148.23]]
+# 걸린 시간:  479.57821226119995
+
+# ./_save/keras46_jongga1.h5
+# loss:  153507344.0
+# prdict:  [[132563.53]]
+# 걸린 시간:  1382.7434787750244

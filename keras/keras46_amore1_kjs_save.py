@@ -107,7 +107,7 @@ model.save('./_save/keras46_siga3.h5')
 loss = model.evaluate([x1_test, x2_test], y_test)
 predict = model.predict([x1_test, x2_test])
 print('loss: ', loss)
-print('prdict: ', predict[-1:])
+print('prdict: ', predict[-1:]) # 제일 마지막에 나온거 하나 슬라이싱
 print('걸린 시간: ', end_time-start_time)
 
 # loss:  179939504.0
