@@ -110,7 +110,7 @@ model = load_model('./_save/keras46_siga2.h5')
 loss = model.evaluate([x1_test, x2_test], y_test)
 predict = model.predict([x1_test, x2_test])
 print('loss: ', loss)
-print('prdict: ', predict[-1:])
+print('predict: ', predict[-1:])
 
 # loss:  179939504.0
 # 133839.45

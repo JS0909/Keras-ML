@@ -63,7 +63,8 @@ SIZE = 3
 COLSIZE = 3
 x1, y1 = split_xy3(dataset_amo[feature_cols], dataset_amo[label_cols], SIZE, COLSIZE)
 x2, y2 = split_xy3(dataset_sam[feature_cols], dataset_sam[label_cols], SIZE, COLSIZE)
-print(x1.shape, y1.shape) # (1030, 3, 7) (1030, 3, 1)
+print(x1, y1) # (1030, 3, 7) (1030, 3, 1)
+
 
 x1_train, x1_test, x2_train, x2_test, y_train, y_test = train_test_split(x1, x2, y1, test_size=0.2, shuffle=False)
 
@@ -125,7 +126,7 @@ model.save('./_test/keras46_jongga10.h5')
 loss = model.evaluate([x1_test, x2_test], y_test)
 predict = model.predict([x1_test, x2_test])
 print('loss: ', loss)
-print('prdict: ', predict[-1:])
+print('predict: ', predict[-1:])
 print('걸린 시간: ', end_time-start_time)
 
 # ./_test/keras46_siga3.h5

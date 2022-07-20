@@ -23,4 +23,7 @@ def split_xy3(dataset, time_steps, y_column):
         y.append(tmp_y)
     return np.array(x), np.array(y)
 
-x = split_xy3(dataset, 3, 3)
+x, y = split_xy3(dataset, 1, 2)
+
+print(x.shape, y.shape)
+print(x,'\ny: ', y)
