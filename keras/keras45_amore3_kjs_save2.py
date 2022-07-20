@@ -3,7 +3,7 @@ from sklearn import datasets
 from tensorflow.python.keras.models import Sequential, Model
 from tensorflow.python.keras.layers import Input, Dense, LSTM, Conv1D, Dropout
 from sklearn.model_selection import train_test_split
-from tensorflow.python.keras.callbacks import EarlyStopping
+from tensorflow.python.keras.callbacks import EarlyStopping, TensorBoard
 import time
 from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
@@ -128,11 +128,14 @@ model.summary()
 
 # 3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam')
+
+tb_hist = TensorBoard(log_dir='d:/study_data/_graph', histogram_freq=0, write_graph=True, write_images=True)
+
 start_time = time.time()
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=1000, restore_best_weights=True)
-fit_log = model.fit([x1_train, x2_train], y_train, epochs=500, batch_size=64, callbacks=[Es], validation_split=0.1)
+fit_log = model.fit([x1_train, x2_train], y_train, epochs=10, batch_size=64, callbacks=[Es, tb_hist], validation_split=0.1)
 end_time = time.time()
-model.save('./_test/keras46_jongga17.h5')
+# model.save('./_test/keras46_jongga17.h5')
 
 # 4. 평가, 예측
 loss = model.evaluate([x1_test, x2_test], y_test)
@@ -140,61 +143,6 @@ predict = model.predict([x1_test, x2_test])
 print('loss: ', loss)
 print('predict: ', predict[-1:])
 print('걸린 시간: ', end_time-start_time)
-
-# ./_test/keras46_siga3.h5
-# loss:  208862736.0
-# prdict:  [[131148.23]]
-# 걸린 시간:  479.57821226119995
-
-# ./_test/keras46_jongga1.h5
-# loss:  153507344.0
-# prdict:  [[132563.53]]
-# 걸린 시간:  1382.7434787750244
-
-# ./_test/keras46_jongga2.h5
-# loss:  161115696.0
-# prdict:  [[128316.78]]
-# 걸린 시간:  1343.3939101696014
-
-# ./_test/keras46_jongga3.h5
-# loss:  193656768.0
-# prdict:  [[129210.37]]
-# 걸린 시간:  1061.091631412506
-
-# ./_test/keras46_jongga4.h5
-# loss:  169433376.0
-# prdict:  [[127012.805]]
-# 걸린 시간:  945.789487361908
-
-# ./_test/keras46_jongga5.h5
-# loss:  186838480.0
-# prdict:  [[126969.49]]
-# 걸린 시간:  946.1726791858673
-
-# ./_test/keras46_jongga6.h5
-# loss:  13254822.0
-# prdict:  [[134408.97]]
-# 걸린 시간:  215.71982312202454
-
-# ./_test/keras46_jongga7.h5
-# loss:  71318632.0
-# prdict:  [[133562.36]]
-# 걸린 시간:  211.7583031654358
-
-# ./_test/keras46_jongga8.h5
-# loss:  61163492.0
-# prdict:  [[131521.94]]
-# 걸린 시간:  210.019136428833
-
-# ./_test/keras46_jongga9.h5
-# loss:  63438068.0
-# prdict:  [[132596.52]]
-# 걸린 시간:  215.62591195106506
-
-# ./_test/keras46_jongga10.h5
-# loss:  61402748.0
-# prdict:  [[135873.56]]
-# 걸린 시간:  216.03136539459229
 
 # ==========스플릿 제대로 한 다음꺼===============
 

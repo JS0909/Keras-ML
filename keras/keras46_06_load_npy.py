@@ -2,49 +2,16 @@ import numpy as np
 from keras.preprocessing.image import ImageDataGenerator
 
 # 1. 데이터
-train_datagen = ImageDataGenerator(
-    rescale=1./255,
-    # horizontal_flip=True,
-    # vertical_flip=True,
-    # width_shift_range=0.1,
-    # height_shift_range=5,
-    # rotation_range=5,
-    # zoom_range=1.2,
-    # shear_range=0.7,
-    # fill_mode='nearest'
-    )
+x_train = np.load('d:/study_data/_save/_npy/keras46_5_train_x.npy')
+y_train = np.load('d:/study_data/_save/_npy/keras46_5_train_y.npy')
+x_test = np.load('d:/study_data/_save/_npy/keras46_5_test_x.npy')
+y_test = np.load('d:/study_data/_save/_npy/keras46_5_test_y.npy')
 
-test_datagen = ImageDataGenerator(
-    rescale=1./255
-)
+print(x_train, x_train.shape)
+print(x_train, x_train.shape)
+print(x_train, x_train.shape)
+print(x_train, x_train.shape)
 
-xy_train = train_datagen.flow_from_directory(
-    'd:/study_data/_data/image/brain/train/',
-    target_size=(150, 150),
-    batch_size=500,
-    class_mode='binary',
-    color_mode='grayscale',
-    shuffle=True
-)
-  
-xy_test = test_datagen.flow_from_directory(
-    'd:/study_data/_data/image/brain/test/',
-    target_size=(150, 150),
-    batch_size=500,
-    class_mode='binary',
-    color_mode='grayscale',
-    shuffle=True
-) # Found 120 images belonging to 2 classes.
-
-print(xy_train[0])
-print(xy_train[0][0])
-print(xy_train[0][0].shape) # (5, 150, 150, 3) grayscale해주면 (5, 150, 150, 1)
-print(xy_train[0][1].shape) # (5, )
-
-np.save('d:/study_data/_save/_npy/keras46_5_train_x.npy', arr =xy_train[0][0])
-np.save('d:/study_data/_save/_npy/keras46_5_train_y.npy', arr =xy_train[0][1])
-np.save('d:/study_data/_save/_npy/keras46_5_test_x.npy', arr =xy_test[0][0])
-np.save('d:/study_data/_save/_npy/keras46_5_test_y.npy', arr =xy_test[0][1])
 
 '''
 # 2. 모델
