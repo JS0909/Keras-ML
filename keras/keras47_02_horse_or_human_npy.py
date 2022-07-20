@@ -60,7 +60,6 @@ plt.xlabel('epochs')
 plt.legend()
 plt.show()
 
-
 # loss:  6.182529432408046e-06
 # accuracy:  1.0
 # val_loss:  0.0001792572729755193
