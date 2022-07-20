@@ -3,36 +3,36 @@ from keras.preprocessing.image import ImageDataGenerator
 
 # 1. 데이터
 train_datagen = ImageDataGenerator(
-    rescale=1./255, # MinMaxScale 하겠다
-    horizontal_flip=True, # 수평 뒤집기
-    vertical_flip=True, # 수직 뒤집기
-    width_shift_range=0.1, # 가로 이동 범위
-    height_shift_range=5, # 세로 이동 범위
-    rotation_range=5, # 회전 범위
-    zoom_range=1.2, # 확대 범위
-    shear_range=0.7, # 기울이기 범위
-    fill_mode='nearest' # 채우기 모드는 가장 가까운 거로
-) # 위 내용을 랜덤으로 적용해서 수치화로 땡겨옴, 안넣으면 그냥 수치화
+    rescale=1./255,
+    horizontal_flip=True, 
+    vertical_flip=True,
+    width_shift_range=0.1, 
+    height_shift_range=5, 
+    rotation_range=5, 
+    zoom_range=1.2,
+    shear_range=0.7,
+    fill_mode='nearest')
 
 test_datagen = ImageDataGenerator(
     rescale=1./255
-) # 평가는 증폭하면 안됨. 원래 있던 걸 맞춰야되니까.
+)
 
-xy_train = train_datagen.flow_from_directory( # 경로상의 폴더에 있는 이미지를 가져오겠다
+xy_train = train_datagen.flow_from_directory(
     'd:/_data/image/brain/train/',
-    target_size=(100, 100),
+    target_size=(200, 200),
     batch_size=5,
     class_mode='binary',
     color_mode='grayscale',
-    shuffle=True,
+    shuffle=True
 )
   
 xy_test = test_datagen.flow_from_directory(
     'd:/_data/image/brain/test/',
-    target_size=(100, 100),
+    target_size=(200, 200),
     batch_size=5,
     class_mode='binary',
-    shuffle=True,
+    color_mode='grayscale',
+    shuffle=True
 ) # Found 120 images belonging to 2 classes.
 
 print(xy_train)
@@ -60,29 +60,49 @@ from tensorflow.python.keras.models import Sequential
 from tensorflow.python.keras.layers import Dense, Conv2D, Flatten
 
 model = Sequential()
-model.add(Conv2D(10, (2,2), input_shape=(100,100,1), activation='relu'))
-model.add(Conv2D(10, (3,3), activation='relu'))
+model.add(Conv2D(64, (2,2), input_shape=(200,200,1), activation='relu'))
+model.add(Conv2D(128, (3,3), activation='relu'))
 model.add(Flatten())
-model.add(Dense(10, activation='relu'))
+model.add(Dense(64, activation='relu'))
+model.add(Dense(32, activation='relu'))
 model.add(Dense(1, activation='sigmoid'))
 
 # 3. 컴파일, 훈련
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy']) # 메트릭스에 'acc'해도 됨
 
 # model.fit(xy_train[0][0], xy_train[0][1]) # 배치사이즈 최대로하면 한덩이라서 이렇게 가능
-log = model.fit_generator(xy_train, epochs= 30, validation_data=xy_test, 
-                    validation_steps=4, 
-                    steps_per_epoch=32 # dataset/batch size = 16-/5 = 32
+log = model.fit_generator(xy_train, epochs= 200, validation_data=xy_test, 
+                    steps_per_epoch=32,
+                    validation_steps=4 
+                    # dataset/batch size = 16-/5 = 32
                                        # 1에포에 배치 몇개를 돌리겠다
                     )
 
 # 그래프
-accuracy = log.histroy['accuracy']
-val_accuracy = log.history['val_accuracy']
 loss = log.history['loss']
+accuracy = log.history['accuracy']
 val_loss = log.history['val_loss']
+val_accuracy = log.history['val_accuracy']
 
 print('loss: ', loss[-1])
-print('val_loss: ', val_loss[-1])
 print('accuracy: ', accuracy[-1])
+print('val_loss: ', val_loss[-1])
 print('val_accuracy: ', val_accuracy[-1])
+
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+
+mpl.rcParams['font.family'] = 'malgun gothic'
+mpl.rcParams['axes.unicode_minus'] = False
+
+plt.figure(figsize=(9,6))
+plt.plot(log.history['loss'], c='black', label='loss')
+plt.plot(log.history['accuracy'], marker='.', c='red', label='accuracy')
+plt.plot(log.history['val_loss'], c='blue', label='val_loss')
+plt.plot(log.history['val_accuracy'], marker='.', c='green', label='val_accuracy')
+plt.grid()
+plt.title('뇌 사진')
+plt.ylabel('loss')
+plt.xlabel('epochs')
+plt.legend()
+plt.show()
