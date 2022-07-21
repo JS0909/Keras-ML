@@ -15,7 +15,7 @@ x_train, x_test, y_train, y_test =  train_test_split(x, y, train_size=0.7, shuff
 scaler = StandardScaler()
 x_train = scaler.fit_transform(x_train)
 x_test = scaler.transform(x_test)
-print(x_train.shape, x_test.shape)
+print(x_train.shape, x_test.shape) # (14447, 8) (6193, 8)
 x_train = x_train.reshape(14447, 8, 1)
 x_test = x_test.reshape(6193, 8, 1)
 

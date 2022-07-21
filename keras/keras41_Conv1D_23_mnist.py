@@ -33,7 +33,7 @@ model.add(Dropout(0.1))
 model.add(Dense(70))
 model.add(Dropout(0.1))
 model.add(Dense(50))
-model.add(Dense(10, activation='sigmoid'))
+model.add(Dense(10, activation='softmax'))
 
 # 3. 컴파일, 훈련
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
@@ -50,7 +50,7 @@ print('loss : ', loss)
 print('acc스코어 : ', acc_sc)
 print('mnist')
 
-# CNN
+# Conv2D
 # loss :  [0.06552130728960037, 0.9810000061988831]
 # acc스코어 :  0.981
 

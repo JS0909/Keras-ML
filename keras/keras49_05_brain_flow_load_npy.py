@@ -2,24 +2,17 @@ import numpy as np
 from keras.preprocessing.image import ImageDataGenerator
 
 # 1. 데이터
-x_train = np.load('d:/study_data/_save/_npy/keras46_5_train_x.npy')
-y_train = np.load('d:/study_data/_save/_npy/keras46_5_train_y.npy')
-x_test = np.load('d:/study_data/_save/_npy/keras46_5_test_x.npy')
-y_test = np.load('d:/study_data/_save/_npy/keras46_5_test_y.npy')
-
-print(x_train, x_train.shape)
-print(x_train, x_train.shape)
-print(x_train, x_train.shape)
-print(x_train, x_train.shape)
-
-
+x_train = np.load('d:/study_data/_save/_npy/keras49_5_train_x.npy')
+y_train = np.load('d:/study_data/_save/_npy/keras49_5_train_y.npy')
+x_test = np.load('d:/study_data/_save/_npy/keras49_5_test_x.npy')
+y_test = np.load('d:/study_data/_save/_npy/keras49_5_test_y.npy')
 
 # 2. 모델
 from tensorflow.python.keras.models import Sequential
 from tensorflow.python.keras.layers import Dense, Conv2D, Flatten
 
 model = Sequential()
-model.add(Conv2D(64, (2,2), input_shape=(200,200,1), activation='relu'))
+model.add(Conv2D(64, (2,2), input_shape=(150,150,1), activation='relu'))
 model.add(Conv2D(128, (3,3), activation='relu'))
 model.add(Flatten())
 model.add(Dense(64, activation='relu'))
@@ -28,14 +21,7 @@ model.add(Dense(1, activation='sigmoid'))
 
 # 3. 컴파일, 훈련
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy']) # 메트릭스에 'acc'해도 됨
-
-log = model.fit(x_train, y_train, epochs=10, batch_size=10, validation_split=0.2) # 배치사이즈 최대로하면 한덩이라서 이렇게 가능
-# log = model.fit_generator(xy_train, epochs= 200, validation_data=xy_test, 
-#                     steps_per_epoch=32,
-#                     validation_steps=4 
-#                     # dataset/batch size = 16-/5 = 32
-#                                        # 1에포에 배치 몇개를 돌리겠다
-#                     )
+log = model.fit(x_train, y_train, epochs=10, validation_split=0.2, batch_size=13)
 
 # 그래프
 loss = log.history['loss']
@@ -65,3 +51,16 @@ plt.ylabel('loss')
 plt.xlabel('epochs')
 plt.legend()
 plt.show()
+
+# 증폭 전
+# loss:  0.23752331733703613
+# accuracy:  0.8409090638160706
+# val_loss:  1.1625388860702515
+# val_accuracy:  0.689393937587738
+
+
+# 증폭 후
+# loss:  0.2102251499891281
+# accuracy:  0.8484848737716675
+# val_loss:  3.3091487884521484
+# val_accuracy:  0.5984848737716675

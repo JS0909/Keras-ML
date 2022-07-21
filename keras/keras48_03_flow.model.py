@@ -10,7 +10,6 @@ import tensorflow as tf
 
 (x_train, y_train), (x_test, y_test) = fashion_mnist.load_data()
 
-'''
 train_datagen = ImageDataGenerator(
     rescale=1./255,
     horizontal_flip=True,
@@ -54,9 +53,6 @@ print(x_augument.shape) # (40000, 28, 28, 1)
 x_train = np.concatenate((x_train, x_augument))
 y_train = np.concatenate((y_train, y_augument))
 print(x_train.shape, y_train.shape) # (100000, 28, 28, 1) (100000,)
-'''
-x_train = x_train.reshape(x_train.shape[0], x_train.shape[1], x_train.shape[2], 1)
-x_test = x_test.reshape(x_test.shape[0], x_test.shape[1], x_test.shape[2], 1)
 
 y_train= to_categorical(y_train)
 y_test=to_categorical(y_test)
