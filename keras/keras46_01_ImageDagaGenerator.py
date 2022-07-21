@@ -10,7 +10,7 @@ train_datagen = ImageDataGenerator(
     rotation_range=5, # 회전 범위
     zoom_range=1.2, # 확대 범위
     shear_range=0.7, # 기울이기 범위
-    fill_mode='nearest' # 채우기 모드는 가장 가까운 거로
+    fill_mode='nearest' # 움직였을때 비워지는 부분들은 가장 가까운 거로 채우겠다
 ) # 위 내용을 랜덤으로 적용해서 수치화로 땡겨옴, 안넣으면 그냥 수치화
 
 test_datagen = ImageDataGenerator(

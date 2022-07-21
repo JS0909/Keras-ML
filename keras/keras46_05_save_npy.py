@@ -41,7 +41,7 @@ print(xy_train[0][0])
 print(xy_train[0][0].shape) # (5, 150, 150, 3) grayscale해주면 (5, 150, 150, 1)
 print(xy_train[0][1].shape) # (5, )
 
-np.save('d:/study_data/_save/_npy/keras46_5_train_x.npy', arr =xy_train[0][0])
+np.save('d:/study_data/_save/_npy/keras46_5_train_x.npy', arr =xy_train[0][0]) # 넘파이로 저장하면 부를때 아주 빨라진다
 np.save('d:/study_data/_save/_npy/keras46_5_train_y.npy', arr =xy_train[0][1])
 np.save('d:/study_data/_save/_npy/keras46_5_test_x.npy', arr =xy_test[0][0])
 np.save('d:/study_data/_save/_npy/keras46_5_test_y.npy', arr =xy_test[0][1])

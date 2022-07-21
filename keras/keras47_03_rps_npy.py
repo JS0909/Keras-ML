@@ -30,8 +30,7 @@ model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accur
 
 log = model.fit(x_train, y_train, epochs=10, batch_size=10, validation_split=0.2) # 배치사이즈 최대로하면 한덩이라서 이렇게 가능
 
-
-# 그래프
+# 4. 평가, 예측
 loss = log.history['loss']
 accuracy = log.history['accuracy']
 val_loss = log.history['val_loss']
@@ -42,6 +41,7 @@ print('accuracy: ', accuracy[-1])
 print('val_loss: ', val_loss[-1])
 print('val_accuracy: ', val_accuracy[-1])
 
+# 그래프
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
