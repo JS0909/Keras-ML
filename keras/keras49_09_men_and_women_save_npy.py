@@ -38,20 +38,12 @@ randidx = np.random.randint(x_train.shape[0], size=augument_size)
 x_augument = x_train[randidx].copy()
 y_augument = y_train[randidx].copy()
 
-# x 시리즈 전부 리쉐입
-x_train = x_train.reshape(x_train.shape[0], x_train.shape[1], x_train.shape[2], 3)
-x_test = x_test.reshape(x_test.shape[0], x_test.shape[1], x_test.shape[2], 3)
-x_augument = x_augument.reshape(x_augument.shape[0], x_augument.shape[1], x_augument.shape[2], 3)
-
 # x 증폭 데이터 담기
 x_augument = train_datagen.flow(x_augument, y_augument, batch_size=augument_size, shuffle=False).next()[0]
-
-x_train = scale_datagen.flow(x_train, y_train, batch_size=augument_size, shuffle=False).next()[0]
 
 # 원본train과 증폭train 합치기
 x_train = np.concatenate((x_train, x_augument))
 y_train = np.concatenate((y_train, y_augument))
-
 
 np.save('d:/study_data/_save/_npy/keras49_09_train_x.npy', arr =x_train)
 np.save('d:/study_data/_save/_npy/keras49_09_train_y.npy', arr =y_train)

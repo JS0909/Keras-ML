@@ -29,7 +29,7 @@ model.add(Dense(1, activation='sigmoid'))
 # 3. 컴파일, 훈련
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy']) # 메트릭스에 'acc'해도 됨
 
-log = model.fit(x_train, y_train, epochs=30, batch_size=10, validation_split=0.2) # 배치사이즈 최대로하면 한덩이라서 이렇게 가능
+log = model.fit(x_train, y_train, epochs=10, batch_size=10, validation_split=0.2) # 배치사이즈 최대로하면 한덩이라서 이렇게 가능
 
 
 # 그래프
@@ -72,7 +72,7 @@ plt.show()
 # val_accuracy:  0.625
 
 # 증폭 후
-# loss:  0.015880711376667023
-# accuracy:  0.9950000047683716
-# val_loss:  4.658458232879639
-# val_accuracy:  0.5249999761581421
+# loss:  0.274936318397522
+# accuracy:  0.9578863978385925
+# val_loss:  1.668540358543396
+# val_accuracy:  0.523809552192688
