@@ -46,11 +46,6 @@ randidx = np.random.randint(x_train.shape[0], size=augument_size)
 x_augument = x_train[randidx].copy()
 y_augument = y_train[randidx].copy()
 
-# x 시리즈 전부 리쉐입
-x_train = x_train.reshape(x_train.shape[0], x_train.shape[1], x_train.shape[2], 1)
-x_test = x_test.reshape(x_test.shape[0], x_test.shape[1], x_test.shape[2], 1)
-x_augument = x_augument.reshape(x_augument.shape[0], x_augument.shape[1], x_augument.shape[2], 1)
-
 # x 증폭 데이터 담기
 x_augument = train_datagen.flow(x_augument, y_augument, batch_size=augument_size, shuffle=False).next()[0]
 

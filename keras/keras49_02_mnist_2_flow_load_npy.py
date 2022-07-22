@@ -29,8 +29,8 @@ model.add(Dense(10, activation='softmax'))
 
 # 3. 컴파일, 훈련
 model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=50, restore_best_weights=True)
-log = model.fit(x_train, y_train, epochs=100, batch_size=100, callbacks=[Es], validation_split=0.2)
+Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=100, restore_best_weights=True)
+log = model.fit(x_train, y_train, epochs=50, batch_size=100, callbacks=[Es], validation_split=0.2)
 
 #4. 평가, 예측
 loss = model.evaluate(x_test, y_test)
@@ -46,5 +46,5 @@ print('mnist')
 
 # 증폭 후
 # Conv2D
-# loss :  [0.13133148849010468, 0.9603999853134155]
-# acc스코어 :  0.9976032972335815
+# loss :  [0.12623269855976105, 0.9821000099182129]
+# acc :  0.9984297752380371
