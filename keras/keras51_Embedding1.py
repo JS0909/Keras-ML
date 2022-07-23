@@ -25,7 +25,8 @@ print(x)
 from keras.preprocessing.sequence import pad_sequences
 pad_x = pad_sequences(x, padding='pre', maxlen=5) 
 # padding : x의 데이터에 0을 채우거나 데이터를 잘라서 뒤에 오는 숫자만큼 크기를 맞춤
-# 시계열 데이터이기 때문에 통상 앞부분에 0을 채우는 것이 좋다
+# 시계열 데이터이기 때문에 통상 앞부분에 0을 채우는 것이 좋다. 뒤로 갈 수록 데이터 기여도가 높기 때문.
+# 물론 이 문제는 Bidirectional wrapping을 사용하면 어느정도 해결됨
 # pre : 앞에 0채움 / post : 뒤에 0채움
 
 print(pad_x)

@@ -9,15 +9,16 @@ x_predict = ['나는 형권이가 정말 재미없다 너무 정말']
 # 긍정 1, 부정 0
 labels = np.array([1,1,1,1,1,0,0,0,0,0,0,1,1,0]) # (14,)
 
-token = Tokenizer( oov_token="<OOV>")
+token = Tokenizer(oov_token="<OOV>")
 token.fit_on_texts(docs)
 token.fit_on_texts(x_predict)
 
 x = token.texts_to_sequences(docs)
-y = token.texts_to_sequences(x_predict)
+pred = token.texts_to_sequences(x_predict)
 
 from keras.preprocessing.sequence import pad_sequences
 pad_x = pad_sequences(x, padding='pre', maxlen=5, truncating='pre') # truncating 
+pred = pad_sequences(pred, padding='pre', maxlen=5, truncating='pre') 
 
 print(pad_x)
 print(pad_x.shape) # (14, 5)
@@ -34,6 +35,7 @@ from tensorflow.python.keras.models import Sequential
 from tensorflow.python.keras.layers import Dense, Conv1D, LSTM, Embedding
 
 model = Sequential()
+# Embedding 레이어가 꼭 있어야만 하는 것은 아니지만 단어 처리의 정확성과 계산량 효율면에서 들어가는 것이 훨씬 좋다.
 model.add(Dense(32, input_shape=(5,)))
 model.add(Dense(64, activation='relu'))
 model.add(Dense(32, activation='relu'))
@@ -46,6 +48,10 @@ model.fit(pad_x, labels, epochs=20, batch_size=16)
 
 # 4. 평가, 예측
 acc = model.evaluate(pad_x, labels)[1]
-# pred = model.predict(x_predict)
+pred = model.predict(pred)
 print('acc: ', acc)
-# print('결과: ', pred)
+print('결과: ', pred)
+
+# acc:  0.7857142686843872
+# 결과:  [[0.969171]]
+# Embedding 미사용 시 acc 확 떨어짐
