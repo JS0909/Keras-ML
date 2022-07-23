@@ -18,14 +18,15 @@ print(x.shape) # (7, 3, 1)
 
 # 2. 모델구성
 model = Sequential()
-model.add(Conv1D(100, 2, input_shape=(3,1)))
+model.add(Conv1D(10, 2, input_shape=(3,1))) # Conv1D는 3차원 먹고 3차원 뱉음
+# model.add(LSTM(10, input_shape=(3,1))) # LSTM은 3차원 먹고 2차원 뱉음
 model.add(Flatten())
-model.add(Dense(100, activation = 'relu'))
-model.add(Dense(100, activation = 'relu'))
-model.add(Dense(100, activation = 'relu'))
+model.add(Dense(10, activation = 'relu'))
+model.add(Dense(10, activation = 'relu'))
+model.add(Dense(10, activation = 'relu'))
 model.add(Dense(1))
 
-model.summary() # LSTM params: 517 // Conv1D params: 97
+model.summary() # LSTM params: 480 // Conv1D params: 30
 
 # 3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam')

@@ -6,7 +6,7 @@ from tensorflow.python.keras.callbacks import EarlyStopping
 # 1 데이터
 x1_datasets = np.array([range(100), range(301, 401)]) # 삼성전자 종가, 하이닉스 종가
 x2_datasets = np.array([range(101, 201), range(411, 511), range(150, 250)]) # 원유, 돈육, 밀
-x1 = np.transpose(x1_datasets)
+x1 = np.transpose(x1_datasets) # 행과 열 전치함
 x2 = np.transpose(x2_datasets)
 
 print(x1.shape, x2.shape) # (100, 2) (100, 3)

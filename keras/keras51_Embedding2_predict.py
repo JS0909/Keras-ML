@@ -16,7 +16,8 @@ x = token.texts_to_sequences(docs)
 pred = token.texts_to_sequences([x_predict])
 
 from keras.preprocessing.sequence import pad_sequences
-pad_x = pad_sequences(x, padding='pre', maxlen=5, truncating='post') # truncating 
+pad_x = pad_sequences(x, padding='pre', maxlen=5, truncating='pre') # truncating : 잘라주겠다 / pre : 앞에서 / post : 뒤에서
+pred = pad_sequences(pred, padding='pre', maxlen=5, truncating='pre')
 
 print(pad_x)
 print(pad_x.shape) # (14, 5)
@@ -43,7 +44,7 @@ model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])
 model.fit(pad_x, labels, epochs=20, batch_size=16)
 
 # 4. 평가, 예측
-acc = model.evaluate(pad_x, labels)[1]
+acc = model.evaluate(pad_x, labels)[1] # compile에서 metrics 사용했으니까 [0]은 loss, [1]은 acc
 pred = model.predict(pred)
 print('acc: ', acc)
 print('결과: ', pred)
@@ -59,6 +60,6 @@ if pred>=0.5:
 else:
         print('부정')
         
-# acc:  0.9285714030265808
-# 결과:  [[0.49950126]]
+# acc:  1.0
+# 결과:  [[0.49335837]]
 # 부정
