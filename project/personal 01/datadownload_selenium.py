@@ -15,8 +15,7 @@ def createFolder(directory):
         print ('Error: Creating directory. ' +  directory)
 
 
-keyword='jindo'
-keyword2='dog'
+keyword='happy beagle'
 createFolder('d:/project/'+keyword)
 
 chromedriver = 'C://chromedriver.exe'
@@ -41,7 +40,7 @@ driver.find_element(By.XPATH,'//*[@id="sbtc"]/button').click()
 # 스크롤
 # =============================================================================
 print(keyword+' 스크롤 중 .............')
-elem =  driver.find_element(By.TAG_NAME,"dog")
+elem =  driver.find_element(By.TAG_NAME,"body")
 for i in range(60):
     elem.send_keys(Keys.PAGE_DOWN)
     time.sleep(0.1)
