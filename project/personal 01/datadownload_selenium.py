@@ -15,7 +15,7 @@ def createFolder(directory):
         print ('Error: Creating directory. ' +  directory)
 
 
-keyword='happy beagle'
+keyword='dachshund'
 createFolder('d:/project/'+keyword)
 
 chromedriver = 'C://chromedriver.exe'

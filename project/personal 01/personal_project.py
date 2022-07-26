@@ -1,5 +1,5 @@
 from tensorflow.python.keras.models import Sequential
-from tensorflow.python.keras.layers import Dense, Conv2D, Flatten, MaxPool2D
+from tensorflow.python.keras.layers import Dense, Conv2D, Flatten, MaxPool2D, Input
 import numpy as np
 from tensorflow.python.keras.callbacks import EarlyStopping
 import tensorflow as tf
@@ -7,27 +7,32 @@ from sklearn.metrics import accuracy_score
 import pandas as pd
 
 # 1. 데이터
-(x_train, y_train), (x_test, y_test) = mnist.load_data()
+x1_train = np.load('d:/study_data/project/_save/train_x1.npy')
+y1_train = np.load('d:/study_data/project/_save/train_y1.npy')
+x2_train = np.load('d:/study_data/project/_save/train_x2.npy')
+y2_train = np.load('d:/study_data/project/_save/train_y2.npy')
 
-print(x_train.shape, y_train.shape) # (60000, 28, 28) (60000,)
-print(x_test.shape, y_test.shape) # (10000, 28, 28) (10000,)
-# 데이터 순서대로 즉 총 곱셈값이 변하지 않으면 됨 : reshape
+x1_test = np.load('d:/study_data/project/_save/test_x1.npy')
+y1_test = np.load('d:/study_data/project/_save/test_y1.npy')
+x2_test = np.load('d:/study_data/project/_save/test_x2.npy')
+y2_test = np.load('d:/study_data/project/_save/test_y2.npy')
 
-x_train = x_train.reshape(60000, 28, 28, 1) # 데이터의 갯수자체는 성능과 큰 상관이 없을 수 있다
-x_test = x_test.reshape(10000, 28, 28, 1)
-print(x_train.shape)
+print(x1_train.shape, y1_train.shape)
+print(x2_train.shape, y2_train.shape)
+print(x1_test.shape, y1_test.shape)
+print(x2_test.shape, y2_test.shape)
 
-print(np.unique(y_train, return_counts=True))
-# (array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], dtype=uint8), array([5923, 6742, 5958, 6131, 5842, 5421, 5918, 6265, 5851, 5949],
-#   dtype=int64))
-y_train = pd.get_dummies(y_train)
-y_test = pd.get_dummies(y_test)
-print(y_train.shape) # (60000, 10) // output 10개 = 라벨값
+# x_train = x_train.reshape(60000, 28, 28, 1) # 데이터의 갯수자체는 성능과 큰 상관이 없을 수 있다
+# x_test = x_test.reshape(10000, 28, 28, 1)
 
-# [과제] acc 0.98 이상
-# convolution 세개 이상
+# print(np.unique(y_train, return_counts=True))
 
-# 2. 모델구성
+y1_train = pd.get_dummies(y1_train)
+y1_test = pd.get_dummies(y1_test)
+y2_train = pd.get_dummies(y2_train)
+y2_test = pd.get_dummies(y2_test)
+
+# 2. 모델구성 ////////////////// 하는 중
 model = Sequential()
 model.add(Conv2D(filters=64, kernel_size=(3,3), strides=1, padding='same', input_shape=(28, 28, 1)))
 model.add(MaxPool2D()) # 처음부터 MaxPooling 안함 // 안겹치게 잘라서 큰 수만 빼냄, 전체 크기가 반땡, 자르는 사이즈 변경 가능하긴 함 디폴트는 2x2
@@ -39,6 +44,57 @@ model.add(Dense(32, activation='relu')) # 아웃풋 노드 갯수는 항상 맨 
 model.add(Dense(32, activation='relu'))
 model.add(Dense(10, activation='softmax'))
 model.summary() # (None, 28, 28, 64) ... 데이터 갯수 = None
+
+# 2-1. 모델1
+input1 = Input(shape=(2,))
+dense1 = Dense(100, activation='relu', name='d1')(input1)
+dense2 = Dense(100, activation='relu', name='d2')(dense1)
+dense3 = Dense(100, activation='relu', name='d3')(dense2)
+output1 = Dense(100, activation='relu', name='out_d1')(dense3)
+
+# 2-2. 모델2
+input2 = Input(shape=(3,))
+dense11 = Dense(100, activation='relu', name='d11')(input2)
+dense12 = Dense(100, activation='swish', name='d12')(dense11)
+dense13 = Dense(100, activation='relu', name='d13')(dense12)
+dense14 = Dense(100, activation='relu', name='d14')(dense13)
+output2 = Dense(100, activation='relu', name='out_d2')(dense14)
+
+# 2-3. 모델3
+input3 = Input(shape=(2,))
+dense15 = Dense(100, activation='relu', name='d15')(input3)
+dense16 = Dense(100, activation='swish', name='d16')(dense15)
+dense17 = Dense(100, activation='relu', name='d17')(dense16)
+dense18 = Dense(100, activation='relu', name='d18')(dense17)
+output3 = Dense(100, activation='relu', name='out3')(dense18)
+
+# Concatenate
+from tensorflow.python.keras.layers import concatenate, Concatenate
+# merge1 = concatenate([output1, output2, output3], name='m1')
+merge1 = Concatenate(axis=0)([output1, output2, output3])
+merge2 = Dense(100, activation='relu', name='mg2')(merge1)
+merge3 = Dense(100, name='mg3')(merge2)
+last_output = Dense(1, name='last1')(merge3)
+
+# 2-4. output모델1
+output41 = Dense(10)(last_output)
+output42 = Dense(10)(output41)
+last_output1 = Dense(1)(output42)
+
+# 2-5. output모델2
+output51 = Dense(10)(last_output)
+output52 = Dense(10)(output51)
+last_output2 = Dense(1)(output52)
+
+model = Model(inputs=[input1, input2, input3], outputs=[last_output1, last_output2])
+
+model.summary()
+
+
+
+
+
+
 
 # 3. 컴파일, 훈련
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
