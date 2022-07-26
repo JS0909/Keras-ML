@@ -23,13 +23,13 @@ print(x_train.shape) # (3400, 150, 150, 3)
 print(y1_train.shape, y2_train.shape) # (3400, 30) (3400, 4)
 print(y1_test.shape, y2_test.shape) # (200, 30) (200, 4)
 
-
-# print(np.unique(y1_train, return_counts=True))
-
-y1_train = pd.get_dummies(y1_train)
-y1_test = pd.get_dummies(y1_test)
-y2_train = pd.get_dummies(y2_train)
-y2_test = pd.get_dummies(y2_test)
+# from sklearn.preprocessing import OneHotEncoder
+# oh = OneHotEncoder()
+# y1_train = y1_train.reshape(-1,1)
+# y1_test = y1_test.reshape(-1,1)
+# oh.fit(y1_train)
+# y1_train = oh.transform(y1_train).toarray()
+# y1_test = oh.transform(y1_test).toarray()
 
 # 2. 모델구성
 # 2-1. input모델
@@ -58,13 +58,27 @@ model.summary()
 # 3. 컴파일, 훈련
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=100, restore_best_weights=True)
-log = model.fit(x_train, [y1_train, y2_train], epochs=1000, batch_size=100, callbacks=[Es], validation_split=0.2)
+log = model.fit(x_train, [y1_train, y2_train], epochs=1, batch_size=100, callbacks=[Es], validation_split=0.2)
 
 #4. 평가, 예측
-# loss = model.evaluate(x_test, y_test)
-# y_predict = model.predict(x_test)
-# y_predict = tf.argmax(y_predict, axis=1)
-# y_test = tf.argmax(y_test, axis=1)
-# acc_sc = accuracy_score(y_test, y_predict)
-# print('loss : ', loss)
-# print('acc스코어 : ', acc_sc)
+loss = model.evaluate(x_test, [y1_test, y2_test])
+
+# y1_train = y1_train.reshape(3400*30)
+# y1_train = pd.get_dummies(y1_train)
+
+# y1_test = y1_test.reshape(200*30)
+# y1_test = pd.get_dummies(y1_test)
+
+# y2_train = y2_train.reshape(3400*4)
+# y2_train = pd.get_dummies(y2_train)
+
+# y2_test = y2_test.reshape(200*4)
+# y2_test = pd.get_dummies(y2_test)
+
+
+y1_pred, y2_pred = model.predict(x_test)
+y1_pred = tf.argmax(y1_pred, axis=1)
+y2_pred = tf.argmax(y2_pred, axis=1)
+acc_sc = accuracy_score([y1_test,y1_pred], [y2_test, y2_pred])
+print('loss : ', loss)
+print('acc스코어 : ', acc_sc)
