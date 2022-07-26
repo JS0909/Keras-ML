@@ -36,3 +36,5 @@ for i in range(20):
     plt.axis('off')
     plt.imshow(x_10_train[i])
 plt.show()
+
+# 이미지 증폭안시킨거, 시킨거 10장씩 매칭시키기
