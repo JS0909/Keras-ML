@@ -22,7 +22,7 @@ scale_datagen = ImageDataGenerator(rescale=1./255)
 xy1_train = scale_datagen.flow_from_directory(
     'd:/study_data/_data/image/dog/breed/',
     target_size=(150, 150),
-    batch_size=500,
+    batch_size=8000,
     class_mode='categorical',
     shuffle=True
 )
@@ -30,10 +30,20 @@ xy1_train = scale_datagen.flow_from_directory(
 xy2_train = scale_datagen.flow_from_directory(
     'd:/study_data/_data/image/dog/age/',
     target_size=(150, 150),
-    batch_size=500,
+    batch_size=8000,
     class_mode='categorical',
     shuffle=True
 )
+
+print(xy1_train.class_indices)
+print(xy2_train.class_indices)
+# {'beagle': 0, 'bichon': 1, 'bulldog': 2, 'chihuahua': 3, 'chow_chow': 4, 
+# 'cocker_spaniel': 5, 'collie': 6, 'dachshund': 7, 'fox_terrier': 8, 'german_shepherd': 9, 
+# 'golden_retriever': 10, 'greyhound': 11, 'husky': 12, 'jack_russell_terrier': 13, 'jindo': 14, 
+# 'labrador_retriever': 15, 'maltese': 16, 'miniature_pinscher': 17, 'papillon': 18, 'pomeranian': 19, 
+# 'poodle': 20, 'pug': 21, 'rottweiler': 22, 'samoyed': 23, 'schnauzer': 24, 'shiba': 25,
+# 'shihtzu': 26, 'spitz': 27, 'welsh_corgi': 28, 'yorkshire_terrier': 29}
+# {'11year_': 0, '5month_4year': 1, '5year_10year': 2, '_4month': 3}
 
 # 파일 불러온 변수에서 xy 분리
 x1_train = xy1_train[0][0]
@@ -44,30 +54,33 @@ y2_train = xy2_train[0][1]
 # input 데이터 하나로
 x_train = np.concatenate((x1_train, x2_train))
 
-print(x_train.shape, y1_train.shape, y2_train.shape) # (1000, 150, 150, 3) (500, 30) (500, 4)
+print(x1_train.shape, x2_train.shape) # (6685, 255, 255, 3) (1363, 255, 255, 3)
+print(x_train.shape, y1_train.shape, y2_train.shape) # (8048, 255, 255, 3) (6685, 30) (1363, 4)
 
-augument_size1 = 500
-randidx1 = np.random.randint(y1_train.shape[0], size=augument_size1)
-y1_train_aug = y1_train[randidx1].copy()
-randidx1 = np.random.randint(y2_train.shape[0], size=augument_size1)
-y2_train_aug = y2_train[randidx1].copy()
-# 스플릿을 위한 x y 행값 맞추기
-y1_train_aug = train_datagen.flow(x1_train, y1_train_aug, batch_size=augument_size1, shuffle=False).next()[1]
-y2_train_aug = train_datagen.flow(x2_train, y2_train_aug, batch_size=augument_size1, shuffle=False).next()[1]
+# train_test_split을 위한 x, y1, y2 행값 맞춰주기
+augument_size_y1 = x_train.shape[0] - y1_train.shape[0]
+augument_size_y2 = x_train.shape[0] - y2_train.shape[0]
+randidx1 = np.random.randint(y1_train.shape[0], size=augument_size_y1)
+y1_train_aug = y1_train[randidx1]
+randidx1 = np.random.randint(y2_train.shape[0], size=augument_size_y2)
+y2_train_aug = y2_train[randidx1]
+
+print(y1_train_aug.shape, y2_train_aug.shape) # (1363, 30) (6685, 4)
 
 y1_train = np.concatenate((y1_train, y1_train_aug))
 y2_train = np.concatenate((y2_train, y2_train_aug))
+
+print(x_train.shape, y1_train.shape, y2_train.shape) # (8048, 255, 255, 3) (8048, 30) (8048, 4)
 
 x_train, x_test, y1_train, y1_test, y2_train, y2_test = train_test_split(x_train, y1_train, y2_train, 
                                                         train_size=0.8, shuffle=True, random_state=9)
 
 # 증폭 사이즈만큼 난수 뽑아서
-augument_size2 = 2600
+augument_size2 = 2000
 randidx2 = np.random.randint(x_train.shape[0], size=augument_size2)
 # 각각 인덱스에 난수 넣고 돌려가면서 이미지 저장
 x1_augument = x_train[randidx2].copy()
-y1_augument = y1_train[randidx2].copy()
-y2_augument = y2_train[randidx2].copy()
+y1_augument = y1_train[randidx2].copy() # flow를 위해 생성함
 
 # x 증폭 데이터 담기
 x_augument = train_datagen.flow(x1_augument, y1_augument, batch_size=augument_size2, shuffle=False).next()[0]
@@ -76,8 +89,9 @@ x_train = scale_datagen.flow(x_train, y1_train, batch_size=augument_size2, shuff
 
 # 원본train과 증폭train 합치기
 x_train = np.concatenate((x_train, x_augument))
-y1_train = np.concatenate((y1_train, y1_augument))
-y2_train = np.concatenate((y2_train, y2_augument))
+
+print(x_train.shape, y1_train.shape, y2_train.shape) # (4000, 255, 255, 3) (6438, 30) (6438, 4)
+print(x_test.shape, y1_test.shape, y2_test.shape) # (1610, 255, 255, 3) (1610, 30) (1610, 4)
 
 np.save('d:/study_data/_save/_npy/_project/train_x.npy', arr =x_train)
 np.save('d:/study_data/_save/_npy/_project/train_y1.npy', arr =y1_train)

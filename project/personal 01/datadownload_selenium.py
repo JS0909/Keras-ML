@@ -1,80 +1,71 @@
-from selenium import webdriver 
+from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
 import time
-import os
 import urllib.request
+import os
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+from urllib.request import Request, urlopen
 
-# 크롬 버전 103.0.5060.134
+#selenium 최신버전으로 문법이 바꼈다. 바뀐걸로 적용해줌.
+#Chrome 드라이버 자동으로 잡아주는게 추가됨(Service, ChromeDriverManager)
+#Xpath 위치 잘 봐야함
 
-def createFolder(directory):
+def createDirectory(directory):
     try:
         if not os.path.exists(directory):
             os.makedirs(directory)
     except OSError:
-        print ('Error: Creating directory. ' +  directory)
+        print("Error: Failed to create the directory.")
 
+def crawling_img(name):
+    options = webdriver.ChromeOptions()
+    options.add_experimental_option('excludeSwitches', ['enable-logging'])
+    driver = webdriver.Chrome(options=options, service=Service(ChromeDriverManager().install())) #드라이버 위치 자동으로 찾아줌
+    driver.get("https://www.google.co.kr/imghp?hl=ko&tab=wi&authuser=0&ogbl")
+    elem = driver.find_element(By.NAME,"q")
+    elem.send_keys(name)
+    elem.send_keys(Keys.RETURN)
 
-keyword='요크셔테리어'
-createFolder('d:/project/'+keyword)
+    SCROLL_PAUSE_TIME = 1
+    # Get scroll height
+    last_height = driver.execute_script("return document.body.scrollHeight")  # 브라우저의 높이를 자바스크립트로 찾음
+    while True:
+        # Scroll down to bottom
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")  # 브라우저 끝까지 스크롤을 내림
+        # Wait to load page
+        time.sleep(SCROLL_PAUSE_TIME)
+        # Calculate new scroll height and compare with last scroll height
+        new_height = driver.execute_script("return document.body.scrollHeight")
+        if new_height == last_height:
+            try:
+                driver.find_elements(By.CSS_SELECTOR,".mye4qd").click()
+            except:
+                break
+        last_height = new_height
 
-chromedriver = 'C://chromedriver.exe'
-driver = webdriver.Chrome(chromedriver)
-driver.implicitly_wait(3)
+    imgs = driver.find_elements(By.CSS_SELECTOR,".rg_i.Q4LuWd")
+    dir = "D:/project/" + name
+    #끝까지 다내려서 개느림
+    a = [range(1,201)]
+    createDirectory(dir) #폴더 생성해준다
+    count = 1
+    for img in imgs:
+        try:
+            img.click()
+            time.sleep(2)
+            imgUrl = driver.find_element(By.XPATH,'//*[@id="Sva75c"]/div/div/div[3]/div[2]/c-wiz/div/div[1]/div[1]/div[3]/div/a/img').get_attribute("src")
+            path = "D:/project/" + name + "/"
+            urllib.request.urlretrieve(imgUrl, path + "img_" + str(count) + ".jpg")
+            count = count + 1
+            if count >= 160: #이미지 장수 선택 
+                break
+        except:
+            print("안되는디") #경로못찾으면 패~쓰~~~~~
+    driver.close()
+                
+dog = ["bulldog"]
 
-
-# =============================================================================
-# 구글 이미지 검색 접속 및 검색어 입력
-# =============================================================================
-print(keyword, '검색')
-driver.get('https://www.google.co.kr/imghp?hl=ko')
-
-Keyword=driver.find_element(By.XPATH,'//*[@id="sbtc"]/div/div[2]/input')
-#Keyword.send_keys(keyword+keyword2)
-Keyword.send_keys(keyword)
-
-driver.find_element(By.XPATH,'//*[@id="sbtc"]/button').click()
-
-
-# =============================================================================
-# 스크롤
-# =============================================================================
-print(keyword+' 스크롤 중 .............')
-elem =  driver.find_element(By.TAG_NAME,"body")
-for i in range(60):
-    elem.send_keys(Keys.PAGE_DOWN)
-    time.sleep(0.1)
-    
-try:
-    driver.find_element(By.XPATH,'//*[@id="islmp"]/div/div/div/div[1]/div[4]/div[2]/input').click()
-    for i in range(60):
-        elem.send_keys(Keys.PAGE_DOWN)
-        time.sleep(0.1)
-except:
-    pass
-
-
-# =============================================================================
-# 이미지 개수
-# =============================================================================
-links=[]
-images = driver.find_elements(By.CSS_SELECTOR,"img.rg_i.Q4LuWd")
-for image in images:
-    if image.get_attribute('src')!=None:
-        links.append(image.get_attribute('src'))
-
-print(keyword+' 찾은 이미지 개수:',len(links))
-time.sleep(2)
-
-
-# =============================================================================
-# 이미지 다운로드
-# =============================================================================
-for k,i in enumerate(links):
-    url = i
-    start = time.time()
-    urllib.request.urlretrieve(url, "d:/project/"+keyword+"/"+"img"+str(k)+".jpg")
-    print(str(k+1)+'/'+str(len(links))+' '+keyword+' 다운로드 중....... Download time : '+str(time.time() - start)[:5]+' 초')
-print(keyword+' ---다운로드 완료---')
-
-driver.close()
+for actor in dog:
+    crawling_img(actor)
