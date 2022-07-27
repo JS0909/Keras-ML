@@ -6,6 +6,9 @@ import tensorflow as tf
 from sklearn.metrics import accuracy_score
 import pandas as pd
 from tensorflow.python.keras.layers import concatenate, Concatenate
+import tensorflow as tf
+
+tf.random.set_seed(9) # 하이퍼 파라미터 튜닝 용이하게 하기 위해
 
 # 1. 데이터
 filepath = 'd:/study_data/_save/_npy/_project/'
@@ -19,15 +22,15 @@ x_test = np.load(filepath+'test_x'+suffix)
 y1_test = np.load(filepath+'test_y1'+suffix)
 y2_test = np.load(filepath+'test_y2'+suffix)
 
-print(x_train.shape) # (5200, 255, 255, 3)
-print(y1_train.shape, y2_train.shape) # (6438, 30) (6438, 4)
-print(y1_test.shape, y2_test.shape) # (1610, 30) (1610, 4)
+# print(x_train.shape) # (4000, 150, 150, 3)
+# print(y1_train.shape, y2_train.shape) # (6438, 30) (6438, 4)
+# print(y1_test.shape, y2_test.shape) # (1610, 30) (1610, 4)
 
-print(y2_train)
+# print(y2_train)
 
 # 2. 모델구성
 # 2-1. input모델
-input1 = Input(shape=(255, 255, 3))
+input1 = Input(shape=(150, 150, 3))
 conv1 = Conv2D(32,(2,2), padding='same', activation='swish')(input1)
 mp1 = MaxPool2D()(conv1)
 conv2 = Conv2D(32,(2,2), activation='swish')(mp1)
