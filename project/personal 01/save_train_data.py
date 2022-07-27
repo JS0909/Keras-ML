@@ -3,6 +3,7 @@ import tensorflow as tf
 import pandas as pd
 from keras.preprocessing.image import ImageDataGenerator
 from sklearn.model_selection import train_test_split
+tf.random.set_seed(9)
 
 # 1. 데이터
 train_datagen = ImageDataGenerator(
