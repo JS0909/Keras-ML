@@ -9,6 +9,16 @@ from tensorflow.python.keras.layers import concatenate, Concatenate
 
 tf.random.set_seed(9) # 하이퍼 파라미터 튜닝 용이하게 하기 위해
 
+breed = {0:'beagle', 1:'bichon', 2:'bulldog', 3:'chihuahua', 4:'chow_chow', 
+5:'cocker_spaniel', 6:'collie', 7:'dachshund', 8:'fox_terrier', 9:'german_shepherd', 
+10:'golden_retriever', 11:'greyhound', 12:'husky', 13:'jack_russell_terrier', 14:'jindo', 
+15:'labrador_retriever', 16:'maltese', 17:'miniature_pinscher', 18:'papillon', 19:'pomeranian', 
+20:'poodle', 21:'pug', 22:'rottweiler', 23:'samoyed', 24:'schnauzer', 25:'shiba',
+26:'shihtzu', 27:'spitz', 28:'welsh_corgi', 29:'yorkshire_terrier'}
+
+age = {0:'11year_', 1:'5month_4year', 2:'5year_10year', 3:'_4month'}
+age_class = {0:'유년', 1:'청년', 2:'중장년', 3:'노년'}
+
 # 1. 데이터
 filepath = 'd:/study_data/_save/_npy/_project/'
 suffix = '.npy'
@@ -28,6 +38,8 @@ testing_img = np.load(filepath+'testing_img'+suffix)
 # print(y1_test.shape, y2_test.shape) # (1610, 30) (1610, 4)
 
 # print(y2_train)
+
+'''
 # 2. 모델구성
 # 2-1. input모델
 input1 = Input(shape=(150, 150, 3))
@@ -55,10 +67,10 @@ model.summary()
 # 3. 컴파일, 훈련
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=100, restore_best_weights=True)
-log = model.fit(x_train, [y1_train, y2_train], epochs=10, batch_size=32, callbacks=[Es], validation_split=0.2)
+log = model.fit(x_train, [y1_train, y2_train], epochs=1000, batch_size=32, callbacks=[Es], validation_split=0.2)
 model.save('D:/study_data/_save/_h5/project.h5')
-
-# model = load_model('D:/study_data/_save/_h5/project.h5')
+'''
+model = load_model('D:/study_data/_save/_h5/project.h5')
 
 #4. 평가, 예측
 loss = model.evaluate(x_test, [y1_test, y2_test])
@@ -82,12 +94,48 @@ for i in a:
     print(y2_pred[i], '\n')
 
 testpred_breed, testpred_age = model.predict(testing_img)
-testpred_breed = tf.argmax(testpred_breed, axis=1)
-testpred_age = tf.argmax(testpred_age, axis=1)
-testpred_breed = np.array(testpred_breed)
-testpred_age = np.array(testpred_age)
-print(testpred_breed, testpred_age)
+# print('종 확률: ', testpred_breed[0][tf.argmax(testpred_breed, axis=1)])
+# print('나이 확률: ', testpred_age[0][tf.argmax(testpred_age, axis=1)])
 
-converter = tf.lite.TFLiteConverter.from_keras_model(model) 
-tflite_model = converter.convert() 
-open("d:/study_data/_save/converted_model.tflite", "wb").write(tflite_model)
+
+testpred_breed_arg = tf.argmax(testpred_breed, axis=1)
+testpred_age_arg = tf.argmax(testpred_age, axis=1)
+testpred_breed_arr = np.array(testpred_breed_arg)
+testpred_age_arr = np.array(testpred_age_arg)
+
+
+print('종: ', breed[testpred_breed_arr[-1]], ' // 확률:', testpred_breed[0][tuple(testpred_breed_arg)])
+print('나이: ', age[testpred_age_arr[-1]], age_class[testpred_age_arr[-1]],' // 확률:', testpred_age[0][tuple(testpred_age_arg)])
+
+# 이거 메모장 봐가면서 넣어라
+dog_jung = ['chow_chow', ]
+dog_ha = ['chihuahua', ]
+age_jung = '중장년'
+age_ha = ['유년', '노년']
+
+if breed[breed[testpred_breed_arr[-1]]]==dog_jung:
+    num1 = 2.5
+elif breed[breed[testpred_breed_arr[-1]]]==dog_ha:
+    num1 = 0
+else:
+    num1 = 5
+
+if age_class[testpred_age_arr[-1]]==age_jung:
+    num2 = 2.5
+elif age_class[testpred_age_arr[-1]]==age_ha:
+    num2 = 0
+else:
+    num2 = 5
+
+        
+
+# 인덱스 튜플화해서 접근하라고 future warning 메세지 뜸
+# FutureWarning: Using a non-tuple sequence for multidimensional indexing is deprecated; 
+# use `arr[tuple(seq)]` instead of `arr[seq]`. In the future this will be interpreted as an array index, 
+# `arr[np.array(seq)]`, which will result either in an error or a different result.  
+
+
+#----------- Android studio에서 사용하기 위해 tflite 파일로 모델 변환------------------
+# converter = tf.lite.TFLiteConverter.from_keras_model(model) 
+# tflite_model = converter.convert() 
+# open("d:/study_data/_save/converted_model.tflite", "wb").write(tflite_model)
