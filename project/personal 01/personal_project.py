@@ -86,17 +86,18 @@ acc_sc2 = accuracy_score(y2_test_arg,y2_pred)
 print('y1_acc스코어 : ', acc_sc1)
 print('y2_acc스코어 : ', acc_sc2)
 
+'''
+# 결과 잘 나오는지 중간 확인
 y1_pred = np.array(y1_pred)
 y2_pred = np.array(y2_pred)
 a = range(0, 10)
 for i in a:
     print(y1_pred[i])
     print(y2_pred[i], '\n')
+'''
 
+# 테스트용 이미지로 프레딕트
 testpred_breed, testpred_age = model.predict(testing_img)
-# print('종 확률: ', testpred_breed[0][tf.argmax(testpred_breed, axis=1)])
-# print('나이 확률: ', testpred_age[0][tf.argmax(testpred_age, axis=1)])
-
 
 testpred_breed_arg = tf.argmax(testpred_breed, axis=1)
 testpred_age_arg = tf.argmax(testpred_age, axis=1)
@@ -106,19 +107,23 @@ testpred_age_arr = np.array(testpred_age_arg)
 
 print('종: ', breed[testpred_breed_arr[-1]], ' // 확률:', testpred_breed[0][tuple(testpred_breed_arg)])
 print('나이: ', age[testpred_age_arr[-1]], age_class[testpred_age_arr[-1]],' // 확률:', testpred_age[0][tuple(testpred_age_arg)])
+# 인덱스 튜플화해서 접근하라고 future warning 메세지 뜸
+# FutureWarning: Using a non-tuple sequence for multidimensional indexing is deprecated; 
+# use `arr[tuple(seq)]` instead of `arr[seq]`. In the future this will be interpreted as an array index, 
+# `arr[np.array(seq)]`, which will result either in an error or a different result.  
 
-dog_jung = ['chow_chow', 'bulldog', 'greyhound', 'maltese', 'miniature_pinscher',
-            'papillon', 'pomeranian', 'poodle', 'shiba', 'spitz']
+dog_sang = ['samoyed', 'rottweiler', 'german_shepherd', 'jack_russell_terrier', 
+            'husky', 'collie', 'labrador_retriever', 'golden_retriever']
 dog_ha = ['chihuahua', 'pug', 'shihtzu', 'yorkshire_terrier']
 age_jung = '중장년'
 age_ha = ['유년', '노년']
 
-if breed[breed[testpred_breed_arr[-1]]]==dog_jung:
-    num1 = 2.5
-elif breed[breed[testpred_breed_arr[-1]]]==dog_ha:
+if breed[testpred_breed_arr[-1]]==dog_sang:
+    num1 = 5
+elif breed[testpred_breed_arr[-1]]==dog_ha:
     num1 = 0
 else:
-    num1 = 5
+    num1 = 2.5
 
 if age_class[testpred_age_arr[-1]]==age_jung:
     num2 = 2.5
@@ -127,13 +132,18 @@ elif age_class[testpred_age_arr[-1]]==age_ha:
 else:
     num2 = 5
 
-        
-
-# 인덱스 튜플화해서 접근하라고 future warning 메세지 뜸
-# FutureWarning: Using a non-tuple sequence for multidimensional indexing is deprecated; 
-# use `arr[tuple(seq)]` instead of `arr[seq]`. In the future this will be interpreted as an array index, 
-# `arr[np.array(seq)]`, which will result either in an error or a different result.  
-
+exercise = num1+num2
+if exercise==10:
+    ex = '최상 / 산책 1시간 30분 ~ 2시간'
+elif exercise==7.5:
+    ex = '상 / 산책 1시간 ~ 1시간 30분'
+elif exercise==5:
+    ex = '중 / 산책 30분 ~ 1시간'
+elif exercise==2.5:
+    ex = '하 / 산책 20분 ~ 40분'
+else:
+    ex = '최하 / 산책 20분'
+print('활동량: ', ex)
 
 #----------- Android studio에서 사용하기 위해 tflite 파일로 모델 변환------------------
 # converter = tf.lite.TFLiteConverter.from_keras_model(model) 
