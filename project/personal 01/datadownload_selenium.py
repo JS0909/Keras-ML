@@ -63,9 +63,10 @@ def crawling_img(name):
                 break
         except:
             print("안되는디")
+            pass
     driver.close()
                 
-dog = ["bichon"]
+dog = ["shihtzu"]
 
 for actor in dog:
     crawling_img(actor)
