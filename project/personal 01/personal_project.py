@@ -107,9 +107,9 @@ testpred_age_arr = np.array(testpred_age_arg)
 print('종: ', breed[testpred_breed_arr[-1]], ' // 확률:', testpred_breed[0][tuple(testpred_breed_arg)])
 print('나이: ', age[testpred_age_arr[-1]], age_class[testpred_age_arr[-1]],' // 확률:', testpred_age[0][tuple(testpred_age_arg)])
 
-# 이거 메모장 봐가면서 넣어라
-dog_jung = ['chow_chow', ]
-dog_ha = ['chihuahua', ]
+dog_jung = ['chow_chow', 'bulldog', 'greyhound', 'maltese', 'miniature_pinscher',
+            'papillon', 'pomeranian', 'poodle', 'shiba', 'spitz']
+dog_ha = ['chihuahua', 'pug', 'shihtzu', 'yorkshire_terrier']
 age_jung = '중장년'
 age_ha = ['유년', '노년']
 
