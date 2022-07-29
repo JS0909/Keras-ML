@@ -51,12 +51,12 @@ dense2 = Dense(32, activation='relu')(dense1)
 output = Dense(32, activation='relu')(dense2)
 
 # 2-2. output모델1
-output1 = Dense(10)(output)
+output1 = Dense(16)(output)
 output2 = Dense(10)(output1)
 last_output1 = Dense(30, activation='softmax')(output2)
 
 # 2-3. output모델2
-output3 = Dense(10)(output)
+output3 = Dense(16)(output)
 output4 = Dense(10)(output3)
 last_output2 = Dense(4, activation='softmax')(output4)
 
@@ -67,9 +67,9 @@ model.summary()
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=150, restore_best_weights=True)
 log = model.fit(x_train, [y1_train, y2_train], epochs=1000, batch_size=32, callbacks=[Es], validation_split=0.2)
-model.save('D:/study_data/_save/_h5/project.h5')
+model.save('D:/study_data/_save/_h5/project2.h5')
 
-# model = load_model('D:/study_data/_save/_h5/project.h5')
+# model = load_model('D:/study_data/_save/_h5/project2.h5')
 
 #4. 평가, 예측
 loss = model.evaluate(x_test, [y1_test, y2_test])

@@ -69,7 +69,7 @@ def upload_file():
         # print(y1_train.shape, y2_train.shape) # (6897, 30) (6897, 4)
         # print(y1_test.shape, y2_test.shape) # (1725, 30) (1725, 4)
 
-        model = load_model('D:/study_data/_save/_h5/project.h5')
+        model = load_model('D:/study_data/_save/_h5/project2.h5')
 
         #4. 평가, 예측
         loss = model.evaluate(x_test, [y1_test, y2_test])
@@ -104,7 +104,7 @@ def upload_file():
         testpred_age_arr = np.array(testpred_age_arg)
 
         dog_sang = ['samoyed', 'rottweiler', 'german_shepherd', 'jack_russell_terrier', 
-            'husky', 'collie', 'labrador_retriever', 'golden_retriever']
+                    'husky', 'collie', 'labrador_retriever', 'golden_retriever']
         dog_jung = ['jindo','chow_chow', 'bulldog', 'greyhound', 'maltese', 'miniature_pinscher',
                     'papillon', 'pomeranian', 'poodle', 'shiba', 'schnauzer',
                     'spitz', 'beagle', 'fox_terrier', 'bichon', 'dachshund', 'cocker_spaniel', 'welsh_corgi']
@@ -113,11 +113,11 @@ def upload_file():
         age_u = '유년'
         age_no = '노년'
 
-        if breed[testpred_breed_arr[-1]]==dog_sang:
+        if breed[testpred_breed_arr[-1]] in dog_sang:
             num1 = 5
-        elif breed[testpred_breed_arr[-1]]==dog_jung:
+        elif breed[testpred_breed_arr[-1]] in dog_jung:
             num1 = 2.5
-        elif breed[testpred_breed_arr[-1]]==dog_ha:
+        elif breed[testpred_breed_arr[-1]] in dog_ha:
             num1 = 0
 
         if age_class[testpred_age_arr[-1]]==age_jung:
