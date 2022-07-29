@@ -49,7 +49,7 @@ def upload_file():
         26:'shihtzu', 27:'spitz', 28:'welsh_corgi', 29:'yorkshire_terrier'}
 
         age = {0:'11year_', 1:'5month_4year', 2:'5year_10year', 3:'_4month'}
-        age_class = {0:'유년', 1:'청년', 2:'중장년', 3:'노년'}
+        age_class = {0:'노년', 1:'청년', 2:'중장년', 3:'유년'}
 
         # 1. 데이터
         filepath = 'd:/study_data/_save/_npy/_project/'
@@ -104,24 +104,31 @@ def upload_file():
         testpred_age_arr = np.array(testpred_age_arg)
 
         dog_sang = ['samoyed', 'rottweiler', 'german_shepherd', 'jack_russell_terrier', 
-                    'husky', 'collie', 'labrador_retriever', 'golden_retriever']
+            'husky', 'collie', 'labrador_retriever', 'golden_retriever']
+        dog_jung = ['jindo','chow_chow', 'bulldog', 'greyhound', 'maltese', 'miniature_pinscher',
+                    'papillon', 'pomeranian', 'poodle', 'shiba', 'schnauzer',
+                    'spitz', 'beagle', 'fox_terrier', 'bichon', 'dachshund', 'cocker_spaniel', 'welsh_corgi']
         dog_ha = ['chihuahua', 'pug', 'shihtzu', 'yorkshire_terrier']
         age_jung = '중장년'
-        age_ha = ['유년', '노년']
+        age_u = '유년'
+        age_no = '노년'
 
         if breed[testpred_breed_arr[-1]]==dog_sang:
             num1 = 5
+        elif breed[testpred_breed_arr[-1]]==dog_jung:
+            num1 = 2.5
         elif breed[testpred_breed_arr[-1]]==dog_ha:
             num1 = 0
-        else:
-            num1 = 2.5
 
         if age_class[testpred_age_arr[-1]]==age_jung:
             num2 = 2.5
             age_weight = 2
-        elif age_class[testpred_age_arr[-1]]==age_ha:
+        elif age_class[testpred_age_arr[-1]]==age_u:
             num2 = 0
             age_weight = 3
+        elif age_class[testpred_age_arr[-1]]==age_no:
+            num2 = 0
+            age_weight = 2
         else:
             num2 = 5
             age_weight = 2
@@ -141,25 +148,25 @@ def upload_file():
         # weight = int(input('몸무게 입력: '))
         # kcal = int(input('사료 1g 당 칼로리 입력: '))
         food = ((weight * 30 + 70) * age_weight) / kcal
-        
+
+        age_po = round(testpred_age[0][tuple(testpred_age_arg)]*100, 5)
+        breed_result = breed[testpred_breed_arr[-1]]
+        breed_po = round(testpred_breed[0][tuple(testpred_breed_arg)]*100, 3)
+        age_result = age[testpred_age_arr[-1]]
+        age_cl = age_class[testpred_age_arr[-1]]
+
         # ===== 정보 출력 =====
-        print('종: ', breed[testpred_breed_arr[-1]], '//', round(testpred_breed[0][tuple(testpred_breed_arg)]*100, 3),'%')
-        print('나이: ', age[testpred_age_arr[-1]], age_class[testpred_age_arr[-1]],'//', round(testpred_age[0][tuple(testpred_age_arg)]*100, 5),'%')
+        print('종: ', breed_result, '//', breed_po,'%')
+        print('나이: ', age_result, age_cl, age_po, '%')
         # 인덱스 튜플화해서 접근하라고 future warning 메세지 뜸
         # FutureWarning: Using a non-tuple sequence for multidimensional indexing is deprecated; 
         # use `arr[tuple(seq)]` instead of `arr[seq]`. In the future this will be interpreted as an array index, 
         # `arr[np.array(seq)]`, which will result either in an error or a different result.  
         print('적정 활동량: ', ex)
-        print('적정 사료양: ', food, 'g')
-        
-        breed_r = breed[testpred_breed_arr[-1]]
-        b_chance_r = round(testpred_breed[0][tuple(testpred_breed_arg)]*100, 3)
-        age_r = age[testpred_age_arr[-1]]
-        a_chance_r = round(testpred_age[0][tuple(testpred_age_arg)]*100, 5)
-        age_cl = age_class[testpred_age_arr[-1]]
+        print('적정 사료양: ', round(food,3), 'g')
     
-        return render_template('tf.html', breed=breed_r, b_chance=b_chance_r, age=age_r, a_chace=a_chance_r, 
-                               ex=ex, food=food, age_cl=age_cl)
+        return render_template('tf.html', breed=breed_result, breed_po=breed_po, age=age_result, age_po=age_po,
+                               age_cl=age_cl, ex=ex, food=round(food,3))
 
     
 if __name__ == '__main__':
