@@ -26,7 +26,7 @@ xy1_train = scale_datagen.flow_from_directory(
     batch_size=8000,
     class_mode='categorical',
     shuffle=True
-)
+) # Found 7259 images belonging to 30 classes.
 
 xy2_train = scale_datagen.flow_from_directory(
     'd:/study_data/_data/image/dog/age/',
@@ -34,10 +34,10 @@ xy2_train = scale_datagen.flow_from_directory(
     batch_size=8000,
     class_mode='categorical',
     shuffle=True
-)
+) # Found 1363 images belonging to 4 classes.
 
-print(xy1_train.class_indices)
-print(xy2_train.class_indices)
+# print(xy1_train.class_indices)
+# print(xy2_train.class_indices)
 # {'beagle': 0, 'bichon': 1, 'bulldog': 2, 'chihuahua': 3, 'chow_chow': 4, 
 # 'cocker_spaniel': 5, 'collie': 6, 'dachshund': 7, 'fox_terrier': 8, 'german_shepherd': 9, 
 # 'golden_retriever': 10, 'greyhound': 11, 'husky': 12, 'jack_russell_terrier': 13, 'jindo': 14, 
@@ -55,8 +55,8 @@ y2_train = xy2_train[0][1]
 # input 데이터 하나로
 x_train = np.concatenate((x1_train, x2_train))
 
-print(x1_train.shape, x2_train.shape) # (6685, 255, 255, 3) (1363, 255, 255, 3)
-print(x_train.shape, y1_train.shape, y2_train.shape) # (8048, 255, 255, 3) (6685, 30) (1363, 4)
+print(x1_train.shape, x2_train.shape) # (7259, 150, 150, 3) (1363, 150, 150, 3)
+print(x_train.shape, y1_train.shape, y2_train.shape) # (8622, 150, 150, 3) (7259, 30) (1363, 4)
 
 # train_test_split을 위한 x, y1, y2 행값 맞춰주기
 augument_size_y1 = x_train.shape[0] - y1_train.shape[0]
@@ -66,18 +66,18 @@ y1_train_aug = y1_train[randidx1]
 randidx1 = np.random.randint(y2_train.shape[0], size=augument_size_y2)
 y2_train_aug = y2_train[randidx1]
 
-print(y1_train_aug.shape, y2_train_aug.shape) # (1363, 30) (6685, 4)
+print(y1_train_aug.shape, y2_train_aug.shape) # (1363, 30) (7259, 4)
 
 y1_train = np.concatenate((y1_train, y1_train_aug))
 y2_train = np.concatenate((y2_train, y2_train_aug))
 
-print(x_train.shape, y1_train.shape, y2_train.shape) # (8048, 255, 255, 3) (8048, 30) (8048, 4)
+print(x_train.shape, y1_train.shape, y2_train.shape) # (8622, 150, 150, 3) (8622, 30) (8622, 4)
 
 x_train, x_test, y1_train, y1_test, y2_train, y2_test = train_test_split(x_train, y1_train, y2_train, 
                                                         train_size=0.8, shuffle=True, random_state=9)
 
 # 증폭 사이즈만큼 난수 뽑아서
-augument_size2 = 2000
+augument_size2 = 3000
 randidx2 = np.random.randint(x_train.shape[0], size=augument_size2)
 # 각각 인덱스에 난수 넣고 돌려가면서 이미지 저장
 x1_augument = x_train[randidx2].copy()
@@ -86,13 +86,14 @@ y1_augument = y1_train[randidx2].copy() # flow를 위해 생성함
 # x 증폭 데이터 담기
 x_augument = train_datagen.flow(x1_augument, y1_augument, batch_size=augument_size2, shuffle=False).next()[0]
 
+# x_train도 x_augument와 같은 비율로 스케일
 x_train = scale_datagen.flow(x_train, y1_train, batch_size=augument_size2, shuffle=False).next()[0]
 
 # 원본train과 증폭train 합치기
 x_train = np.concatenate((x_train, x_augument))
 
-print(x_train.shape, y1_train.shape, y2_train.shape) # (4000, 255, 255, 3) (6438, 30) (6438, 4)
-print(x_test.shape, y1_test.shape, y2_test.shape) # (1610, 255, 255, 3) (1610, 30) (1610, 4)
+print(x_train.shape, y1_train.shape, y2_train.shape) # (6000, 150, 150, 3) (6897, 30) (6897, 4)
+print(x_test.shape, y1_test.shape, y2_test.shape) # (1725, 150, 150, 3) (1725, 30) (1725, 4)
 
 np.save('d:/study_data/_save/_npy/_project/train_x.npy', arr =x_train)
 np.save('d:/study_data/_save/_npy/_project/train_y1.npy', arr =y1_train)

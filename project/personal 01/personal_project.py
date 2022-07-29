@@ -5,7 +5,7 @@ from tensorflow.python.keras.callbacks import EarlyStopping
 import tensorflow as tf
 from sklearn.metrics import accuracy_score
 import pandas as pd
-from tensorflow.python.keras.layers import concatenate, Concatenate
+
 
 tf.random.set_seed(9) # 하이퍼 파라미터 튜닝 용이하게 하기 위해
 
@@ -34,20 +34,17 @@ y2_test = np.load(filepath+'test_y2'+suffix)
 testing_img = np.load(filepath+'testing_img'+suffix)
 
 # print(x_train.shape) # (4000, 150, 150, 3)
-# print(y1_train.shape, y2_train.shape) # (6438, 30) (6438, 4)
-# print(y1_test.shape, y2_test.shape) # (1610, 30) (1610, 4)
-
-# print(y2_train)
-
+# print(y1_train.shape, y2_train.shape) # (6897, 30) (6897, 4)
+# print(y1_test.shape, y2_test.shape) # (1725, 30) (1725, 4)
 '''
 # 2. 모델구성
 # 2-1. input모델
 input1 = Input(shape=(150, 150, 3))
 conv1 = Conv2D(32,(2,2), padding='same', activation='swish')(input1)
 mp1 = MaxPool2D()(conv1)
-conv2 = Conv2D(32,(2,2), activation='swish')(mp1)
+conv2 = Conv2D(64,(2,2), activation='swish')(mp1)
 flat1 = Flatten()(conv2)
-dense1 = Dense(32, activation='relu')(flat1)
+dense1 = Dense(64, activation='relu')(flat1)
 dense2 = Dense(32, activation='relu')(dense1)
 output = Dense(32, activation='relu')(dense2)
 
@@ -66,7 +63,7 @@ model.summary()
 
 # 3. 컴파일, 훈련
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=100, restore_best_weights=True)
+Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=150, restore_best_weights=True)
 log = model.fit(x_train, [y1_train, y2_train], epochs=1000, batch_size=32, callbacks=[Es], validation_split=0.2)
 model.save('D:/study_data/_save/_h5/project.h5')
 '''
@@ -104,14 +101,6 @@ testpred_age_arg = tf.argmax(testpred_age, axis=1)
 testpred_breed_arr = np.array(testpred_breed_arg)
 testpred_age_arr = np.array(testpred_age_arg)
 
-
-print('종: ', breed[testpred_breed_arr[-1]], ' // 확률:', testpred_breed[0][tuple(testpred_breed_arg)])
-print('나이: ', age[testpred_age_arr[-1]], age_class[testpred_age_arr[-1]],' // 확률:', testpred_age[0][tuple(testpred_age_arg)])
-# 인덱스 튜플화해서 접근하라고 future warning 메세지 뜸
-# FutureWarning: Using a non-tuple sequence for multidimensional indexing is deprecated; 
-# use `arr[tuple(seq)]` instead of `arr[seq]`. In the future this will be interpreted as an array index, 
-# `arr[np.array(seq)]`, which will result either in an error or a different result.  
-
 dog_sang = ['samoyed', 'rottweiler', 'german_shepherd', 'jack_russell_terrier', 
             'husky', 'collie', 'labrador_retriever', 'golden_retriever']
 dog_ha = ['chihuahua', 'pug', 'shihtzu', 'yorkshire_terrier']
@@ -127,10 +116,13 @@ else:
 
 if age_class[testpred_age_arr[-1]]==age_jung:
     num2 = 2.5
+    age_weight = 2
 elif age_class[testpred_age_arr[-1]]==age_ha:
     num2 = 0
+    age_weight = 3
 else:
     num2 = 5
+    age_weight = 2
 
 exercise = num1+num2
 if exercise==10:
@@ -143,7 +135,21 @@ elif exercise==2.5:
     ex = '하 / 산책 20분 ~ 40분'
 else:
     ex = '최하 / 산책 20분'
-print('활동량: ', ex)
+        
+weight = int(input('몸무게 입력: '))
+kcal = int(input('사료 1g 당 칼로리 입력: '))
+food = ((weight * 30 + 70) * age_weight) / kcal
+
+# ===== 정보 출력 =====
+print('종: ', breed[testpred_breed_arr[-1]], '//', round(testpred_breed[0][tuple(testpred_breed_arg)]*100, 3),'%')
+print('나이: ', age[testpred_age_arr[-1]], age_class[testpred_age_arr[-1]],'//', round(testpred_age[0][tuple(testpred_age_arg)]*100, 5),'%')
+# 인덱스 튜플화해서 접근하라고 future warning 메세지 뜸
+# FutureWarning: Using a non-tuple sequence for multidimensional indexing is deprecated; 
+# use `arr[tuple(seq)]` instead of `arr[seq]`. In the future this will be interpreted as an array index, 
+# `arr[np.array(seq)]`, which will result either in an error or a different result.  
+print('적정 활동량: ', ex)
+print('적정 사료양: ', food, 'g')
+
 
 #----------- Android studio에서 사용하기 위해 tflite 파일로 모델 변환------------------
 # converter = tf.lite.TFLiteConverter.from_keras_model(model) 
