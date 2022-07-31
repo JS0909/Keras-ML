@@ -1,10 +1,8 @@
 from flask import Flask, render_template, request
 import os
 from keras.preprocessing.image import ImageDataGenerator
-from tensorflow.python.keras.models import Model, load_model
-from tensorflow.python.keras.layers import Dense, Conv2D, Flatten, MaxPool2D, Input
+from tensorflow.python.keras.models import load_model
 import numpy as np
-from tensorflow.python.keras.callbacks import EarlyStopping
 import tensorflow as tf
 from sklearn.metrics import accuracy_score
 
@@ -33,8 +31,8 @@ def upload_file():
 
         testing_img = scale_datagen.flow_from_directory(
             'D:/study_data/_testing_image/',
-            target_size=(224, 224),
-            batch_size=8000,
+            target_size=(150, 150),
+            batch_size=100,
             class_mode='categorical',
             shuffle=True
         )
@@ -65,7 +63,7 @@ def upload_file():
 
         testing_img = np.load(filepath+'testing_img'+suffix)
 
-        model = load_model('D:/study_data/_save/_h5/project2.h5')
+        model = load_model('D:/study_data/_save/_h5/project.h5')
 
         #4. 평가, 예측
         loss = model.evaluate(x_test, [y1_test, y2_test])

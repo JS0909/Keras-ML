@@ -52,7 +52,7 @@ output = Dense(32, activation='relu')(dense2)
 '''
 
 # VGGNet 16 모델 구성 참고
-input1 = Input(shape=(224, 224, 3))
+input1 = Input(shape=(150, 150, 3))
 conv1 = Conv2D(64,(3,3), padding='same', activation='relu')(input1)
 conv2 = Conv2D(64,(3,3), activation='relu')(conv1)
 mp1 = MaxPool2D(pool_size=(2,2))(conv2)
@@ -73,13 +73,8 @@ conv8 = Conv2D(512,(3,3), activation='relu')(conv7)
 conv9 = Conv2D(512,(3,3), activation='relu')(conv8)
 conv10 = Conv2D(512,(3,3), activation='relu')(conv9)
 mp4 = MaxPool2D(pool_size=(2,2))(conv10)
-drop4 = Dropout(0.2)(mp4)
 
-conv11 = Conv2D(512,(3,3), activation='relu')(drop4)
-conv12 = Conv2D(512,(3,3), activation='relu')(conv11)
-conv13 = Conv2D(512,(3,3), activation='relu')(conv12)
-mp5 = MaxPool2D(pool_size=(2,2))(conv13)
-flat1 = Flatten()(mp5)
+flat1 = Flatten()(mp4)
 drop1 = Dropout(0.3)(flat1)
 output = Dense(32, activation='relu')(drop1)
 
@@ -98,7 +93,7 @@ model.summary()
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=70, restore_best_weights=True)
 log = model.fit(x_train, [y1_train, y2_train], epochs=256, batch_size=32, callbacks=[Es], validation_split=0.2)
-model.save('D:/study_data/_save/_h5/project2.h5')
+model.save('D:/study_data/_save/_h5/project.h5')
 
 # model = load_model('D:/study_data/_save/_h5/project.h5')
 
@@ -222,3 +217,11 @@ print('적정 사료양: ', round(food,3), 'g')
 # 나이:  5month_4year 청년 42.77118 %
 # 적정 활동량:  상 / 산책 1시간 ~ 1시간 30분
 # 적정 사료양:  215.0 g
+
+# 메모리 문제로 150으로 크기 줄이고 레이어 conv10까지로 줄임
+# y1_acc스코어 :  0.03413400758533502
+# y2_acc스코어 :  0.41845764854614415
+# 종:  jindo // 4.297 %
+# 나이:  5month_4year 청년 40.66658 %
+# 적정 활동량:  상 / 산책 1시간 ~ 1시간 30분
+# 적정 사료양:  286.667 g

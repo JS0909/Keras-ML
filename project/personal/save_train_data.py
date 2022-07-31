@@ -22,7 +22,7 @@ scale_datagen = ImageDataGenerator(rescale=1./255)
 
 xy1_train = scale_datagen.flow_from_directory(
     'd:/study_data/_data/image/dog/breed/',
-    target_size=(224, 224),
+    target_size=(150, 150),
     batch_size=5000,
     class_mode='categorical',
     shuffle=True
@@ -30,7 +30,7 @@ xy1_train = scale_datagen.flow_from_directory(
 
 xy2_train = scale_datagen.flow_from_directory(
     'd:/study_data/_data/image/dog/age/',
-    target_size=(224, 224),
+    target_size=(150, 150),
     batch_size=1000,
     class_mode='categorical',
     shuffle=True
@@ -55,8 +55,8 @@ y2_train = xy2_train[0][1]
 # input 데이터 하나로
 x_train = np.concatenate((x1_train, x2_train))
 
-print(x1_train.shape, x2_train.shape) # (3000, 224, 224, 3) (951, 224, 224, 3)
-print(x_train.shape, y1_train.shape, y2_train.shape) # (3951, 224, 224, 3) (3000, 30) (951, 4)
+print(x1_train.shape, x2_train.shape) # (3000, 150, 150, 3) (951, 150, 150, 3)
+print(x_train.shape, y1_train.shape, y2_train.shape) # (3951, 150, 150, 3) (3000, 30) (951, 4)
 
 # train_test_split을 위한 x, y1, y2 행값 맞춰주기
 randidx = np.random.randint(y1_train.shape[0], size=x_train.shape[0]-y1_train.shape[0])
@@ -95,8 +95,8 @@ y2_train_aug = y2_train[randidx]
 y1_train = np.concatenate((y1_train, y1_train_aug))
 y2_train = np.concatenate((y2_train, y2_train_aug))
 
-print(x_train.shape, y1_train.shape, y2_train.shape) # (4660, 224, 224, 3) (4660, 30) (4660, 4)
-print(x_test.shape, y1_test.shape, y2_test.shape) # (791, 224, 224, 3) (791, 30) (791, 4)
+print(x_train.shape, y1_train.shape, y2_train.shape) # (4660, 150, 150, 3) (4660, 30) (4660, 4)
+print(x_test.shape, y1_test.shape, y2_test.shape) # (791, 150, 150, 3) (791, 30) (791, 4)
 
 np.save('d:/study_data/_save/_npy/_project/train_x.npy', arr =x_train)
 np.save('d:/study_data/_save/_npy/_project/train_y1.npy', arr =y1_train)

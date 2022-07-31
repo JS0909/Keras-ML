@@ -8,8 +8,8 @@ scale_datagen = ImageDataGenerator(rescale=1./255)
 
 testing_img = scale_datagen.flow_from_directory(
     'D:/study_data/_testing_image/',
-    target_size=(224, 224),
-    batch_size=8000,
+    target_size=(150, 150),
+    batch_size=100,
     class_mode='categorical',
     shuffle=True
 )
