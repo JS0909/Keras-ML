@@ -90,9 +90,9 @@ x_train = scale_datagen.flow(x_train, y1_train, batch_size=x_train_size, shuffle
 x_train = np.concatenate((x_train, x_augument))
 
 # 모델에 넣기 위해 x, y1, y2 행 맞추기
-randidx = np.random.randint(x_train.shape[0], size=x_train.shape[0]-y1_train.shape[0])
+randidx = np.random.randint(y1_train.shape[0], size=x_train.shape[0]-y1_train.shape[0])
 y1_train_aug = y1_train[randidx]
-randidx = np.random.randint(x_train.shape[0], size=x_train.shape[0]-y2_train.shape[0])
+randidx = np.random.randint(y2_train.shape[0], size=x_train.shape[0]-y2_train.shape[0])
 y2_train_aug = y2_train[randidx]
 y1_train = np.concatenate((y1_train, y1_train_aug))
 y2_train = np.concatenate((y2_train, y2_train_aug))
