@@ -87,12 +87,13 @@ y1_augument = y1_train[randidx2].copy() # flow를 위해 생성함
 x_augument = train_datagen.flow(x1_augument, y1_augument, batch_size=augument_size2, shuffle=False).next()[0]
 
 # x_train도 x_augument와 같은 비율로 스케일
-x_train = scale_datagen.flow(x_train, y1_train, batch_size=augument_size2, shuffle=False).next()[0]
+x_train_size = x_train.shape[0]
+x_train = scale_datagen.flow(x_train, y1_train, batch_size=x_train_size, shuffle=False).next()[0]
 
 # 원본train과 증폭train 합치기
 x_train = np.concatenate((x_train, x_augument))
 
-print(x_train.shape, y1_train.shape, y2_train.shape) # (6000, 150, 150, 3) (3715, 30) (3715, 4)
+print(x_train.shape, y1_train.shape, y2_train.shape) # (3000, 150, 150, 3) (3715, 30) (3715, 4)
 print(x_test.shape, y1_test.shape, y2_test.shape) # (929, 150, 150, 3) (929, 30) (929, 4)
 
 np.save('d:/study_data/_save/_npy/_project/train_x.npy', arr =x_train)
