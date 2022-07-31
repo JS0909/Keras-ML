@@ -59,31 +59,27 @@ print(x1_train.shape, x2_train.shape) # (3693, 150, 150, 3) (951, 150, 150, 3)
 print(x_train.shape, y1_train.shape, y2_train.shape) # (4644, 150, 150, 3) (3693, 30) (951, 4)
 
 # train_test_split을 위한 x, y1, y2 행값 맞춰주기
-augument_size_y1 = x_train.shape[0] - y1_train.shape[0]
-augument_size_y2 = x_train.shape[0] - y2_train.shape[0]
-randidx1 = np.random.randint(y1_train.shape[0], size=augument_size_y1)
-y1_train_aug = y1_train[randidx1]
-randidx1 = np.random.randint(y2_train.shape[0], size=augument_size_y2)
-y2_train_aug = y2_train[randidx1]
-
-print(y1_train_aug.shape, y2_train_aug.shape) # (951, 30) (3693, 4)
-
+randidx = np.random.randint(y1_train.shape[0], size=x_train.shape[0]-y1_train.shape[0])
+y1_train_aug = y1_train[randidx]
+randidx = np.random.randint(y2_train.shape[0], size=x_train.shape[0]-y2_train.shape[0])
+y2_train_aug = y2_train[randidx]
+# print(y1_train_aug.shape, y2_train_aug.shape) # (951, 30) (3693, 4)
 y1_train = np.concatenate((y1_train, y1_train_aug))
 y2_train = np.concatenate((y2_train, y2_train_aug))
 
-print(x_train.shape, y1_train.shape, y2_train.shape) # (4644, 150, 150, 3) (4644, 30) (4644, 4)
+# print(x_train.shape, y1_train.shape, y2_train.shape) # (4644, 150, 150, 3) (4644, 30) (4644, 4)
 
 x_train, x_test, y1_train, y1_test, y2_train, y2_test = train_test_split(x_train, y1_train, y2_train, 
                                                         train_size=0.8, shuffle=True, random_state=9)
 
 # 증폭 사이즈만큼 난수 뽑아서
 augument_size2 = 1500
-randidx2 = np.random.randint(x_train.shape[0], size=augument_size2)
+randidx = np.random.randint(x_train.shape[0], size=augument_size2)
 # 각각 인덱스에 난수 넣고 돌려가면서 이미지 저장
-x1_augument = x_train[randidx2].copy()
-y1_augument = y1_train[randidx2].copy() # flow를 위해 생성함
+x1_augument = x_train[randidx].copy()
+y1_augument = y1_train[randidx].copy() # flow를 위해 생성함
 
-# x 증폭 데이터 담기
+# x_train 증폭 데이터 담기
 x_augument = train_datagen.flow(x1_augument, y1_augument, batch_size=augument_size2, shuffle=False).next()[0]
 
 # x_train도 x_augument와 같은 비율로 스케일
@@ -92,6 +88,14 @@ x_train = scale_datagen.flow(x_train, y1_train, batch_size=x_train_size, shuffle
 
 # 원본train과 증폭train 합치기
 x_train = np.concatenate((x_train, x_augument))
+
+# 모델에 넣기 위해 x, y1, y2 행 맞추기
+randidx = np.random.randint(x_train.shape[0], size=x_train.shape[0]-y1_train.shape[0])
+y1_train_aug = y1_train[randidx]
+randidx = np.random.randint(x_train.shape[0], size=x_train.shape[0]-y2_train.shape[0])
+y2_train_aug = y2_train[randidx]
+y1_train = np.concatenate((y1_train, y1_train_aug))
+y2_train = np.concatenate((y2_train, y2_train_aug))
 
 print(x_train.shape, y1_train.shape, y2_train.shape) # (5215, 150, 150, 3) (3715, 30) (3715, 4)
 print(x_test.shape, y1_test.shape, y2_test.shape) # (929, 150, 150, 3) (929, 30) (929, 4)
