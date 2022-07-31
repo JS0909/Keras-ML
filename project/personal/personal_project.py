@@ -1,5 +1,5 @@
 from tensorflow.python.keras.models import Model, load_model
-from tensorflow.python.keras.layers import Dense, Conv2D, Flatten, MaxPool2D, Input
+from tensorflow.python.keras.layers import Dense, Conv2D, Flatten, MaxPool2D, Input, Dropout
 import numpy as np
 from tensorflow.python.keras.callbacks import EarlyStopping
 import tensorflow as tf
@@ -41,22 +41,23 @@ print(y1_test.shape, y2_test.shape) # (929, 30) (929, 4)
 # 2. 모델구성
 # 2-1. input모델
 input1 = Input(shape=(150, 150, 3))
-conv1 = Conv2D(32,(2,2), padding='same', activation='swish')(input1)
+conv1 = Conv2D(64,(2,2), padding='same', activation='swish')(input1)
 mp1 = MaxPool2D()(conv1)
 conv2 = Conv2D(64,(2,2), activation='swish')(mp1)
 flat1 = Flatten()(conv2)
 dense1 = Dense(64, activation='relu')(flat1)
-dense2 = Dense(32, activation='relu')(dense1)
+drop1 = Dropout(0.2)(dense1)
+dense2 = Dense(32, activation='relu')(drop1)
 output = Dense(32, activation='relu')(dense2)
 
 # 2-2. output모델1
-output1 = Dense(16)(output)
-output2 = Dense(10)(output1)
+output1 = Dense(32)(output)
+output2 = Dense(16)(output1)
 last_output1 = Dense(30, activation='softmax')(output2)
 
 # 2-3. output모델2
-output3 = Dense(16)(output)
-output4 = Dense(10)(output3)
+output3 = Dense(32)(output)
+output4 = Dense(32)(output3)
 last_output2 = Dense(4, activation='softmax')(output4)
 
 model = Model(inputs=input1, outputs=[last_output1, last_output2])
@@ -64,9 +65,9 @@ model.summary()
 
 # 3. 컴파일, 훈련
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=150, restore_best_weights=True)
-log = model.fit(x_train, [y1_train, y2_train], epochs=1000, batch_size=32, callbacks=[Es], validation_split=0.2)
-model.save('D:/study_data/_save/_h5/project2.h5')
+Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=100, restore_best_weights=True)
+log = model.fit(x_train, [y1_train, y2_train], epochs=700, batch_size=32, callbacks=[Es], validation_split=0.2)
+model.save('D:/study_data/_save/_h5/project.h5')
 
 # model = load_model('D:/study_data/_save/_h5/project2.h5')
 
@@ -153,13 +154,23 @@ breed_result = breed[testpred_breed_arr[-1]]
 breed_po = round(testpred_breed[0][tuple(testpred_breed_arg)]*100, 3)
 age_result = age[testpred_age_arr[-1]]
 age_cl = age_class[testpred_age_arr[-1]]
-
-# ===== 정보 출력 =====
-print('종: ', breed_result, '//', breed_po,'%')
-print('나이: ', age_result, age_cl, age_po, '%')
 # 인덱스 튜플화해서 접근하라고 future warning 메세지 뜸
 # FutureWarning: Using a non-tuple sequence for multidimensional indexing is deprecated; 
 # use `arr[tuple(seq)]` instead of `arr[seq]`. In the future this will be interpreted as an array index, 
 # `arr[np.array(seq)]`, which will result either in an error or a different result.  
+
+
+
+# ===== 정보 출력 =====
+print('종: ', breed_result, '//', breed_po,'%')
+print('나이: ', age_result, age_cl, age_po, '%')
+
 print('적정 활동량: ', ex)
 print('적정 사료양: ', round(food,3), 'g')
+
+
+# model.save('D:/study_data/_save/_h5/project.h5')
+# y1_acc스코어 :  0.055314533622559656
+# y2_acc스코어 :  0.43817787418655096
+# 종:  shihtzu // 62.902 %
+# 나이:  5month_4year 청년 72.63526 %

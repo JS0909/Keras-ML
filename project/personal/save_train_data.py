@@ -26,7 +26,7 @@ xy1_train = scale_datagen.flow_from_directory(
     batch_size=5000,
     class_mode='categorical',
     shuffle=True
-) # Found 3693 images belonging to 30 classes.
+) # Found 3657 images belonging to 30 classes.
 
 xy2_train = scale_datagen.flow_from_directory(
     'd:/study_data/_data/image/dog/age/',
@@ -55,19 +55,19 @@ y2_train = xy2_train[0][1]
 # input 데이터 하나로
 x_train = np.concatenate((x1_train, x2_train))
 
-print(x1_train.shape, x2_train.shape) # (3693, 150, 150, 3) (951, 150, 150, 3)
-print(x_train.shape, y1_train.shape, y2_train.shape) # (4644, 150, 150, 3) (3693, 30) (951, 4)
+print(x1_train.shape, x2_train.shape) # (3657, 150, 150, 3) (951, 150, 150, 3)
+print(x_train.shape, y1_train.shape, y2_train.shape) # (4608, 150, 150, 3) (3657, 30) (951, 4)
 
 # train_test_split을 위한 x, y1, y2 행값 맞춰주기
 randidx = np.random.randint(y1_train.shape[0], size=x_train.shape[0]-y1_train.shape[0])
 y1_train_aug = y1_train[randidx]
 randidx = np.random.randint(y2_train.shape[0], size=x_train.shape[0]-y2_train.shape[0])
 y2_train_aug = y2_train[randidx]
-# print(y1_train_aug.shape, y2_train_aug.shape) # (951, 30) (3693, 4)
+# print(y1_train_aug.shape, y2_train_aug.shape)
 y1_train = np.concatenate((y1_train, y1_train_aug))
 y2_train = np.concatenate((y2_train, y2_train_aug))
 
-# print(x_train.shape, y1_train.shape, y2_train.shape) # (4644, 150, 150, 3) (4644, 30) (4644, 4)
+# print(x_train.shape, y1_train.shape, y2_train.shape)
 
 x_train, x_test, y1_train, y1_test, y2_train, y2_test = train_test_split(x_train, y1_train, y2_train, 
                                                         train_size=0.8, shuffle=True, random_state=9)
@@ -97,8 +97,8 @@ y2_train_aug = y2_train[randidx]
 y1_train = np.concatenate((y1_train, y1_train_aug))
 y2_train = np.concatenate((y2_train, y2_train_aug))
 
-print(x_train.shape, y1_train.shape, y2_train.shape) # (5215, 150, 150, 3) (5215, 30) (5215, 4)
-print(x_test.shape, y1_test.shape, y2_test.shape) # (929, 150, 150, 3) (929, 30) (929, 4)
+print(x_train.shape, y1_train.shape, y2_train.shape) # (5186, 150, 150, 3) (5186, 30) (5186, 4)
+print(x_test.shape, y1_test.shape, y2_test.shape) # (922, 150, 150, 3) (922, 30) (922, 4)
 
 np.save('d:/study_data/_save/_npy/_project/train_x.npy', arr =x_train)
 np.save('d:/study_data/_save/_npy/_project/train_y1.npy', arr =y1_train)
