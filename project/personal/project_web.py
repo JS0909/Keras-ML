@@ -65,10 +65,6 @@ def upload_file():
 
         testing_img = np.load(filepath+'testing_img'+suffix)
 
-        # print(x_train.shape) # (4000, 150, 150, 3)
-        # print(y1_train.shape, y2_train.shape) # (6897, 30) (6897, 4)
-        # print(y1_test.shape, y2_test.shape) # (1725, 30) (1725, 4)
-
         model = load_model('D:/study_data/_save/_h5/project2.h5')
 
         #4. 평가, 예측
@@ -84,16 +80,6 @@ def upload_file():
         acc_sc2 = accuracy_score(y2_test_arg,y2_pred)
         print('y1_acc스코어 : ', acc_sc1)
         print('y2_acc스코어 : ', acc_sc2)
-
-        '''
-        # 결과 잘 나오는지 중간 확인
-        y1_pred = np.array(y1_pred)
-        y2_pred = np.array(y2_pred)
-        a = range(0, 10)
-        for i in a:
-            print(y1_pred[i])
-            print(y2_pred[i], '\n')
-        '''
 
         # 테스트용 이미지로 프레딕트
         testpred_breed, testpred_age = model.predict(testing_img)
@@ -145,8 +131,6 @@ def upload_file():
         else:
             ex = '최하 / 산책 20분'
                 
-        # weight = int(input('몸무게 입력: '))
-        # kcal = int(input('사료 1g 당 칼로리 입력: '))
         food = ((weight * 30 + 70) * age_weight) / kcal
 
         age_po = round(testpred_age[0][tuple(testpred_age_arg)]*100, 5)
@@ -158,10 +142,6 @@ def upload_file():
         # ===== 정보 출력 =====
         print('종: ', breed_result, '//', breed_po,'%')
         print('나이: ', age_result, age_cl, age_po, '%')
-        # 인덱스 튜플화해서 접근하라고 future warning 메세지 뜸
-        # FutureWarning: Using a non-tuple sequence for multidimensional indexing is deprecated; 
-        # use `arr[tuple(seq)]` instead of `arr[seq]`. In the future this will be interpreted as an array index, 
-        # `arr[np.array(seq)]`, which will result either in an error or a different result.  
         print('적정 활동량: ', ex)
         print('적정 사료양: ', round(food,3), 'g')
     

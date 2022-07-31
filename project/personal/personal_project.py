@@ -1,5 +1,6 @@
+from itertools import dropwhile
 from tensorflow.python.keras.models import Model, load_model
-from tensorflow.python.keras.layers import Dense, Conv2D, Flatten, MaxPool2D, Input, Dropout
+from tensorflow.python.keras.layers import Dense, Conv2D, Flatten, MaxPool2D, Input, Dropout, GRU, Reshape
 import numpy as np
 from tensorflow.python.keras.callbacks import EarlyStopping
 import tensorflow as tf
@@ -34,40 +35,70 @@ y2_test = np.load(filepath+'test_y2'+suffix)
 
 testing_img = np.load(filepath+'testing_img'+suffix)
 
-print(x_train.shape) # (5106, 150, 150, 3)
-print(y1_train.shape, y2_train.shape) # (5106, 30) (5106, 4)
-print(y1_test.shape, y2_test.shape) # (902, 30) (902, 4)
-
 # 2. 모델구성
 # 2-1. input모델
+'''
 input1 = Input(shape=(150, 150, 3))
 conv1 = Conv2D(64,(2,2), padding='same', activation='swish')(input1)
 mp1 = MaxPool2D()(conv1)
-conv2 = Conv2D(64,(2,2), activation='swish')(mp1)
-flat1 = Flatten()(conv2)
-dense1 = Dense(64, activation='relu')(flat1)
+conv2 = Conv2D(32,(2,2), activation='swish')(mp1)
+reshape1 = Reshape(target_shape=(74*37, 2*32))(conv2)
+lstm1 = GRU(16)(reshape1)
+# flat1 = Flatten()(conv2)
+dense1 = Dense(64, activation='relu')(lstm1)
 drop1 = Dropout(0.2)(dense1)
-dense2 = Dense(32, activation='relu')(drop1)
+dense2 = Dense(32, activation='linear')(drop1)
 output = Dense(32, activation='relu')(dense2)
+'''
+
+# VGGNet 16 모델 구성 참고
+input1 = Input(shape=(224, 224, 3))
+conv1 = Conv2D(64,(3,3), padding='same', activation='relu')(input1)
+conv2 = Conv2D(64,(3,3), activation='relu')(conv1)
+mp1 = MaxPool2D(pool_size=(2,2))(conv2)
+drop1 = Dropout(0.2)(mp1)
+
+conv3 = Conv2D(128,(3,3), activation='relu')(drop1)
+conv4 = Conv2D(128,(3,3), activation='relu')(conv3)
+mp2 = MaxPool2D(pool_size=(2,2))(conv4)
+drop2 = Dropout(0.2)(mp2)
+
+conv5 = Conv2D(256,(3,3), activation='relu')(drop2)
+conv6 = Conv2D(256,(3,3), activation='relu')(conv5)
+mp3 = MaxPool2D(pool_size=(2,2))(conv6)
+drop3 = Dropout(0.2)(mp3)
+
+conv7 = Conv2D(256,(3,3), activation='relu')(drop3)
+conv8 = Conv2D(512,(3,3), activation='relu')(conv7)
+conv9 = Conv2D(512,(3,3), activation='relu')(conv8)
+conv10 = Conv2D(512,(3,3), activation='relu')(conv9)
+mp4 = MaxPool2D(pool_size=(2,2))(conv10)
+drop4 = Dropout(0.2)(mp4)
+
+conv11 = Conv2D(512,(3,3), activation='relu')(drop4)
+conv12 = Conv2D(512,(3,3), activation='relu')(conv11)
+conv13 = Conv2D(512,(3,3), activation='relu')(conv12)
+mp5 = MaxPool2D(pool_size=(2,2))(conv13)
+flat1 = Flatten()(mp5)
+drop1 = Dropout(0.3)(flat1)
+output = Dense(32, activation='relu')(drop1)
 
 # 2-2. output모델1
-output1 = Dense(32)(output)
-output2 = Dense(16)(output1)
-last_output1 = Dense(30, activation='softmax')(output2)
+output1 = Dense(32, activation='relu')(output)
+last_output1 = Dense(30, activation='softmax')(output1)
 
 # 2-3. output모델2
-output3 = Dense(64)(output)
-output4 = Dense(32)(output3)
-last_output2 = Dense(4, activation='softmax')(output4)
+output2 = Dense(64, activation='relu')(output)
+last_output2 = Dense(4, activation='softmax')(output2)
 
 model = Model(inputs=input1, outputs=[last_output1, last_output2])
 model.summary()
 
 # 3. 컴파일, 훈련
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=50, restore_best_weights=True)
-log = model.fit(x_train, [y1_train, y2_train], epochs=300, batch_size=32, callbacks=[Es], validation_split=0.2)
-model.save('D:/study_data/_save/_h5/project.h5')
+Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=70, restore_best_weights=True)
+log = model.fit(x_train, [y1_train, y2_train], epochs=256, batch_size=32, callbacks=[Es], validation_split=0.2)
+model.save('D:/study_data/_save/_h5/project2.h5')
 
 # model = load_model('D:/study_data/_save/_h5/project.h5')
 
@@ -169,9 +200,25 @@ print('적정 활동량: ', ex)
 print('적정 사료양: ', round(food,3), 'g')
 
 
-# model.save('D:/study_data/_save/_h5/project.h5')
 # conv2d 4번
 # y1_acc스코어 :  0.058823529411764705
 # y2_acc스코어 :  0.4067584480600751
 # 종:  pomeranian // 5.959 %
 # 나이:  5month_4year 청년 44.99539 %
+
+# model.save('D:/study_data/_save/_h5/project.h5')
+# vgg 16
+# y1_acc스코어 :  0.04130162703379224
+# y2_acc스코어 :  0.4380475594493116
+# 종:  pomeranian // 4.725 %
+# 나이:  5month_4year 청년 44.4075 %
+
+# model.save('D:/study_data/_save/_h5/project2.h5')
+# vgg 16
+# epoch 130
+# y1_acc스코어 :  0.03413400758533502
+# y2_acc스코어 :  0.42857142857142855
+# 종:  jindo // 4.188 %
+# 나이:  5month_4year 청년 42.77118 %
+# 적정 활동량:  상 / 산책 1시간 ~ 1시간 30분
+# 적정 사료양:  215.0 g
