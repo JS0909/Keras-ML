@@ -170,7 +170,15 @@ print('적정 사료양: ', round(food,3), 'g')
 
 
 # model.save('D:/study_data/_save/_h5/project.h5')
+
+
+
+
+
+# model.save('D:/study_data/_save/_h5/project2.h5')
 # y1_acc스코어 :  0.055314533622559656
 # y2_acc스코어 :  0.43817787418655096
 # 종:  shihtzu // 62.902 %
 # 나이:  5month_4year 청년 72.63526 %
+
+
