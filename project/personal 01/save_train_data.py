@@ -26,7 +26,7 @@ xy1_train = scale_datagen.flow_from_directory(
     batch_size=8000,
     class_mode='categorical',
     shuffle=True
-) # Found 6776 images belonging to 30 classes.
+) # Found 3693 images belonging to 30 classes.
 
 xy2_train = scale_datagen.flow_from_directory(
     'd:/study_data/_data/image/dog/age/',
