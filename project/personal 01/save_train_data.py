@@ -23,7 +23,7 @@ scale_datagen = ImageDataGenerator(rescale=1./255)
 xy1_train = scale_datagen.flow_from_directory(
     'd:/study_data/_data/image/dog/breed/',
     target_size=(150, 150),
-    batch_size=8000,
+    batch_size=5000,
     class_mode='categorical',
     shuffle=True
 ) # Found 3693 images belonging to 30 classes.
@@ -31,7 +31,7 @@ xy1_train = scale_datagen.flow_from_directory(
 xy2_train = scale_datagen.flow_from_directory(
     'd:/study_data/_data/image/dog/age/',
     target_size=(150, 150),
-    batch_size=8000,
+    batch_size=1000,
     class_mode='categorical',
     shuffle=True
 ) # Found 951 images belonging to 4 classes.
