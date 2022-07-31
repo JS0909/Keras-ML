@@ -97,7 +97,7 @@ y2_train_aug = y2_train[randidx]
 y1_train = np.concatenate((y1_train, y1_train_aug))
 y2_train = np.concatenate((y2_train, y2_train_aug))
 
-print(x_train.shape, y1_train.shape, y2_train.shape) # (5215, 150, 150, 3) (3715, 30) (3715, 4)
+print(x_train.shape, y1_train.shape, y2_train.shape) # (5215, 150, 150, 3) (5215, 30) (5215, 4)
 print(x_test.shape, y1_test.shape, y2_test.shape) # (929, 150, 150, 3) (929, 30) (929, 4)
 
 np.save('d:/study_data/_save/_npy/_project/train_x.npy', arr =x_train)
