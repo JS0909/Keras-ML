@@ -34,9 +34,9 @@ y2_test = np.load(filepath+'test_y2'+suffix)
 
 testing_img = np.load(filepath+'testing_img'+suffix)
 
-print(x_train.shape) # (5215, 150, 150, 3)
-print(y1_train.shape, y2_train.shape) # (5215, 30) (5215, 4)
-print(y1_test.shape, y2_test.shape) # (929, 30) (929, 4)
+print(x_train.shape) # (5106, 150, 150, 3)
+print(y1_train.shape, y2_train.shape) # (5106, 30) (5106, 4)
+print(y1_test.shape, y2_test.shape) # (902, 30) (902, 4)
 
 # 2. 모델구성
 # 2-1. input모델
@@ -44,7 +44,9 @@ input1 = Input(shape=(150, 150, 3))
 conv1 = Conv2D(64,(2,2), padding='same', activation='swish')(input1)
 mp1 = MaxPool2D()(conv1)
 conv2 = Conv2D(64,(2,2), activation='swish')(mp1)
-flat1 = Flatten()(conv2)
+conv3 = Conv2D(32,(2,2), activation='swish')(conv2)
+conv4 = Conv2D(16,(2,2), activation='swish')(conv2)
+flat1 = Flatten()(conv4)
 dense1 = Dense(64, activation='relu')(flat1)
 drop1 = Dropout(0.2)(dense1)
 dense2 = Dense(32, activation='relu')(drop1)
@@ -56,7 +58,7 @@ output2 = Dense(16)(output1)
 last_output1 = Dense(30, activation='softmax')(output2)
 
 # 2-3. output모델2
-output3 = Dense(32)(output)
+output3 = Dense(64)(output)
 output4 = Dense(32)(output3)
 last_output2 = Dense(4, activation='softmax')(output4)
 
@@ -65,8 +67,8 @@ model.summary()
 
 # 3. 컴파일, 훈련
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=100, restore_best_weights=True)
-log = model.fit(x_train, [y1_train, y2_train], epochs=700, batch_size=32, callbacks=[Es], validation_split=0.2)
+Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=50, restore_best_weights=True)
+log = model.fit(x_train, [y1_train, y2_train], epochs=500, batch_size=32, callbacks=[Es], validation_split=0.2)
 model.save('D:/study_data/_save/_h5/project.h5')
 
 # model = load_model('D:/study_data/_save/_h5/project2.h5')
@@ -170,15 +172,15 @@ print('적정 사료양: ', round(food,3), 'g')
 
 
 # model.save('D:/study_data/_save/_h5/project.h5')
-
-
-
-
+# y1_acc스코어 :  0.039045553145336226
+# y2_acc스코어 :  0.43817787418655096
+# 종:  shihtzu // 6.201 %
+# 나이:  5month_4year 청년 44.65193 %
 
 # model.save('D:/study_data/_save/_h5/project2.h5')
-# y1_acc스코어 :  0.055314533622559656
-# y2_acc스코어 :  0.43817787418655096
-# 종:  shihtzu // 62.902 %
-# 나이:  5month_4year 청년 72.63526 %
+# y1_acc스코어 :  0.03547671840354767
+# y2_acc스코어 :  0.4190687361419069
+# 종:  papillon // 7.337 %
+# 나이:  5month_4year 청년 50.17883 %
 
 
