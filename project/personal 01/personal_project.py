@@ -34,9 +34,9 @@ y2_test = np.load(filepath+'test_y2'+suffix)
 
 testing_img = np.load(filepath+'testing_img'+suffix)
 
-print(x_train.shape) # 
-print(y1_train.shape, y2_train.shape) # 
-print(y1_test.shape, y2_test.shape) # 
+print(x_train.shape) # (5215, 150, 150, 3)
+print(y1_train.shape, y2_train.shape) # (5215, 30) (5215, 4)
+print(y1_test.shape, y2_test.shape) # (929, 30) (929, 4)
 
 # 2. 모델구성
 # 2-1. input모델
