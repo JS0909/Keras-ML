@@ -6,7 +6,6 @@ import tensorflow as tf
 from sklearn.metrics import accuracy_score
 import pandas as pd
 
-
 tf.random.set_seed(9) # 하이퍼 파라미터 튜닝 용이하게 하기 위해
 
 breed = {0:'beagle', 1:'bichon', 2:'bulldog', 3:'chihuahua', 4:'chow_chow', 
@@ -35,9 +34,9 @@ y2_test = np.load(filepath+'test_y2'+suffix)
 
 testing_img = np.load(filepath+'testing_img'+suffix)
 
-# print(x_train.shape) # (4000, 150, 150, 3)
-# print(y1_train.shape, y2_train.shape) # (6897, 30) (6897, 4)
-# print(y1_test.shape, y2_test.shape) # (1725, 30) (1725, 4)
+print(x_train.shape) # 
+print(y1_train.shape, y2_train.shape) # 
+print(y1_test.shape, y2_test.shape) # 
 
 # 2. 모델구성
 # 2-1. input모델
