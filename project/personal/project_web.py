@@ -6,8 +6,6 @@ import numpy as np
 import tensorflow as tf
 from sklearn.metrics import accuracy_score
 
-tf.random.set_seed(9) # 하이퍼 파라미터 튜닝 용이하게 하기 위해
-
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'D:/study_data/_testing_image/dogs'
 
@@ -145,7 +143,7 @@ def upload_file():
         print('적정 사료양: ', round(food,3), 'g')
     
         return render_template('tf.html', breed=breed_result, breed_po=breed_po, age=age_result, age_po=age_po,
-                               age_cl=age_cl, ex=ex, food=round(food,3))
+                               age_cl=age_cl, ex=ex, food=round(food,3), acc_sc1=acc_sc1, acc_sc2=acc_sc2)
 
     
 if __name__ == '__main__':

@@ -1,4 +1,3 @@
-from itertools import dropwhile
 from tensorflow.python.keras.models import Model, load_model
 from tensorflow.python.keras.layers import Dense, Conv2D, Flatten, MaxPool2D, Input, Dropout, GRU, Reshape
 import numpy as np
@@ -86,17 +85,22 @@ model = Model(inputs=input1, outputs=[last_output1, last_output2])
 model.summary()
 
 # 3. 컴파일, 훈련
+# model.load_weights('D:/study_data/_save/_h5/project_weight.h5')
+
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=70, restore_best_weights=True)
-log = model.fit(x_train, [y1_train, y2_train], epochs=256, batch_size=32, callbacks=[Es], validation_split=0.2)
-model.save('D:/study_data/_save/_h5/project2.h5')
+log = model.fit(x_train, [y1_train, y2_train], epochs=200, batch_size=32, callbacks=[Es], validation_split=0.2)
+
+model.save('D:/study_data/_save/_h5/project.h5')
+# model.save_weights('D:/study_data/_save/_h5/project_weight.h5')
 
 # model = load_model('D:/study_data/_save/_h5/project.h5')
+
 
 #4. 평가, 예측
 loss = model.evaluate(x_test, [y1_test, y2_test])
 print('tested loss : ', loss)
-
+'''
 y1_pred, y2_pred = model.predict(x_test)
 y1_pred = tf.argmax(y1_pred, axis=1)
 y1_test_arg = tf.argmax(y1_test, axis=1)
@@ -107,7 +111,6 @@ acc_sc2 = accuracy_score(y2_test_arg,y2_pred)
 print('y1_acc스코어 : ', acc_sc1)
 print('y2_acc스코어 : ', acc_sc2)
 
-'''
 # 결과 잘 나오는지 중간 확인
 y1_pred = np.array(y1_pred)
 y2_pred = np.array(y2_pred)
@@ -119,6 +122,7 @@ for i in a:
 
 # 테스트용 이미지로 프레딕트
 testing_img = np.load(filepath+'testing_img'+suffix)
+
 testpred_breed, testpred_age = model.predict(testing_img)
 
 testpred_breed_arg = tf.argmax(testpred_breed, axis=1)
@@ -215,3 +219,4 @@ print('적정 사료양: ', round(food,3), 'g')
 # 나이:  5month_4year 청년 40.66658 %
 # 적정 활동량:  상 / 산책 1시간 ~ 1시간 30분
 # 적정 사료양:  286.667 g
+
