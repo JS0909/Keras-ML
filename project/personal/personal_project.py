@@ -91,7 +91,7 @@ model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accur
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=70, restore_best_weights=True)
 log = model.fit(x_train, [y1_train, y2_train], epochs=200, batch_size=32, callbacks=[Es], validation_split=0.2)
 
-model.save('D:/study_data/_save/_h5/project.h5')
+model.save('D:/study_data/_save/_h5/project3.h5')
 # model.save_weights('D:/study_data/_save/_h5/project_weight.h5')
 
 # model = load_model('D:/study_data/_save/_h5/project.h5')

@@ -61,7 +61,7 @@ def upload_file():
         y2_test = np.load(filepath+'test_y2'+suffix)
 
         # 2, 3. 모델, 훈련
-        model = load_model('D:/study_data/_save/_h5/project2.h5')
+        model = load_model('D:/study_data/_save/_h5/project4.h5')
 
         #4. 평가, 예측
         loss = model.evaluate(x_test, [y1_test, y2_test])
