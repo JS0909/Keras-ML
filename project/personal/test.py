@@ -28,8 +28,6 @@ x_test = np.load(filepath+'test_x'+suffix)
 y1_test = np.load(filepath+'test_y1'+suffix)
 y2_test = np.load(filepath+'test_y2'+suffix)
 
-testing_img = np.load(filepath+'testing_img'+suffix)
-
 model = load_model('D:/study_data/_save/_h5/project2.h5')
 
 #4. 평가, 예측
@@ -47,6 +45,7 @@ print('y1_acc스코어 : ', acc_sc1)
 print('y2_acc스코어 : ', acc_sc2)
 
 # 테스트용 이미지로 프레딕트
+testing_img = np.load(filepath+'testing_img'+suffix)
 testpred_breed, testpred_age = model.predict(testing_img)
 
 testpred_breed_arg = tf.argmax(testpred_breed, axis=1)

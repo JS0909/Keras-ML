@@ -33,8 +33,6 @@ x_test = np.load(filepath+'test_x'+suffix)
 y1_test = np.load(filepath+'test_y1'+suffix)
 y2_test = np.load(filepath+'test_y2'+suffix)
 
-testing_img = np.load(filepath+'testing_img'+suffix)
-
 # 2. 모델구성
 # 2-1. input모델
 '''
@@ -42,10 +40,8 @@ input1 = Input(shape=(150, 150, 3))
 conv1 = Conv2D(64,(2,2), padding='same', activation='swish')(input1)
 mp1 = MaxPool2D()(conv1)
 conv2 = Conv2D(32,(2,2), activation='swish')(mp1)
-reshape1 = Reshape(target_shape=(74*37, 2*32))(conv2)
-lstm1 = GRU(16)(reshape1)
-# flat1 = Flatten()(conv2)
-dense1 = Dense(64, activation='relu')(lstm1)
+flat1 = Flatten()(conv2)
+dense1 = Dense(64, activation='relu')(flat1)
 drop1 = Dropout(0.2)(dense1)
 dense2 = Dense(32, activation='linear')(drop1)
 output = Dense(32, activation='relu')(dense2)
@@ -93,7 +89,7 @@ model.summary()
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=70, restore_best_weights=True)
 log = model.fit(x_train, [y1_train, y2_train], epochs=256, batch_size=32, callbacks=[Es], validation_split=0.2)
-model.save('D:/study_data/_save/_h5/project.h5')
+model.save('D:/study_data/_save/_h5/project2.h5')
 
 # model = load_model('D:/study_data/_save/_h5/project.h5')
 
@@ -122,6 +118,7 @@ for i in a:
 '''
 
 # 테스트용 이미지로 프레딕트
+testing_img = np.load(filepath+'testing_img'+suffix)
 testpred_breed, testpred_age = model.predict(testing_img)
 
 testpred_breed_arg = tf.argmax(testpred_breed, axis=1)
@@ -195,24 +192,17 @@ print('적정 활동량: ', ex)
 print('적정 사료양: ', round(food,3), 'g')
 
 
-# conv2d 4번
+# conv2d
 # y1_acc스코어 :  0.058823529411764705
 # y2_acc스코어 :  0.4067584480600751
 # 종:  pomeranian // 5.959 %
 # 나이:  5month_4year 청년 44.99539 %
 
-# model.save('D:/study_data/_save/_h5/project.h5')
-# vgg 16
-# y1_acc스코어 :  0.04130162703379224
-# y2_acc스코어 :  0.4380475594493116
-# 종:  pomeranian // 4.725 %
-# 나이:  5month_4year 청년 44.4075 %
-
 # model.save('D:/study_data/_save/_h5/project2.h5')
 # vgg 16
 # epoch 130
-# y1_acc스코어 :  0.03413400758533502
-# y2_acc스코어 :  0.42857142857142855
+# y1_acc스코어 :  0.04130162703379224
+# y2_acc스코어 :  0.4380475594493116
 # 종:  jindo // 4.188 %
 # 나이:  5month_4year 청년 42.77118 %
 # 적정 활동량:  상 / 산책 1시간 ~ 1시간 30분

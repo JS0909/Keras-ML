@@ -38,6 +38,7 @@ def upload_file():
         )
 
         np.save('d:/study_data/_save/_npy/_project/testing_img.npy', arr =testing_img[0][0])
+        print('새 이미지 수치화 저장 완료')
 
         breed = {0:'beagle', 1:'bichon', 2:'bulldog', 3:'chihuahua', 4:'chow_chow', 
         5:'cocker_spaniel', 6:'collie', 7:'dachshund', 8:'fox_terrier', 9:'german_shepherd', 
@@ -61,9 +62,8 @@ def upload_file():
         y1_test = np.load(filepath+'test_y1'+suffix)
         y2_test = np.load(filepath+'test_y2'+suffix)
 
-        testing_img = np.load(filepath+'testing_img'+suffix)
-
-        model = load_model('D:/study_data/_save/_h5/project.h5')
+        # 2, 3. 모델, 훈련
+        model = load_model('D:/study_data/_save/_h5/project2.h5')
 
         #4. 평가, 예측
         loss = model.evaluate(x_test, [y1_test, y2_test])
@@ -80,6 +80,7 @@ def upload_file():
         print('y2_acc스코어 : ', acc_sc2)
 
         # 테스트용 이미지로 프레딕트
+        testing_img = np.load(filepath+'testing_img'+suffix)
         testpred_breed, testpred_age = model.predict(testing_img)
 
         testpred_breed_arg = tf.argmax(testpred_breed, axis=1)
