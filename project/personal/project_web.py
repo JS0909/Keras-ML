@@ -5,6 +5,7 @@ from tensorflow.python.keras.models import load_model
 import numpy as np
 import tensorflow as tf
 from sklearn.metrics import accuracy_score
+import cv2
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'D:/study_data/_testing_image/dogs'
@@ -21,6 +22,7 @@ def upload_file():
         f = request.files['file']
       #저장할 경로 + 파일명
         f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))
+        img = cv2.imread(app.config['UPLOAD_FOLDER'])
         weight = int(request.form['num1'])
         kcal = int(request.form['num2'])
         
@@ -29,7 +31,7 @@ def upload_file():
 
         testing_img = scale_datagen.flow_from_directory(
             'D:/study_data/_testing_image/',
-            target_size=(150, 150),
+            target_size=(224, 224),
             batch_size=100,
             class_mode='categorical',
             shuffle=True
@@ -61,7 +63,7 @@ def upload_file():
         y2_test = np.load(filepath+'test_y2'+suffix)
 
         # 2, 3. 모델, 훈련
-        model = load_model('D:/study_data/_save/_h5/project4.h5')
+        model = load_model('D:/study_data/_save/_h5/project.h5')
 
         #4. 평가, 예측
         loss = model.evaluate(x_test, [y1_test, y2_test])
@@ -142,8 +144,9 @@ def upload_file():
         print('적정 활동량: ', ex)
         print('적정 사료양: ', round(food,3), 'g')
     
+        
         return render_template('tf.html', breed=breed_result, breed_po=breed_po, age=age_result, age_po=age_po,
-                               age_cl=age_cl, ex=ex, food=round(food,3), acc_sc1=acc_sc1, acc_sc2=acc_sc2)
+                               age_cl=age_cl, ex=ex, food=round(food,3), acc_sc1=acc_sc1, acc_sc2=acc_sc2, img_file=img)
 
     
 if __name__ == '__main__':

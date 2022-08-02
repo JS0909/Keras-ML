@@ -5,7 +5,7 @@ from tensorflow.python.keras.callbacks import EarlyStopping
 import tensorflow as tf
 from sklearn.metrics import accuracy_score
 import pandas as pd
-from tensorflow.keras.applications.vgg16 import VGG16
+from keras.applications.vgg16 import VGG16
 
 tf.random.set_seed(9) # 하이퍼 파라미터 튜닝 용이하게 하기 위해
 
@@ -36,11 +36,33 @@ y2_test = np.load(filepath+'test_y2'+suffix)
 # 2. 모델구성
 # 2-1. input모델
 input1 = Input(shape=(224, 224, 3))
-model = VGG16(input_tensor = input1)
-layer_dict = dict([(layer.name, layer) for layer in model.layers])
-vgg_lastlayer = layer_dict['block5_pool'].output
-drop1 = Dropout(0.3)(vgg_lastlayer)
-output = Dense(32, activation='relu')(drop1)
+conv1 = Conv2D(64,(3,3), padding='same', activation='relu')(input1)
+conv2 = Conv2D(64,(3,3), activation='relu')(conv1)
+mp1 = MaxPool2D(pool_size=(2,2))(conv2)
+
+conv3 = Conv2D(128,(3,3), activation='relu')(mp1)
+conv4 = Conv2D(128,(3,3), activation='relu')(conv3)
+mp2 = MaxPool2D(pool_size=(2,2))(conv4)
+
+conv5 = Conv2D(256,(3,3), activation='relu')(mp2)
+conv6 = Conv2D(256,(3,3), activation='relu')(conv5)
+conv7 = Conv2D(256,(3,3), activation='relu')(conv6)
+mp3 = MaxPool2D(pool_size=(2,2))(conv7)
+
+conv8 = Conv2D(512,(3,3), activation='relu')(mp3)
+conv9 = Conv2D(512,(3,3), activation='relu')(conv8)
+conv10 = Conv2D(512,(3,3), activation='relu')(conv9)
+mp4 = MaxPool2D(pool_size=(2,2))(conv10)
+
+conv11 = Conv2D(512,(3,3), activation='relu')(mp4)
+conv12 = Conv2D(512,(3,3), activation='relu')(conv11)
+conv13 = Conv2D(512,(3,3), activation='relu')(conv12)
+mp5 = MaxPool2D(pool_size=(2,2))(conv13)
+
+flat1 = Flatten()(mp4)
+dense1 = Dense(4096, activation='relu')(flat1)
+dense2 = Dense(4096, activation='relu')(dense1)
+output = Dense(1000, activation='relu')(dense2)
 
 # 2-2. output모델1
 output1 = Dense(32, activation='relu')(output)
@@ -51,14 +73,13 @@ output2 = Dense(64, activation='relu')(output)
 last_output2 = Dense(4, activation='softmax')(output2)
 
 model = Model(inputs=input1, outputs=[last_output1, last_output2])
-model.summary()
 
 # 3. 컴파일, 훈련
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=70, restore_best_weights=True)
 log = model.fit(x_train, [y1_train, y2_train], epochs=200, batch_size=32, callbacks=[Es], validation_split=0.2)
 
-model.save('D:/study_data/_save/_h5/project_vgg16.h5')
+# model.save('D:/study_data/_save/_h5/project_vgg16.h5')
 
 # model = load_model('D:/study_data/_save/_h5/project.h5')
 

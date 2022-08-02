@@ -1,6 +1,9 @@
 <html>
    <body>
       <div>
+         <p>
+            <img src="{{ url_for('static', filename=image_file) }}">
+        </p>
         <p>종 : <span>{{breed}} // {{breed_po}} % </span></p>
         <p>나이 : <span>{{age}} {{age_cl}} // {{age_po}} % </span></p>
         <p>적정 활동량 : <span>{{ex}}</span></p>
