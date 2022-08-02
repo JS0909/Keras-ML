@@ -7,7 +7,6 @@ tf.random.set_seed(999)
 
 # 1. 데이터
 train_datagen = ImageDataGenerator(
-    rescale=1./255,
     horizontal_flip=True,
     vertical_flip=True,
     width_shift_range=0.1,
@@ -22,7 +21,7 @@ scale_datagen = ImageDataGenerator(rescale=1./255)
 
 xy1_train = scale_datagen.flow_from_directory(
     'd:/study_data/_data/image/dog/breed/',
-    target_size=(150, 150),
+    target_size=(224, 224),
     batch_size=5000,
     class_mode='categorical',
     shuffle=True
@@ -30,7 +29,7 @@ xy1_train = scale_datagen.flow_from_directory(
 
 xy2_train = scale_datagen.flow_from_directory(
     'd:/study_data/_data/image/dog/age/',
-    target_size=(150, 150),
+    target_size=(224, 224),
     batch_size=1000,
     class_mode='categorical',
     shuffle=True
@@ -79,10 +78,6 @@ y1_augument = y1_train[randidx].copy() # flow를 위해 생성함
 
 # x_train 증폭 데이터 담기
 x_augument = train_datagen.flow(x1_augument, y1_augument, batch_size=augument_size2, shuffle=False).next()[0]
-
-# x_train도 x_augument와 같은 비율로 스케일
-x_train_size = x_train.shape[0]
-x_train = scale_datagen.flow(x_train, y1_train, batch_size=x_train_size, shuffle=False).next()[0]
 
 # 원본train과 증폭train 합치기
 x_train = np.concatenate((x_train, x_augument))

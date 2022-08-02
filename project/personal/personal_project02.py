@@ -5,6 +5,7 @@ from tensorflow.python.keras.callbacks import EarlyStopping
 import tensorflow as tf
 from sklearn.metrics import accuracy_score
 import pandas as pd
+from tensorflow.keras.applications.vgg16 import VGG16
 
 tf.random.set_seed(9) # 하이퍼 파라미터 튜닝 용이하게 하기 위해
 
@@ -34,43 +35,11 @@ y2_test = np.load(filepath+'test_y2'+suffix)
 
 # 2. 모델구성
 # 2-1. input모델
-'''
-input1 = Input(shape=(150, 150, 3))
-conv1 = Conv2D(64,(2,2), padding='same', activation='swish')(input1)
-mp1 = MaxPool2D()(conv1)
-conv2 = Conv2D(32,(2,2), activation='swish')(mp1)
-flat1 = Flatten()(conv2)
-dense1 = Dense(64, activation='relu')(flat1)
-drop1 = Dropout(0.2)(dense1)
-dense2 = Dense(32, activation='linear')(drop1)
-output = Dense(32, activation='relu')(dense2)
-'''
-
-# VGGNet 16 모델 구성 참고
 input1 = Input(shape=(224, 224, 3))
-conv1 = Conv2D(64,(3,3), padding='same', activation='relu')(input1)
-conv2 = Conv2D(64,(3,3), activation='relu')(conv1)
-mp1 = MaxPool2D(pool_size=(2,2))(conv2)
-drop1 = Dropout(0.2)(mp1)
-
-conv3 = Conv2D(128,(3,3), activation='relu')(drop1)
-conv4 = Conv2D(128,(3,3), activation='relu')(conv3)
-mp2 = MaxPool2D(pool_size=(2,2))(conv4)
-drop2 = Dropout(0.2)(mp2)
-
-conv5 = Conv2D(256,(3,3), activation='relu')(drop2)
-conv6 = Conv2D(256,(3,3), activation='relu')(conv5)
-mp3 = MaxPool2D(pool_size=(2,2))(conv6)
-drop3 = Dropout(0.2)(mp3)
-
-conv7 = Conv2D(256,(3,3), activation='relu')(drop3)
-conv8 = Conv2D(512,(3,3), activation='relu')(conv7)
-conv9 = Conv2D(512,(3,3), activation='relu')(conv8)
-conv10 = Conv2D(512,(3,3), activation='relu')(conv9)
-mp4 = MaxPool2D(pool_size=(2,2))(conv10)
-
-flat1 = Flatten()(mp4)
-drop1 = Dropout(0.3)(flat1)
+model = VGG16(input_tensor = input1)
+layer_dict = dict([(layer.name, layer) for layer in model.layers])
+vgg_lastlayer = layer_dict['block5_pool'].output
+drop1 = Dropout(0.3)(vgg_lastlayer)
 output = Dense(32, activation='relu')(drop1)
 
 # 2-2. output모델1
@@ -85,14 +54,11 @@ model = Model(inputs=input1, outputs=[last_output1, last_output2])
 model.summary()
 
 # 3. 컴파일, 훈련
-# model.load_weights('D:/study_data/_save/_h5/project_weight.h5')
-
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=70, restore_best_weights=True)
 log = model.fit(x_train, [y1_train, y2_train], epochs=200, batch_size=32, callbacks=[Es], validation_split=0.2)
 
-model.save('D:/study_data/_save/_h5/project.h5')
-# model.save_weights('D:/study_data/_save/_h5/project_weight.h5')
+model.save('D:/study_data/_save/_h5/project_vgg16.h5')
 
 # model = load_model('D:/study_data/_save/_h5/project.h5')
 
@@ -196,33 +162,61 @@ print('적정 활동량: ', ex)
 print('적정 사료양: ', round(food,3), 'g')
 
 
-# conv2d
-# y1_acc스코어 :  0.058823529411764705
-# y2_acc스코어 :  0.4067584480600751
-# 종:  pomeranian // 5.959 %
-# 나이:  5month_4year 청년 44.99539 %
 
-# model.save('D:/study_data/_save/_h5/project2.h5')
-# vgg 16
-# epoch 130
-# y1_acc스코어 :  0.04130162703379224
-# y2_acc스코어 :  0.4380475594493116
-# 종:  jindo // 4.188 %
-# 나이:  5month_4year 청년 42.77118 %
-# 적정 활동량:  상 / 산책 1시간 ~ 1시간 30분
-# 적정 사료양:  215.0 g
 
-# 메모리 문제로 150으로 크기 줄이고 레이어 conv10까지로 줄임
-# y1_acc스코어 :  0.03413400758533502
-# y2_acc스코어 :  0.41845764854614415
-# 종:  jindo // 4.297 %
-# 나이:  5month_4year 청년 40.66658 %
-# 적정 활동량:  상 / 산책 1시간 ~ 1시간 30분
-# 적정 사료양:  286.667 g
 
-# 허스키 사진
-# tested loss :  [4.580451011657715, 3.4139418601989746, 1.1665090322494507, 0.017699114978313446, 0.42225033044815063]
-# 종:  husky // 4.349 %
-# 나이:  5month_4year 청년 40.26143 %
-# 적정 활동량:  최상 / 산책 1시간 30분 ~ 2시간
-# 적정 사료양:  860.0 g
+# Model: "vgg16"
+# _________________________________________________________________
+#  Layer (type)                Output Shape              Param #
+# =================================================================
+#  input_1 (InputLayer)        [(None, 224, 224, 3)]     0
+
+#  block1_conv1 (Conv2D)       (None, 224, 224, 64)      1792
+
+#  block1_conv2 (Conv2D)       (None, 224, 224, 64)      36928
+
+#  block1_pool (MaxPooling2D)  (None, 112, 112, 64)      0
+
+#  block2_conv1 (Conv2D)       (None, 112, 112, 128)     73856
+
+#  block2_conv2 (Conv2D)       (None, 112, 112, 128)     147584
+
+#  block2_pool (MaxPooling2D)  (None, 56, 56, 128)       0
+
+#  block3_conv1 (Conv2D)       (None, 56, 56, 256)       295168
+
+#  block3_conv2 (Conv2D)       (None, 56, 56, 256)       590080
+
+#  block3_conv3 (Conv2D)       (None, 56, 56, 256)       590080
+
+#  block3_pool (MaxPooling2D)  (None, 28, 28, 256)       0
+
+#  block4_conv1 (Conv2D)       (None, 28, 28, 512)       1180160
+
+#  block4_conv2 (Conv2D)       (None, 28, 28, 512)       2359808
+
+#  block4_conv3 (Conv2D)       (None, 28, 28, 512)       2359808
+
+#  block4_pool (MaxPooling2D)  (None, 14, 14, 512)       0
+
+#  block5_conv1 (Conv2D)       (None, 14, 14, 512)       2359808
+
+#  block5_conv2 (Conv2D)       (None, 14, 14, 512)       2359808
+
+#  block5_conv3 (Conv2D)       (None, 14, 14, 512)       2359808
+
+#  block5_pool (MaxPooling2D)  (None, 7, 7, 512)         0
+
+#  flatten (Flatten)           (None, 25088)             0
+
+#  fc1 (Dense)                 (None, 4096)              102764544
+
+#  fc2 (Dense)                 (None, 4096)              16781312
+
+#  predictions (Dense)         (None, 1000)              4097000
+
+# =================================================================
+# Total params: 138,357,544
+# Trainable params: 138,357,544
+# Non-trainable params: 0
+# _________________________________________________________________
