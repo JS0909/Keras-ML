@@ -28,7 +28,43 @@ x_test = np.load(filepath+'test_x'+suffix)
 y1_test = np.load(filepath+'test_y1'+suffix)
 y2_test = np.load(filepath+'test_y2'+suffix)
 
-model = load_model('D:/study_data/_save/_h5/project2.h5')
+
+# 2. 모델
+from keras.applications.vgg16 import VGG16
+from tensorflow.python.keras.layers import Conv2D, MaxPooling2D, Flatten
+from tensorflow.python.keras.layers import Dense, Dropout, Input
+from tensorflow.python.keras.models import Model
+
+# 사전 학습된 모델 불러오기
+input_tensor = Input(shape=(224,224,3))
+model = VGG16(weights='imagenet', include_top=False, input_tensor = input_tensor)
+
+# 모델 Layer 데이터화
+layer_dict = dict([(layer.name, layer) for layer in model.layers])
+
+# Layer 추가
+x = layer_dict['block5_pool'].output
+# Cov2D Layer +
+x = Conv2D(filters = 64, kernel_size=(3, 3), activation='relu')(x)
+# MaxPooling2D Layer +
+x = MaxPooling2D(pool_size=(2, 2))(x)
+# Flatten Layer +
+x = Flatten()(x)
+# FC Layer +
+x = Dense(2048, activation='relu')(x)
+x = Dropout(0.5)(x)
+x = Dense(1024, activation='relu')(x)
+x1 = Dropout(0.5)(x)
+x21 = Dense(30, activation='softmax')(x1)
+x22 = Dense(4, activation='softmax')(x1)
+
+# new model 정의
+new_model = Model(inputs = model.input, outputs = [x21,x22])
+
+
+
+
+
 
 #4. 평가, 예측
 loss = model.evaluate(x_test, [y1_test, y2_test])

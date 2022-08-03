@@ -1,14 +1,16 @@
 from flask import Flask, render_template, request
 import os
+from isort import file
 from keras.preprocessing.image import ImageDataGenerator
 from tensorflow.python.keras.models import load_model
 import numpy as np
 import tensorflow as tf
 from sklearn.metrics import accuracy_score
-import cv2
+import os
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'D:/study_data/_testing_image/dogs'
+# app.config['UPLOAD_FOLDER'] = 'C:/study/project/personal/static/image'
 
 #업로드 HTML 렌더링
 @app.route('/')
@@ -22,7 +24,9 @@ def upload_file():
         f = request.files['file']
       #저장할 경로 + 파일명
         f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))
-        img = cv2.imread(app.config['UPLOAD_FOLDER'])
+        # file_dir = 'D:/study_data/_testing_image/dogs'
+        # file_name = str(os.listdir(file_dir)[-1]) 
+        # img = file_dir+file_name
         weight = int(request.form['num1'])
         kcal = int(request.form['num2'])
         
@@ -146,7 +150,7 @@ def upload_file():
     
         
         return render_template('tf.html', breed=breed_result, breed_po=breed_po, age=age_result, age_po=age_po,
-                               age_cl=age_cl, ex=ex, food=round(food,3), acc_sc1=acc_sc1, acc_sc2=acc_sc2, img_file=img)
+                               age_cl=age_cl, ex=ex, food=round(food,3), acc_sc1=acc_sc1, acc_sc2=acc_sc2)
 
     
 if __name__ == '__main__':
