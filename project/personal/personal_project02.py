@@ -60,16 +60,13 @@ conv13 = Conv2D(512,(3,3), activation='relu')(conv12)
 mp5 = MaxPool2D(pool_size=(2,2))(conv13)
 
 flat1 = Flatten()(mp4)
-dense1 = Dense(4096, activation='relu')(flat1)
-dense2 = Dense(4096, activation='relu')(dense1)
-output = Dense(1000, activation='relu')(dense2)
 
 # 2-2. output모델1
-output1 = Dense(32, activation='relu')(output)
+output1 = Dense(32, activation='relu')(flat1)
 last_output1 = Dense(30, activation='softmax')(output1)
 
 # 2-3. output모델2
-output2 = Dense(64, activation='relu')(output)
+output2 = Dense(64, activation='relu')(flat1)
 last_output2 = Dense(4, activation='softmax')(output2)
 
 model = Model(inputs=input1, outputs=[last_output1, last_output2])
@@ -79,7 +76,7 @@ model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accur
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=70, restore_best_weights=True)
 log = model.fit(x_train, [y1_train, y2_train], epochs=200, batch_size=32, callbacks=[Es], validation_split=0.2)
 
-# model.save('D:/study_data/_save/_h5/project_vgg16.h5')
+model.save('D:/study_data/_save/_h5/project_vgg16.h5')
 
 # model = load_model('D:/study_data/_save/_h5/project.h5')
 
@@ -87,7 +84,7 @@ log = model.fit(x_train, [y1_train, y2_train], epochs=200, batch_size=32, callba
 #4. 평가, 예측
 loss = model.evaluate(x_test, [y1_test, y2_test])
 print('tested loss : ', loss)
-'''
+
 y1_pred, y2_pred = model.predict(x_test)
 y1_pred = tf.argmax(y1_pred, axis=1)
 y1_test_arg = tf.argmax(y1_test, axis=1)
@@ -95,9 +92,8 @@ y2_pred = tf.argmax(y2_pred, axis=1)
 y2_test_arg = tf.argmax(y2_test, axis=1)
 acc_sc1 = accuracy_score(y1_test_arg,y1_pred)
 acc_sc2 = accuracy_score(y2_test_arg,y2_pred)
-print('y1_acc스코어 : ', acc_sc1)
-print('y2_acc스코어 : ', acc_sc2)
 
+'''
 # 결과 잘 나오는지 중간 확인
 y1_pred = np.array(y1_pred)
 y2_pred = np.array(y2_pred)
@@ -182,6 +178,8 @@ print('나이: ', age_result, age_cl, age_po, '%')
 print('적정 활동량: ', ex)
 print('적정 사료양: ', round(food,3), 'g')
 
+print('y1_acc스코어 : ', acc_sc1)
+print('y2_acc스코어 : ', acc_sc2)
 
 
 
@@ -229,12 +227,6 @@ print('적정 사료양: ', round(food,3), 'g')
 #  block5_pool (MaxPooling2D)  (None, 7, 7, 512)         0
 
 #  flatten (Flatten)           (None, 25088)             0
-
-#  fc1 (Dense)                 (None, 4096)              102764544
-
-#  fc2 (Dense)                 (None, 4096)              16781312
-
-#  predictions (Dense)         (None, 1000)              4097000
 
 # =================================================================
 # Total params: 138,357,544

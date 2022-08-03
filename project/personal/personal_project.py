@@ -45,7 +45,7 @@ drop1 = Dropout(0.2)(dense1)
 dense2 = Dense(32, activation='linear')(drop1)
 output = Dense(32, activation='relu')(dense2)
 '''
-
+'''
 # VGGNet 16 모델 구성 참고
 input1 = Input(shape=(224, 224, 3))
 conv1 = Conv2D(64,(3,3), padding='same', activation='relu')(input1)
@@ -90,17 +90,17 @@ model.summary()
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=70, restore_best_weights=True)
 log = model.fit(x_train, [y1_train, y2_train], epochs=1, batch_size=32, callbacks=[Es], validation_split=0.2)
-
-model.save('D:/study_data/_save/_h5/project.h5')
+'''
+# model.save('D:/study_data/_save/_h5/project.h5')
 # model.save_weights('D:/study_data/_save/_h5/project_weight.h5')
 
-# model = load_model('D:/study_data/_save/_h5/project.h5')
+model = load_model('D:/study_data/_save/_h5/project.h5')
 
 
 #4. 평가, 예측
 loss = model.evaluate(x_test, [y1_test, y2_test])
 print('tested loss : ', loss)
-'''
+
 y1_pred, y2_pred = model.predict(x_test)
 y1_pred = tf.argmax(y1_pred, axis=1)
 y1_test_arg = tf.argmax(y1_test, axis=1)
@@ -108,9 +108,8 @@ y2_pred = tf.argmax(y2_pred, axis=1)
 y2_test_arg = tf.argmax(y2_test, axis=1)
 acc_sc1 = accuracy_score(y1_test_arg,y1_pred)
 acc_sc2 = accuracy_score(y2_test_arg,y2_pred)
-print('y1_acc스코어 : ', acc_sc1)
-print('y2_acc스코어 : ', acc_sc2)
 
+'''
 # 결과 잘 나오는지 중간 확인
 y1_pred = np.array(y1_pred)
 y2_pred = np.array(y2_pred)
@@ -194,6 +193,9 @@ print('나이: ', age_result, age_cl, age_po, '%')
 
 print('적정 활동량: ', ex)
 print('적정 사료양: ', round(food,3), 'g')
+
+print('y1_acc스코어 : ', acc_sc1)
+print('y2_acc스코어 : ', acc_sc2)
 
 
 # conv2d
