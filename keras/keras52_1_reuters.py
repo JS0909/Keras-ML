@@ -44,7 +44,7 @@ from tensorflow.python.keras.layers import Dense, Conv1D, LSTM, Embedding
 
 model = Sequential()
 model.add(Embedding(input_dim=47, output_dim=10, input_length=2000))
-model.add(LSTM(32))
+model.add(LSTM(10))
 model.add(Dense(32, activation='relu'))
 model.add(Dense(64, activation='relu'))
 model.add(Dense(32, activation='relu'))
@@ -53,14 +53,14 @@ model.add(Dense(46, activation='softmax'))
 
 # 3. 컴파일, 훈련
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc'])
-model.fit(x_train, y_train, epochs=1, batch_size=1000)
+model.fit(x_train, y_train, epochs=10, batch_size=5000)
 
 # 4. 평가, 예측
 acc = model.evaluate(x_test, y_test)[1]
 pred = model.predict(x_test)
-pred = np.argmax(pred)
+pred = np.argmax(pred, axis=1)
 print('acc: ', acc)
 print('결과: ', pred)
 
 # acc:  0.21104185283184052
-# 결과:  32066
+# 결과:  [3 3 3 ... 3 3 3]

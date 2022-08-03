@@ -6,6 +6,7 @@ import tensorflow as tf
 from sklearn.metrics import accuracy_score
 import pandas as pd
 from keras.applications.vgg16 import VGG16
+from keras import layers, models
 
 tf.random.set_seed(9) # 하이퍼 파라미터 튜닝 용이하게 하기 위해
 
@@ -35,6 +36,16 @@ y2_test = np.load(filepath+'test_y2'+suffix)
 
 # 2. 모델구성
 # 2-1. input모델
+model = VGG16(weights='imagenet', include_top=False, input_shape = (224,224,3))
+model.trainable = False
+
+layer_dict = dict([(layer.name, layer) for layer in model.layers])
+
+# Layer 추가
+x = layer_dict['block5_pool'].output # 함수형모델에 넣기 위해 레이어 뽑아옴
+x = layers.Flatten()(x)
+
+'''
 input1 = Input(shape=(224, 224, 3))
 conv1 = Conv2D(64,(3,3), padding='same', activation='relu')(input1)
 conv2 = Conv2D(64,(3,3), activation='relu')(conv1)
@@ -60,26 +71,26 @@ conv13 = Conv2D(512,(3,3), activation='relu')(conv12)
 mp5 = MaxPool2D(pool_size=(2,2))(conv13)
 
 flat1 = Flatten()(mp4)
-
+'''
 # 2-2. output모델1
-output1 = Dense(32, activation='relu')(flat1)
-last_output1 = Dense(30, activation='softmax')(output1)
+output1 = layers.Dense(100, activation='relu')(x)
+last_output1 = layers.Dense(30, activation='softmax')(output1)
 
 # 2-3. output모델2
-output2 = Dense(64, activation='relu')(flat1)
-last_output2 = Dense(4, activation='softmax')(output2)
+output2 = layers.Dense(100, activation='relu')(x)
+last_output2 = layers.Dense(4, activation='softmax')(output2)
 
-model = Model(inputs=input1, outputs=[last_output1, last_output2])
+model = Model(inputs=model.input, outputs=[last_output1, last_output2])
+
 
 # 3. 컴파일, 훈련
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=70, restore_best_weights=True)
 log = model.fit(x_train, [y1_train, y2_train], epochs=200, batch_size=32, callbacks=[Es], validation_split=0.2)
 
-model.save('D:/study_data/_save/_h5/project_vgg16.h5')
+# model.save('D:/study_data/_save/_h5/project_vgg16.h5')
 
 # model = load_model('D:/study_data/_save/_h5/project.h5')
-
 
 #4. 평가, 예측
 loss = model.evaluate(x_test, [y1_test, y2_test])
@@ -180,6 +191,13 @@ print('적정 사료양: ', round(food,3), 'g')
 
 print('y1_acc스코어 : ', acc_sc1)
 print('y2_acc스코어 : ', acc_sc2)
+
+# 종:  shiba // 14.06 %
+# 나이:  _4month 유년 58.77891 %
+# 적정 활동량:  하 / 산책 20분 ~ 40분
+# 적정 사료양:  690.0 g
+# y1_acc스코어 :  0.14791403286978508
+# y2_acc스코어 :  0.33375474083438683
 
 
 
