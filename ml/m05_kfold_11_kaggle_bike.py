@@ -73,9 +73,15 @@ score = cross_val_score(model, x_train, y_train, cv=kfold)
 y_predict = cross_val_predict(model, x_test, y_test, cv=kfold)
 r2 = r2_score(y_test, y_predict)
 
+print('acc: ', score, '\n cross_val_score: ', round(np.mean(score),4))
+print('cross_val_predict r2: ', r2)
+
 # # 5. 제출 준비
 # submission = pd.read_csv(path + 'submission.csv', index_col=0)
 # y_submit = model.predict(test_set)
 # submission['count'] = np.abs(y_submit) # 마이너스 나오는거 절대값 처리
 
 # submission.to_csv(path + 'submission.csv', index=True)
+
+# cross_val_score:  0.3225
+# cross_val_predict r2:  0.15622721833692665

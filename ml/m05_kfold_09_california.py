@@ -27,5 +27,8 @@ y_predict = cross_val_predict(model, x_test, y_test, cv=kfold)
 r2 = r2_score(y_test, y_predict)
 
 print('acc: ', score, '\n cross_val_score: ', round(np.mean(score),4))
-print(y_predict)
 print('cross_val_predict r2: ', r2)
+
+# acc:  [-0.03709661 -0.01513668 -0.03498293 -0.03608159 -0.02552909] 
+#  cross_val_score:  -0.0298
+# cross_val_predict r2:  -0.050908179848308865

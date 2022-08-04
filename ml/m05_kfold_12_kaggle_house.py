@@ -206,6 +206,11 @@ score = cross_val_score(model, x_train, y_train, cv=kfold)
 y_predict = cross_val_predict(model, x_test, y_test, cv=kfold)
 r2 = r2_score(y_test, y_predict)
 
+print('acc: ', score, '\n cross_val_score: ', round(np.mean(score),4))
+print(y_predict)
+print('cross_val_predict r2: ', r2)
+
+
 # 5. 제출 준비
 # y_submit = model.predict(test_set)
 # submission_set = pd.read_csv(path + 'submission.csv', index_col=0) # index_col=n n번째 컬럼을 인덱스로 인식
@@ -213,3 +218,6 @@ r2 = r2_score(y_test, y_predict)
 
 # submission_set.to_csv(path + 'submission.csv', index = True)
 
+# acc:  [-0.03553649 -0.08693548 -0.02010491 -0.06759385 -0.11599186] 
+#  cross_val_score:  -0.0652
+# cross_val_predict r2:  -0.023759958524827818
