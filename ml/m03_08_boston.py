@@ -21,20 +21,60 @@ from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 
 model = LinearSVR()
-
-
-# 3. 컴파일, 훈련
 model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('LinearSVR r2 결과: ', result)
+# y_predict = model.predict(x_test)
+# print('ypred: ', y_predict, '\n')
 
-# 4. 평가, 예측
-y_pred = model.predict(x_test)
-score = model.score(x_test, y_test)
+model = SVR()
+model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('SVR r2 결과: ', result)
+# y_predict = model.predict(x_test)
+# print('ypred: ', y_predict, '\n')
 
-print('y_pred: ', y_pred)
-print('R2 score: ', score)
+# model = Perceptron()
+# model.fit(x_train, y_train)
+# result = model.score(x_test, y_test)
+# print('Perceptron r2 결과: ', result)
+# # y_predict = model.predict(x_test)
+# # print('ypred: ', y_predict, '\n')
 
-# with 6 relu
-# loss:  10.714729309082031      
-# r2: 0.8718072307433771
+model = LinearRegression()
+model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('LinearRegression r2 결과: ', result)
+# y_predict = model.predict(x_test)
+# print('ypred: ', y_predict, '\n')
 
-# R2 score:  0.7830612964136615
+model = KNeighborsRegressor()
+model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('KNeighborsRegressor r2 결과: ', result)
+# y_predict = model.predict(x_test)
+# print('ypred: ', y_predict, '\n')
+
+model = DecisionTreeRegressor()
+model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('DecisionTreeRegressor r2 결과: ', result)
+# y_predict = model.predict(x_test)
+# print('ypred: ', y_predict, '\n')
+
+model = RandomForestRegressor()
+model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('RandomForestRegressor r2 결과: ', result)
+# y_predict = model.predict(x_test)
+# print('ypred: ', y_predict, '\n')
+
+# LinearSVR r2 결과:  0.7434063515479603
+# SVR r2 결과:  0.23474677555722312
+# SVR r2 결과:  0.23474677555722312
+# LinearRegression r2 결과:  0.8111288663608656
+# KNeighborsRegressor r2 결과:  0.5900872726222293
+# DecisionTreeRegressor r2 결과:  0.7780553674479604
+# RandomForestRegressor r2 결과:  0.9204893478849648
+
+# perceptron 오류남

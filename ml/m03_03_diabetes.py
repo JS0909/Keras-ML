@@ -12,26 +12,18 @@ x_train, x_test, y_train, y_test =  train_test_split(x, y, train_size=0.9, shuff
 
 
 # 2. 모델구성
-from sklearn.svm import LinearSVC, SVC
-from sklearn.linear_model import Perceptron, LogisticRegression # !논리회귀(분류임)!
-from sklearn.neighbors import KNeighborsClassifier # 최근접 이웃
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier # 결정트리를 여러개 랜덤으로 뽑아서 앙상블해서 봄
+from sklearn.svm import LinearSVR, SVR
+from sklearn.linear_model import Perceptron
+from sklearn.linear_model import LogisticRegression, LinearRegression
+from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 
-model = LinearSVC()
+models = [LinearSVR, SVR, Perceptron, LinearRegression, KNeighborsRegressor, DecisionTreeRegressor, RandomForestRegressor]
 
-
-# 3. 컴파일, 훈련
-model.fit(x_train, y_train )
-
-# 4. 평가, 예측
-score = model.score(x_test, y_test)
-ypred = model.predict(x_test)
-
-print('acc score: ', score)
-print('y_pred: ', ypred)
-
-# loss :  1672.607177734375  
-# acc :  0.5149952410421789
-
-# acc score:  0.2668794571758186
+for model in models:
+    model = model()
+    model_name = str(model).strip('()')
+    model.fit(x_train, y_train)
+    result = model.score(x_test, y_test)
+    print(model_name, '결과: ', result)

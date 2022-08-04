@@ -26,17 +26,19 @@ from sklearn.neighbors import KNeighborsClassifier # 최근접 이웃
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier # 결정트리를 여러개 랜덤으로 뽑아서 앙상블해서 봄
 
-model = LinearSVC()
+models = [LinearSVC, SVC, Perceptron, LogisticRegression, KNeighborsClassifier, DecisionTreeClassifier, RandomForestClassifier]
 
+for model in models:
+    model = model()
+    model_name = str(model).strip('()')
+    model.fit(x_train, y_train)
+    result = model.score(x_test, y_test)
+    print(model_name, '결과: ', result)
 
-# 3. 컴파일, 훈련
-model.fit(x_train, y_train)
-
-# 4. 평가, 예측
-score = model.score(x_test, y_test)
-ypred = model.predict(x_test)
-
-print('acc score: ', score)
-print('y_pred: ', ypred)
-
-# acc score:  0.7280701754385965
+# LinearSVC 결과:  0.8508771929824561
+# SVC 결과:  0.8947368421052632
+# Perceptron 결과:  0.8947368421052632
+# LogisticRegression 결과:  0.956140350877193
+# KNeighborsClassifier 결과:  0.9210526315789473
+# DecisionTreeClassifier 결과:  0.9210526315789473
+# RandomForestClassifier 결과:  0.956140350877193

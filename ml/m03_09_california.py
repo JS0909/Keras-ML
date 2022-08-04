@@ -18,20 +18,18 @@ from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 
-model = LinearSVR()
+models = [LinearSVR, SVR, Perceptron, LinearRegression, KNeighborsRegressor, DecisionTreeRegressor, RandomForestRegressor]
 
-# 3. 컴파일, 훈련
-model.fit(x_train, y_train)
-
-# 4. 평가, 예측
-score = model.score(x_test, y_test)
-ypred = model.predict(x_test)
-
-print('r2 score: ', score)
-print('y_pred: ', ypred)
-
-# tensorflow dense 사용 결과
-# loss :  0.6562458276748657 
-# r2스코어 :  0.5204211245083776
-
-# r2 score:  -3.1944119710222614
+for model in models:
+    model = model()
+    model_name = str(model).strip('()')
+    model.fit(x_train, y_train)
+    result = model.score(x_test, y_test)
+    print(model_name, '결과: ', result)
+    
+# LinearSVR r2 결과:  -6.324623991048357
+# SVR r2 결과:  -0.0370628287403556
+# LinearRegression r2 결과:  0.6001949284390904
+# KNeighborsRegressor r2 결과:  0.13188588139050017
+# DecisionTreeRegressor r2 결과:  0.5967622571521326
+# RandomForestRegressor r2 결과:  0.8091725373390208

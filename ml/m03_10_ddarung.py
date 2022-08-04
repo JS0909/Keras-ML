@@ -52,17 +52,14 @@ from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 
-model = LinearSVR()
+models = [LinearSVR, SVR, Perceptron, LinearRegression, KNeighborsRegressor, DecisionTreeRegressor, RandomForestRegressor]
 
-#3. 컴파일, 훈련
-model.fit(x_train, y_train)
-
-#4. 평가, 예측
-score = model.score(x_test, y_test)
-ypred = model.predict(x_test)
-
-print('r2 score: ', score)
-print('y_pred: ', ypred)
+for model in models:
+    model = model()
+    model_name = str(model).strip('()')
+    model.fit(x_train, y_train)
+    result = model.score(x_test, y_test)
+    print(model_name, '결과: ', result)
 
 # 5. 제출 준비
 # submission = pd.read_csv(path + 'submission.csv', index_col=0)
@@ -70,4 +67,10 @@ print('y_pred: ', ypred)
 # submission['count'] = y_submit
 # submission.to_csv(path + 'submission.csv', index=True)
 
-# r2 score:  0.5387055478544032
+# LinearSVR 결과:  0.5153425426937126
+# SVR 결과:  0.4121444790456895
+# Perceptron 결과:  0.0136986301369863
+# LinearRegression 결과:  0.5904184481917407
+# KNeighborsRegressor 결과:  0.6552522549660906
+# DecisionTreeRegressor 결과:  0.6462640202256265
+# RandomForestRegressor 결과:  0.7946657236601347

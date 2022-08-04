@@ -6,6 +6,9 @@ from tensorflow.python.keras.layers import Dense, Dropout
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
 from tensorflow.python.keras.callbacks import EarlyStopping
+from sklearn.utils import all_estimators
+import warnings
+warnings.filterwarnings('ignore') # warnig 출력 안함
 
 encording_columns = ['MSZoning','Street','Alley','LotShape','LandContour','Utilities','LotConfig',
                     'LandSlope','Neighborhood','Condition1','Condition2','BldgType','HouseStyle',
@@ -193,21 +196,21 @@ y = train_set['SalePrice']
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.75, random_state=99)
 
 #2. 모델구성
-from sklearn.svm import LinearSVR, SVR
-from sklearn.linear_model import Perceptron
-from sklearn.linear_model import LogisticRegression, LinearRegression
-from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
-from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+# allAlgorithms = all_estimators(type_filter='classifier')
+allAlgorithms = all_estimators(type_filter='regressor')
+print('allAlgorithms: ', allAlgorithms)
+print('모델의 개수: ', len(allAlgorithms)) # 41
 
-models = [LinearSVR, SVR, Perceptron, LinearRegression, KNeighborsRegressor, DecisionTreeRegressor, RandomForestRegressor]
-
-for model in models:
-    model = model()
-    model_name = str(model).strip('()')
-    model.fit(x_train, y_train)
-    result = model.score(x_test, y_test)
-    print(model_name, '결과: ', result)
+for (name, algorithm) in allAlgorithms:
+    try:
+        model = algorithm()
+        model.fit(x_train, y_train)
+        ypred = model.predict(x_test)
+        r2 = r2_score(y_test, ypred)
+        print(name, '의 정답률: ', r2)
+    except:
+        # continue # 또는 pass
+        print(name, '은 안나온 놈')
 
 # 5. 제출 준비
 # y_submit = model.predict(test_set)
@@ -216,10 +219,57 @@ for model in models:
 
 # submission_set.to_csv(path + 'submission.csv', index = True)
 
-# LinearSVR 결과:  0.7187348947405945
-# SVR 결과:  -0.07586421857983505
-# Perceptron 결과:  0.0
-# LinearRegression 결과:  0.8648299743838634
-# KNeighborsRegressor 결과:  0.7636827308027394
-# DecisionTreeRegressor 결과:  0.7544631851132991
-# RandomForestRegressor 결과:  0.8658854609346692
+# ARDRegression 의 정답률:  0.865014302794736
+# AdaBoostRegressor 의 정답률:  0.8079591505413154
+# BaggingRegressor 의 정답률:  0.8543601658710889
+# BayesianRidge 의 정답률:  0.8652559641672068
+# CCA 의 정답률:  0.0390786716564856
+# DecisionTreeRegressor 의 정답률:  0.7547779827658907
+# DummyRegressor 의 정답률:  -0.0007912912387950666
+# ElasticNet 의 정답률:  0.8508175200866559
+# ElasticNetCV 의 정답률:  0.7157452061915937
+# ExtraTreeRegressor 의 정답률:  0.7308781404435265
+# ExtraTreesRegressor 의 정답률:  0.8515880020351242
+# GammaRegressor 의 정답률:  -0.0007912912387950666
+# GaussianProcessRegressor 의 정답률:  -6.672676686178005
+# GradientBoostingRegressor 의 정답률:  0.8726426951055464
+# HistGradientBoostingRegressor 의 정답률:  0.852876358927475
+# HuberRegressor 의 정답률:  0.8604797770730244
+# IsotonicRegression 은 안나온 놈
+# KNeighborsRegressor 의 정답률:  0.7636827308027394
+# KernelRidge 의 정답률:  0.8641378719476156
+# Lars 의 정답률:  0.8648299743838638
+# LarsCV 의 정답률:  0.8649499339410769
+# Lasso 의 정답률:  0.8648347446520938
+# LassoCV 의 정답률:  0.7924955246159948
+# LassoLars 의 정답률:  0.8649222012962814
+# LassoLarsCV 의 정답률:  0.8649499339410769
+# LassoLarsIC 의 정답률:  0.8653638371457342
+# LinearRegression 의 정답률:  0.8648299743838634
+# LinearSVR 의 정답률:  0.7196325449741543
+# MLPRegressor 의 정답률:  0.4591178020192628
+# MultiOutputRegressor 은 안나온 놈
+# MultiTaskElasticNet 은 안나온 놈
+# MultiTaskElasticNetCV 은 안나온 놈
+# MultiTaskLasso 은 안나온 놈
+# MultiTaskLassoCV 은 안나온 놈
+# NuSVR 의 정답률:  -0.020262697952646347
+# OrthogonalMatchingPursuit 의 정답률:  0.6684526312440721
+# OrthogonalMatchingPursuitCV 의 정답률:  0.8457020331507406
+# PLSCanonical 의 정답률:  -2.336387242446437
+# PLSRegression 의 정답률:  0.8566363668571819
+# PassiveAggressiveRegressor 의 정답률:  0.7133551714020719
+# PoissonRegressor 의 정답률:  -0.0007912912387950666
+# RANSACRegressor 의 정답률:  0.8068056108534029
+# RadiusNeighborsRegressor 의 정답률:  -1.7765025023196093e+28
+# RandomForestRegressor 의 정답률:  0.8691768881058289
+# RegressorChain 은 안나온 놈
+# Ridge 의 정답률:  0.8648924174869775
+# RidgeCV 의 정답률:  0.8653264153246512
+# SGDRegressor 의 정답률:  -1.0858628660865407e+21
+# SVR 의 정답률:  -0.07586421857983505
+# StackingRegressor 은 안나온 놈
+# TheilSenRegressor 의 정답률:  0.8361742803267112
+# TransformedTargetRegressor 의 정답률:  0.8648299743838634
+# TweedieRegressor 의 정답률:  0.8274087758325406
+# VotingRegressor 은 안나온 놈

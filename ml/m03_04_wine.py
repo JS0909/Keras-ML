@@ -20,16 +20,72 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier # 결정트리를 여러개 랜덤으로 뽑아서 앙상블해서 봄
 
 model = LinearSVC()
+model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('LinearSVC acc 결과: ', result)
+y_predict = model.predict(x_test)
+print('ypred: ', y_predict, '\n')
+
+model = SVC()
+model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('SVC acc 결과: ', result)
+y_predict = model.predict(x_test)
+print('ypred: ', y_predict, '\n')
+
+model = Perceptron()
+model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('Perceptron acc 결과: ', result)
+y_predict = model.predict(x_test)
+print('ypred: ', y_predict, '\n')
+
+model = LogisticRegression()
+model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('LogisticRegression acc 결과: ', result)
+y_predict = model.predict(x_test)
+print('ypred: ', y_predict, '\n')
+
+model = KNeighborsClassifier()
+model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('KNeighborsClassifier acc 결과: ', result)
+y_predict = model.predict(x_test)
+print('ypred: ', y_predict, '\n')
+
+model = DecisionTreeClassifier()
+model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('DecisionTreeClassifier acc 결과: ', result)
+y_predict = model.predict(x_test)
+print('ypred: ', y_predict, '\n')
+
+model = RandomForestClassifier()
+model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('RandomForestClassifier acc 결과: ', result)
+y_predict = model.predict(x_test)
+print('ypred: ', y_predict, '\n')
 
 
-# 3. 컴파일, 훈련
-model.fit(x_train, y_train )
+# LinearSVC acc 결과:  0.9444444444444444
+# ypred:  [1 0 0 2 0 1 1 2 1 1 1 2 0 1 2 1 2 1]
 
-# 4. 평가, 예측
-score = model.score(x_test, y_test)
-ypred = model.predict(x_test)
+# SVC acc 결과:  0.6666666666666666
+# ypred:  [1 0 0 2 0 1 2 2 1 1 1 1 0 2 1 2 0 1]
 
-print('acc score: ', score)
-print('y_pred: ', ypred)
+# Perceptron acc 결과:  0.5555555555555556
+# ypred:  [1 0 0 0 0 1 0 1 1 1 1 1 0 0 1 1 0 1]
 
-# r2 score:  0.6666666666666666
+# LogisticRegression acc 결과:  1.0
+# ypred:  [1 0 0 2 0 1 1 2 1 1 1 2 0 1 2 0 2 1]
+
+# KNeighborsClassifier acc 결과:  0.7222222222222222
+# ypred:  [1 0 0 1 0 1 2 1 1 1 1 2 0 2 2 0 2 2]
+
+# DecisionTreeClassifier acc 결과:  0.9444444444444444
+# ypred:  [1 0 0 2 0 1 1 2 1 1 1 0 0 1 2 0 2 1]
+
+# RandomForestClassifier acc 결과:  1.0
+# ypred:  [1 0 0 2 0 1 1 2 1 1 1 2 0 1 2 0 2 1]

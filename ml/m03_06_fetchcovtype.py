@@ -20,15 +20,50 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier # 결정트리를 여러개 랜덤으로 뽑아서 앙상블해서 봄
 
 model = LinearSVC()
-
-# 3. 컴파일, 훈련
 model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('LinearSVC acc 결과: ', result)
+# y_predict = model.predict(x_test)
+# print('ypred: ', y_predict, '\n')
 
-# 4. 평가, 예측
-score = model.score(x_test, y_test)
-ypred = model.predict(x_test)
+model = SVC()
+model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('SVC acc 결과: ', result)
+# y_predict = model.predict(x_test)
+# print('ypred: ', y_predict, '\n')
 
-print('y_pred: ', ypred)
-print('acc score: ', score)
+model = Perceptron()
+model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('Perceptron acc 결과: ', result)
+# y_predict = model.predict(x_test)
+# print('ypred: ', y_predict, '\n')
 
-# acc score:  0.44215345427007674
+model = LogisticRegression()
+model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('LogisticRegression acc 결과: ', result)
+# y_predict = model.predict(x_test)
+# print('ypred: ', y_predict, '\n')
+
+model = KNeighborsClassifier()
+model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('KNeighborsClassifier acc 결과: ', result)
+# y_predict = model.predict(x_test)
+# print('ypred: ', y_predict, '\n')
+
+model = DecisionTreeClassifier()
+model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('DecisionTreeClassifier acc 결과: ', result)
+# y_predict = model.predict(x_test)
+# print('ypred: ', y_predict, '\n')
+
+model = RandomForestClassifier()
+model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('RandomForestClassifier acc 결과: ', result)
+# y_predict = model.predict(x_test)
+# print('ypred: ', y_predict, '\n')

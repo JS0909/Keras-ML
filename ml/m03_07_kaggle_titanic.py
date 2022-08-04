@@ -54,19 +54,55 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier # 결정트리를 여러개 랜덤으로 뽑아서 앙상블해서 봄
 
 model = LinearSVC()
-
-#3. 컴파일, 훈련
 model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('LinearSVC acc 결과: ', result)
+# y_predict = model.predict(x_test)
+# print('ypred: ', y_predict, '\n')
 
-#4. 평가, 예측
-score = model.score(x_test, y_test)
-ypred = model.predict(x_test)
+model = SVC()
+model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('SVC acc 결과: ', result)
+# y_predict = model.predict(x_test)
+# print('ypred: ', y_predict, '\n')
 
-print('acc score: ', score)
-print('y_pred: ', ypred)
+model = Perceptron()
+model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('Perceptron acc 결과: ', result)
+# y_predict = model.predict(x_test)
+# print('ypred: ', y_predict, '\n')
 
+model = LogisticRegression()
+model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('LogisticRegression acc 결과: ', result)
+# y_predict = model.predict(x_test)
+# print('ypred: ', y_predict, '\n')
 
-# 5. 제출 준비
+model = KNeighborsClassifier()
+model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('KNeighborsClassifier acc 결과: ', result)
+# y_predict = model.predict(x_test)
+# print('ypred: ', y_predict, '\n')
+
+model = DecisionTreeClassifier()
+model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('DecisionTreeClassifier acc 결과: ', result)
+# y_predict = model.predict(x_test)
+# print('ypred: ', y_predict, '\n')
+
+model = RandomForestClassifier()
+model.fit(x_train, y_train)
+result = model.score(x_test, y_test)
+print('RandomForestClassifier acc 결과: ', result)
+# y_predict = model.predict(x_test)
+# print('ypred: ', y_predict, '\n')
+
+# 5. 제출 준비-------------------------------------------------------
 # submission = pd.read_csv(path + 'gender_submission.csv', index_col=0)
 
 # y_submit = model.predict(test_set)
@@ -75,8 +111,12 @@ print('y_pred: ', ypred)
 
 # submission['Survived'] = y_submit
 # submission.to_csv(path + 'gender_submission.csv', index=True)
+#--------------------------------------------------------------------
 
-# loss :  0.4933931231498718
-# acc스코어 :  0.7821229050279329
 
-# acc score:  0.6312849162011173
+# SVC acc 결과:  0.6312849162011173
+# Perceptron acc 결과:  0.6815642458100558
+# LogisticRegression acc 결과:  0.770949720670391
+# KNeighborsClassifier acc 결과:  0.6759776536312849
+# DecisionTreeClassifier acc 결과:  0.7653631284916201
+# RandomForestClassifier acc 결과:  0.776536312849162
