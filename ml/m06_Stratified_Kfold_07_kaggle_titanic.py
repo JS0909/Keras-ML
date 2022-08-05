@@ -60,7 +60,7 @@ model = SVC()
     
 # 3. 4. 컴파일, 훈련, 평가, 예측
 # model.fit(x_train, y_train)
-score = cross_val_score(model, x_train, y_train, cv=kfold)
+score = cross_val_score(model, x_train, y_train, cv=kfold) # 어차피 여기서 kfold에 대해서 straitify 분류 해준다 / 만약 다른 스코어를 쓰면 따로 stratify해주면 좋음
 y_predict = cross_val_predict(model, x_test, y_test, cv=kfold)
 acc = accuracy_score(y_test, y_predict)
 
