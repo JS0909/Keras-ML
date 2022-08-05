@@ -46,3 +46,16 @@ for (name, algorithm) in allAlgorithms:
         # continue # 또는 pass
         print(name, '은 안나온 놈')
 
+# AdaBoostClassifier 의 정답률:  0.5333
+# BaggingClassifier 의 정답률:  0.957
+# BernoulliNB 의 정답률:  0.6323
+# CalibratedClassifierCV 의 정답률:  0.713
+# CategoricalNB 은 안나온 놈
+# ClassifierChain 은 안나온 놈
+# ComplementNB 은 안나온 놈
+# DecisionTreeClassifier 의 정답률:  0.9322
+# DummyClassifier 의 정답률:  0.4878
+# ExtraTreeClassifier 의 정답률:  0.8527
+# ExtraTreesClassifier 의 정답률:  0.9491
+# GaussianNB 의 정답률:  0.0903
+# GaussianProcessClassifier 은 안나온 놈
