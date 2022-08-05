@@ -45,3 +45,26 @@ print('best tuned acc: ', accuracy_score(y_test, ypred_best))
 
 print('걸린시간: ', round(end-start,2), '초')
 
+# Fitting 5 folds for each of 72 candidates, totalling 360 fits
+# ----------
+# iter: 1
+# n_candidates: 24
+# n_resources: 210
+# Fitting 5 folds for each of 24 candidates, totalling 120 fits
+# ----------
+# iter: 2
+# n_candidates: 8
+# n_resources: 630
+# Fitting 5 folds for each of 8 candidates, totalling 40 fits
+# ----------
+# iter: 3
+# n_candidates: 3
+# n_resources: 1890
+# Fitting 5 folds for each of 3 candidates, totalling 15 fits
+# 최적의 매개변수:  RandomForestClassifier(max_depth=10, min_samples_split=5, n_estimators=200)
+# 최적의 파라미터:  {'n_estimators': 200, 'min_samples_split': 5, 'max_depth': 10}
+# best_score_:  0.7104192104192105
+# model.score:  0.753397072364741
+# acc score:  0.753397072364741
+# best tuned acc:  0.753397072364741
+# 걸린시간:  111.99 초
