@@ -29,3 +29,8 @@ acc = accuracy_score(y_test, y_predict)
 print('acc: ', score, '\n cross_val_score: ', round(np.mean(score),4))
 print(y_predict)
 print('cross_val_predict acc: ', acc)
+
+# acc:  [0.94997956 0.94991502 0.9503453  0.95142101 0.95042007] 
+#  cross_val_score:  0.9504
+# [2 1 2 ... 1 2 2]
+# cross_val_predict r2:  0.7597497772977287
