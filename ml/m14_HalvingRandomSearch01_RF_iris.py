@@ -26,7 +26,11 @@ parameters = [
                       
 #2. 모델구성
 from sklearn.ensemble import RandomForestClassifier
-model = HalvingRandomSearchCV(RandomForestClassifier(), parameters, cv=kfold, verbose=1, refit=True, n_jobs=-1)
+model = HalvingRandomSearchCV(RandomForestClassifier(), parameters, cv=kfold, verbose=1, refit=True, n_jobs=-1, aggressive_elimination=True, factor=2)
+# aggressive_elimination=True // 워닝 무시
+# factor=10 // min_resources로 처음에 빼서 사용하고 다음회차부터는 min_resources*factor로 n_resources값을 정해줌
+# 만약 max_resources가 factor*min_resources, 즉 다음회차의 n_resources보다 적어져버리게 된다면 min_resources로만 한번 돌리고 만다
+# 만약 max_resources >= factor*min_resources 이고 그다음 회차도 그렇다면 max_resouces <= factor*min_resources가 될때까지 반복수행한다
 
 # 3. 컴파일, 훈련
 import time

@@ -26,7 +26,8 @@ parameters = [
                       
 #2. 모델구성
 from sklearn.ensemble import RandomForestClassifier
-model = HalvingRandomSearchCV(RandomForestClassifier(), parameters, cv=kfold, verbose=1, refit=True, n_jobs=-1)
+model = HalvingRandomSearchCV(RandomForestClassifier(), parameters, cv=kfold, verbose=1, refit=True, n_jobs=-1, aggressive_elimination=True, factor=10)
+
 
 # 3. 컴파일, 훈련
 import time
