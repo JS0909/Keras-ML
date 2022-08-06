@@ -1,0 +1,17 @@
+import numpy as np
+import tensorflow as tf
+from keras.preprocessing.image import ImageDataGenerator
+tf.random.set_seed(9)
+
+# 1. 데이터
+scale_datagen = ImageDataGenerator(rescale=1./255)
+
+testing_img = scale_datagen.flow_from_directory(
+    'D:/study_data/_testing_image/',
+    target_size=(150, 150),
+    batch_size=100,
+    class_mode='categorical',
+    shuffle=True
+)
+
+np.save('d:/study_data/_save/_npy/_project/testing_img_.npy', arr =testing_img[0][0])
