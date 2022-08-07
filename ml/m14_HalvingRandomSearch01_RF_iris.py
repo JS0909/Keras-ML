@@ -3,8 +3,8 @@ from sklearn.metrics import accuracy_score
 import numpy as np
 import pandas as pd
 from sklearn.experimental import enable_halving_search_cv
-from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score,\
-    GridSearchCV, HalvingRandomSearchCV
+from sklearn.model_selection import train_test_split, StratifiedKFold,\
+    HalvingRandomSearchCV
 
 # 1. 데이터
 datasets = load_iris()
