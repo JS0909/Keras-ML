@@ -12,19 +12,19 @@
 
 import numpy as np
 from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
 
 # 1. 데이터
 datasets = load_iris()
 x = datasets.data
 y = datasets.target
 
-from sklearn.model_selection import train_test_split
 x_train, x_test, y_train, y_test = train_test_split(x, y, shuffle=True, train_size=0.8, random_state=1234)
 
 # 2. 모델구성
-from sklearn.tree import DecisionTreeRegressor
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
-from xgboost import XGBRegressor
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from xgboost import XGBClassifier
 
 '''
 import matplotlib.pyplot as plt
@@ -39,7 +39,7 @@ def plot_feature_importances(model): # 그림 함수 정의
     plt.ylim(-1, n_features) # ylimit : 축의 한계치 설정
 '''
 
-models = [DecisionTreeRegressor(), RandomForestRegressor(), GradientBoostingRegressor(), XGBRegressor()]
+models = [DecisionTreeClassifier(), RandomForestClassifier(), GradientBoostingClassifier(), XGBClassifier()]
 
 # 3. 컴파일, 훈련, 평가, 예측
 ''' 훈련 + 그림
@@ -48,22 +48,31 @@ for i in range(len(models)):
     models[i].fit(x_train, y_train)
     plt.subplot(2,2, i+1)
     plot_feature_importances(models[i])
-    if str(models[i]).startswith('XGBRegressor'):
+    if str(models[i]).startswith('XGBClassifier'):
         plt.title('XGB()')
     else:
         plt.title(models[i])
 plt.show()
 '''
+
 for model in models:
+    model_drop_cal = []
     model.fit(x_train, y_train)
     score = model.score(x_test, y_test)
     if str(model).startswith('XGB'):
-        print('XGB의 스코어: ', score)
+        print('XGB 의 스코어: ', score)
     else:
         print(str(model).strip('()'), '의 스코어: ', score)
-    
-
-# DecisionTreeRegressor 의 스코어:  1.0
-# RandomForestRegressor 의 스코어:  0.9998703339882122
-# GradientBoostingRegressor 의 스코어:  0.9983744292842164
-# XGB 의 스코어:  0.9998069257068463
+    for i in range(len(model.feature_importances_)):
+        if model.feature_importances_[i]<=0.03:
+            model_drop_cal.append(i)
+    print('중요도낮은칼럼: ', model_drop_cal)
+            
+# DecisionTreeClassifier 의 스코어:  1.0
+# 중요도낮은칼럼:  [0, 1]
+# RandomForestClassifier 의 스코어:  1.0
+# 중요도낮은칼럼:  [1]
+# GradientBoostingClassifier 의 스코어:  1.0
+# 중요도낮은칼럼:  [0, 1]
+# XGB 의 스코어:  1.0
+# 중요도낮은칼럼:  [0, 1]

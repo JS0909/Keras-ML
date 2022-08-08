@@ -10,9 +10,9 @@ from sklearn.model_selection import train_test_split
 x_train, x_test, y_train, y_test = train_test_split(x, y, shuffle=True, train_size=0.8, random_state=1234)
 
 # 2. 모델구성
-from sklearn.tree import DecisionTreeRegressor
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
-from xgboost import XGBRegressor
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from xgboost import XGBClassifier
 
 '''
 import matplotlib.pyplot as plt
@@ -27,7 +27,7 @@ def plot_feature_importances(model): # 그림 함수 정의
     plt.ylim(-1, n_features) # ylimit : 축의 한계치 설정
 '''
 
-models = [DecisionTreeRegressor(), RandomForestRegressor(), GradientBoostingRegressor(), XGBRegressor()]
+models = [DecisionTreeClassifier(), RandomForestClassifier(), GradientBoostingClassifier(), XGBClassifier()]
 
 # 3. 컴파일, 훈련, 평가, 예측
 ''' 훈련 + 그림
@@ -36,7 +36,7 @@ for i in range(len(models)):
     models[i].fit(x_train, y_train)
     plt.subplot(2,2, i+1)
     plot_feature_importances(models[i])
-    if str(models[i]).startswith('XGBRegressor'):
+    if str(models[i]).startswith('XGBClassifier'):
         plt.title('XGB()')
     else:
         plt.title(models[i])
@@ -51,7 +51,7 @@ for model in models:
         print(str(model).strip('()'), '의 스코어: ', score)
     
 
-# DecisionTreeRegressor 의 스코어:  0.5594202898550724
-# RandomForestRegressor 의 스코어:  0.7730684057971013
-# GradientBoostingRegressor 의 스코어:  0.759599408165565
+# DecisionTreeClassifier 의 스코어:  0.5594202898550724
+# RandomForestClassifier 의 스코어:  0.7730684057971013
+# GradientBoostingClassifier 의 스코어:  0.759599408165565
 # XGB 의 스코어:  0.7663788594865716
