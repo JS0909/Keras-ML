@@ -67,12 +67,17 @@ for model in models:
         if model.feature_importances_[i]<=0.03:
             model_drop_cal.append(i)
     print('중요도낮은칼럼: ', model_drop_cal)
+    print('모든칼럼중요도: ', model.feature_importances_)
             
 # DecisionTreeClassifier 의 스코어:  1.0
 # 중요도낮은칼럼:  [0, 1]
+# 모든칼럼중요도:  [0.01669101 0.01669101 0.56740948 0.39920851]
 # RandomForestClassifier 의 스코어:  1.0
 # 중요도낮은칼럼:  [1]
+# 모든칼럼중요도:  [0.114322   0.02250392 0.42799619 0.43517789]
 # GradientBoostingClassifier 의 스코어:  1.0
 # 중요도낮은칼럼:  [0, 1]
+# 모든칼럼중요도:  [0.00441744 0.01497494 0.26137953 0.71922808]
 # XGB 의 스코어:  1.0
 # 중요도낮은칼럼:  [0, 1]
+# 모든칼럼중요도:  [0.00912187 0.0219429  0.678874   0.29006115]

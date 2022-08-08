@@ -1,12 +1,16 @@
 import numpy as np
 from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
 
 # 1. 데이터
 datasets = load_breast_cancer()
 x = datasets.data
 y = datasets.target
 
-from sklearn.model_selection import train_test_split
+allfeature = round(x.shape[1]*0.2, 1)
+print('자를 갯수: ', int(allfeature))
+
+
 x_train, x_test, y_train, y_test = train_test_split(x, y, shuffle=True, train_size=0.8, random_state=1234)
 
 # 2. 모델구성
@@ -14,34 +18,9 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from xgboost import XGBClassifier
 
-'''
-import matplotlib.pyplot as plt
-
-def plot_feature_importances(model): # 그림 함수 정의
-    n_features = datasets.data.shape[1]
-    plt.barh(np.arange(n_features), model.feature_importances_, align='center')
-                # x                     y
-    plt.yticks(np.arange(n_features), datasets.feature_names) # 눈금 설정
-    plt.xlabel('Feature Importances')
-    plt.ylabel('Features')
-    plt.ylim(-1, n_features) # ylimit : 축의 한계치 설정
-'''
-
 models = [DecisionTreeClassifier(), RandomForestClassifier(), GradientBoostingClassifier(), XGBClassifier()]
 
 # 3. 컴파일, 훈련, 평가, 예측
-''' 훈련 + 그림
-plt.figure(figsize=(10,5))
-for i in range(len(models)):
-    models[i].fit(x_train, y_train)
-    plt.subplot(2,2, i+1)
-    plot_feature_importances(models[i])
-    if str(models[i]).startswith('XGBClassifier'):
-        plt.title('XGB()')
-    else:
-        plt.title(models[i])
-plt.show()
-'''
 for model in models:
     model.fit(x_train, y_train)
     score = model.score(x_test, y_test)
@@ -49,9 +28,29 @@ for model in models:
         print('XGB 의 스코어: ', score)
     else:
         print(str(model).strip('()'), '의 스코어: ', score)
+    for a in range(int(allfeature)):
+        print(np.argsort(model.feature_importances_)[a])
+
+# 자를 갯수:  6.0
+# DecisionTreeClassifier 의 스코어:  0.8947368421052632
+# 중요도낮은칼럼순서:  [ 0 20 19 18 16 15 28 12 11 14  2  1  9  3  4 29  6  7  8  5 25 22 10 26
+#  21 13 17 24 23 27]
+# RandomForestClassifier 의 스코어:  0.9298245614035088
+# 중요도낮은칼럼순서:  [11 14  9 18  8 17 29 19 16 28  5 15  4  1 12 25 24 10 21 26 13  3  2  0
+#   7  6 23 20 22 27]
+# GradientBoostingClassifier 의 스코어:  0.9122807017543859
+# 중요도낮은칼럼순서:  [17  9 14 11  8  0 15 16 25 19  2 18  5 28  6 12  4 26  3 29 10 13  1 24
+#  21 20 22 23  7 27]
+# XGB 의 스코어:  0.9385964912280702
+# 중요도낮은칼럼순서:  [ 8 12 11 19  5 17  2 10 16  9 28 25 14 15  4 18 26 24  0  1  6 13 21  3
+#  29 22 23 20 27  7]
+
+
+
     
 
-# DecisionTreeClassifier 의 스코어:  0.5594202898550724
-# RandomForestClassifier 의 스코어:  0.7730684057971013
-# GradientBoostingClassifier 의 스코어:  0.759599408165565
-# XGB 의 스코어:  0.7663788594865716
+datasets = load_breast_cancer()
+x = datasets.data
+y = datasets.target
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, shuffle=True, train_size=0.8, random_state=1234)
