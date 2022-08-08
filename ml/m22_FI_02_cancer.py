@@ -25,9 +25,9 @@ for model in models:
     model.fit(x_train, y_train)
     score = model.score(x_test, y_test)
     if str(model).startswith('XGB'):
-        print('XGB 의 스코어: ', score)
+        print('XGB 의 스코어:        ', score)
     else:
-        print(str(model).strip('()'), '의 스코어: ', score)
+        print(str(model).strip('()'), '의 스코어:        ', score)
         
     featurelist = []
     for a in range(int(allfeature)):
@@ -41,15 +41,13 @@ for model in models:
         print('XGB 의 드랍후 스코어: ', score)
     else:
         print(str(model).strip('()'), '의 드랍후 스코어: ', score)
-    
-    
 
 # 자를 갯수:  6
-# DecisionTreeClassifier 의 스코어:  0.8947368421052632
-# DecisionTreeClassifier 의 스코어:  0.9122807017543859
-# RandomForestClassifier 의 스코어:  0.9298245614035088
-# RandomForestClassifier 의 스코어:  0.9210526315789473
-# GradientBoostingClassifier 의 스코어:  0.9122807017543859
-# GradientBoostingClassifier 의 스코어:  0.9122807017543859
-# XGB 의 스코어:  0.9385964912280702
-# XGB 의 스코어:  0.9385964912280702
+# DecisionTreeClassifier 의 스코어:         0.8947368421052632
+# DecisionTreeClassifier 의 드랍후 스코어:  0.8859649122807017
+# RandomForestClassifier 의 스코어:         0.9298245614035088
+# RandomForestClassifier 의 드랍후 스코어:  0.9298245614035088
+# GradientBoostingClassifier 의 스코어:         0.9122807017543859
+# GradientBoostingClassifier 의 드랍후 스코어:  0.9122807017543859
+# XGB 의 스코어:         0.9385964912280702
+# XGB 의 드랍후 스코어:  0.9385964912280702

@@ -3,8 +3,7 @@ import pandas as pd
 from sklearn.experimental import enable_halving_search_cv
 from sklearn.model_selection import train_test_split, StratifiedKFold,\
     HalvingRandomSearchCV
-import warnings
-warnings.filterwarnings('ignore') # warnig 출력 안함
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 
 # pandas의 y라벨의 종류 확인 train_set.columns.values
@@ -43,6 +42,9 @@ y = train_set['Survived']
 x = train_set.drop(columns = ['PassengerId','Name','Ticket','Survived'],axis=1) 
 y = np.array(y).reshape(-1, 1) # 벡터로 표시되어 있는 y데이터를 행렬로 전환
 
+allfeature = round(x.shape[1]*0.2, 0)
+print('자를 갯수: ', int(allfeature))
+
 x_train, x_test, y_train, y_test = train_test_split(x, y, shuffle=True, train_size=0.8, random_state=1234)
 
 # 2. 모델구성
@@ -50,43 +52,26 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from xgboost import XGBClassifier
 
-'''
-import matplotlib.pyplot as plt
-
-def plot_feature_importances(model): # 그림 함수 정의
-    n_features = datasets.data.shape[1]
-    plt.barh(np.arange(n_features), model.feature_importances_, align='center')
-                # x                     y
-    plt.yticks(np.arange(n_features), datasets.feature_names) # 눈금 설정
-    plt.xlabel('Feature Importances')
-    plt.ylabel('Features')
-    plt.ylim(-1, n_features) # ylimit : 축의 한계치 설정
-'''
-
 models = [DecisionTreeClassifier(), RandomForestClassifier(), GradientBoostingClassifier(), XGBClassifier()]
 
 # 3. 컴파일, 훈련, 평가, 예측
-''' 훈련 + 그림
-plt.figure(figsize=(10,5))
-for i in range(len(models)):
-    models[i].fit(x_train, y_train)
-    plt.subplot(2,2, i+1)
-    plot_feature_importances(models[i])
-    if str(models[i]).startswith('XGBClassifier'):
-        plt.title('XGB()')
-    else:
-        plt.title(models[i])
-plt.show()
-'''
 for model in models:
     model.fit(x_train, y_train)
     score = model.score(x_test, y_test)
     if str(model).startswith('XGB'):
-        print('XGB 의 스코어: ', score)
+        print('XGB 의 스코어:        ', score)
     else:
-        print(str(model).strip('()'), '의 스코어: ', score)
-    
-# DecisionTreeClassifier 의 스코어:  0.7988826815642458
-# RandomForestClassifier 의 스코어:  0.8324022346368715
-# GradientBoostingClassifier 의 스코어:  0.8324022346368715
-# XGB 의 스코어:  0.8324022346368715
+        print(str(model).strip('()'), '의 스코어:        ', score)
+        
+    featurelist = []
+    for a in range(int(allfeature)):
+        featurelist.append(np.argsort(model.feature_importances_)[a])
+        
+    x_bf = np.delete(x, featurelist, axis=1)
+    x_train2, x_test2, y_train2, y_test2 = train_test_split(x_bf, y, shuffle=True, train_size=0.8, random_state=1234)
+    model.fit(x_train2, y_train2)
+    score = model.score(x_test2, y_test2)
+    if str(model).startswith('XGB'):
+        print('XGB 의 드랍후 스코어: ', score)
+    else:
+        print(str(model).strip('()'), '의 드랍후 스코어: ', score)
