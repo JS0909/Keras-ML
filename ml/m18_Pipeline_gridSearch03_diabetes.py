@@ -34,7 +34,7 @@ from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.experimental import enable_halving_search_cv
 from sklearn.model_selection import HalvingGridSearchCV, HalvingRandomSearchCV
 
-model = HalvingGridSearchCV(pipe, parameters, cv=5, verbose=1)
+model = HalvingRandomSearchCV(pipe, parameters, cv=5, verbose=1)
 
 model.fit(x_train, y_train)
 
@@ -43,6 +43,7 @@ result = model.score(x_test, y_test)
 
 print('model.score: ', result)
 
+# model.score:  0.7646993515685362
 
 # 파이프라인 안쓰고
 # best tuned acc:  0.8272497743392861

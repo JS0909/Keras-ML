@@ -21,6 +21,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import make_pipeline
 
 model = make_pipeline(MinMaxScaler(), SVC()) # 굳이 변수명으로 정의하지 않아도 바로 갖다 쓸 수 있음
+# 스케일러 여러개 사용 가능
 
 # 3. 훈련
 model.fit(x_train, y_train) # pipeline의 fit에는 알아서 fit_transform이 들어가 있음
