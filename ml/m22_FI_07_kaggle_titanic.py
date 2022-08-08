@@ -4,7 +4,8 @@ from sklearn.experimental import enable_halving_search_cv
 from sklearn.model_selection import train_test_split, StratifiedKFold,\
     HalvingRandomSearchCV
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
-
+import warnings
+warnings.filterwarnings('ignore') # warnig 출력 안함
 
 # pandas의 y라벨의 종류 확인 train_set.columns.values
 # numpy에서는 np.unique(y, return_counts=True)
@@ -39,7 +40,8 @@ test_set = test_set.drop(columns = ['PassengerId','Name','Ticket'],axis=1)
 #---------------------------------------------------------------------------------------------------
 
 y = train_set['Survived']
-x = train_set.drop(columns = ['PassengerId','Name','Ticket','Survived'],axis=1) 
+x = train_set.drop(columns = ['PassengerId','Name','Ticket','Survived'],axis=1)
+x = np.array(x)
 y = np.array(y).reshape(-1, 1) # 벡터로 표시되어 있는 y데이터를 행렬로 전환
 
 allfeature = round(x.shape[1]*0.2, 0)
@@ -75,3 +77,13 @@ for model in models:
         print('XGB 의 드랍후 스코어: ', score)
     else:
         print(str(model).strip('()'), '의 드랍후 스코어: ', score)
+        
+# 자를 갯수:  1
+# DecisionTreeClassifier 의 스코어:         0.7988826815642458
+# DecisionTreeClassifier 의 드랍후 스코어:  0.7877094972067039
+# RandomForestClassifier 의 스코어:         0.8324022346368715
+# RandomForestClassifier 의 드랍후 스코어:  0.8324022346368715
+# GradientBoostingClassifier 의 스코어:         0.8324022346368715
+# GradientBoostingClassifier 의 드랍후 스코어:  0.8324022346368715
+# XGB 의 스코어:         0.8324022346368715
+# XGB 의 드랍후 스코어:  0.8435754189944135

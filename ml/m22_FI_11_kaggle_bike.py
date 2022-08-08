@@ -1,4 +1,5 @@
 import pandas as pd 
+import numpy as np
 from sklearn.experimental import enable_halving_search_cv
 from sklearn.model_selection import train_test_split, KFold,\
     HalvingRandomSearchCV
@@ -41,6 +42,7 @@ train_set.drop('registered',axis=1,inplace=True) # registered 드랍 이유 모�
 
 x = train_set.drop(['count'], axis=1)
 y = train_set['count']
+x = np.array(x)
 
 print(x.shape, y.shape) # (10886, 14) (10886,)
 
@@ -79,3 +81,12 @@ for model in models:
     else:
         print(str(model).strip('()'), '의 드랍후 스코어: ', score)
 
+# 자를 갯수:  2
+# DecisionTreeRegressor 의 스코어:         0.8998943779000376
+# DecisionTreeRegressor 의 드랍후 스코어:  0.9021440230126041
+# RandomForestRegressor 의 스코어:         0.9535349275867362
+# RandomForestRegressor 의 드랍후 스코어:  0.9545753200896735
+# GradientBoostingRegressor 의 스코어:         0.8704971338382665
+# GradientBoostingRegressor 의 드랍후 스코어:  0.8677989200475393
+# XGB 의 스코어:         0.9551549751415519
+# XGB 의 드랍후 스코어:  0.9580691040233864

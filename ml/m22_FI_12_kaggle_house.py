@@ -190,6 +190,7 @@ test_set.drop(['MSZoning', 'Neighborhood' , 'Condition2', 'MasVnrType', 'ExterQu
 
 x = train_set.drop(['SalePrice'], axis=1)
 y = train_set['SalePrice']
+x = np.array(x)
 
 allfeature = round(x.shape[1]*0.2, 0)
 print('자를 갯수: ', int(allfeature))
@@ -225,3 +226,14 @@ for model in models:
         print('XGB 의 드랍후 스코어: ', score)
     else:
         print(str(model).strip('()'), '의 드랍후 스코어: ', score)
+        
+
+# 자를 갯수:  2
+# DecisionTreeRegressor 의 스코어:         0.7679125675777974
+# DecisionTreeRegressor 의 드랍후 스코어:  0.7840868446715827
+# RandomForestRegressor 의 스코어:         0.8766456123293699
+# RandomForestRegressor 의 드랍후 스코어:  0.8696261906140561
+# GradientBoostingRegressor 의 스코어:         0.8741234916950783
+# GradientBoostingRegressor 의 드랍후 스코어:  0.8762868373727299
+# XGB 의 스코어:         0.845574071747059
+# XGB 의 드랍후 스코어:  0.8527746335749569
