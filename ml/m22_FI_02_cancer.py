@@ -28,15 +28,28 @@ for model in models:
         print('XGB 의 스코어: ', score)
     else:
         print(str(model).strip('()'), '의 스코어: ', score)
+        
     featurelist = []
     for a in range(int(allfeature)):
         featurelist.append(np.argsort(model.feature_importances_)[a])
-    print(featurelist)
+        
+    x_bf = np.delete(x, featurelist, axis=1)
+    x_train2, x_test2, y_train2, y_test2 = train_test_split(x_bf, y, shuffle=True, train_size=0.8, random_state=1234)
+    model.fit(x_train2, y_train2)
+    score = model.score(x_test2, y_test2)
+    if str(model).startswith('XGB'):
+        print('XGB 의 드랍후 스코어: ', score)
+    else:
+        print(str(model).strip('()'), '의 드랍후 스코어: ', score)
+    
+    
 
-
-
-datasets = load_breast_cancer()
-x = datasets.data
-y = datasets.target
-
-x_train, x_test, y_train, y_test = train_test_split(x, y, shuffle=True, train_size=0.8, random_state=1234)
+# 자를 갯수:  6
+# DecisionTreeClassifier 의 스코어:  0.8947368421052632
+# DecisionTreeClassifier 의 스코어:  0.9122807017543859
+# RandomForestClassifier 의 스코어:  0.9298245614035088
+# RandomForestClassifier 의 스코어:  0.9210526315789473
+# GradientBoostingClassifier 의 스코어:  0.9122807017543859
+# GradientBoostingClassifier 의 스코어:  0.9122807017543859
+# XGB 의 스코어:  0.9385964912280702
+# XGB 의 스코어:  0.9385964912280702
