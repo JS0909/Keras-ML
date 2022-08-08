@@ -19,6 +19,7 @@ from sklearn.neighbors import KNeighborsClassifier # 최근접 이웃
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier # 결정트리를 여러개 랜덤으로 뽑아서 앙상블해서 봄
 
+'''
 model = LinearSVC()
 model.fit(x_train, y_train)
 result = model.score(x_test, y_test)
@@ -60,6 +61,7 @@ result = model.score(x_test, y_test)
 print('DecisionTreeClassifier acc 결과: ', result)
 # y_predict = model.predict(x_test)
 # print('ypred: ', y_predict, '\n')
+'''
 
 model = RandomForestClassifier()
 model.fit(x_train, y_train)

@@ -27,3 +27,11 @@ for model in models:
     model.fit(x_train, y_train)
     result = model.score(x_test, y_test)
     print(model_name, '결과: ', result)
+    
+# LinearSVR 결과:  -0.21026793010486222
+# SVR 결과:  0.2668794571758186
+# Perceptron 결과:  0.0
+# LinearRegression 결과:  0.6557534150889773
+# KNeighborsRegressor 결과:  0.5704639112420011
+# DecisionTreeRegressor 결과:  -0.054909125498723066
+# RandomForestRegressor 결과:  0.6329634639445246
