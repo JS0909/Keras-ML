@@ -11,7 +11,7 @@ x = datasets.data
 y = datasets.target
 print(x.shape, y.shape) # (506, 13) (506,)
 
-pca = PCA(n_components=12) # 주성분 분석, 차원 축소 // n_components 개수만큼으로 열을 줄임
+pca = PCA(n_components=12) # 주성분 분석, 차원 축소 // n_components 개수만큼으로 x의 열을 줄임
 # y 값이 없는 대표적 비 지도 학습의 하나
 x = pca.fit_transform(x) 
 print(x.shape) # (506, 2)
