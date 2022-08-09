@@ -6,6 +6,7 @@ from tensorflow.python.keras.callbacks import EarlyStopping
 import tensorflow as tf
 from sklearn.metrics import accuracy_score
 import pandas as pd
+import time
 
 # [실습] 완성해봐
 # 성능은 cnn보다 좋게
@@ -30,7 +31,9 @@ model.add(Dense(10, activation='softmax'))
 # 3. 컴파일, 훈련
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=50, restore_best_weights=True)
+start = time.time()
 log = model.fit(x_train, y_train, epochs=1000, batch_size=32, callbacks=[Es], validation_split=0.2)
+end = time.time()
 
 #4. 평가, 예측
 loss = model.evaluate(x_test, y_test)
@@ -40,6 +43,8 @@ y_test = tf.argmax(y_test, axis=1)
 acc_sc = accuracy_score(y_test, y_predict)
 print('loss : ', loss)
 print('acc스코어 : ', acc_sc)
+print('시간: ', end-start)
 
-# loss :  [0.2079867124557495, 0.9509999752044678]
-# acc스코어 :  0.951
+# loss :  [0.2103029042482376, 0.9445000290870667]
+# acc스코어 :  0.9445
+# 시간:  362.1198184490204

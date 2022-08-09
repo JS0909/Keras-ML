@@ -6,6 +6,7 @@ from tensorflow.python.keras.callbacks import EarlyStopping
 import tensorflow as tf
 from sklearn.metrics import accuracy_score
 import pandas as pd
+import time
 
 # 1. 데이터
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
@@ -44,7 +45,9 @@ model.summary() # (None, 28, 28, 64) ... 데이터 갯수 = None
 # 3. 컴파일, 훈련
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=50, restore_best_weights=True)
+start = time.time()
 log = model.fit(x_train, y_train, epochs=1000, batch_size=100, callbacks=[Es], validation_split=0.2)
+end = time.time()
 
 #4. 평가, 예측
 loss = model.evaluate(x_test, y_test)
@@ -54,6 +57,8 @@ y_test = tf.argmax(y_test, axis=1)
 acc_sc = accuracy_score(y_test, y_predict)
 print('loss : ', loss)
 print('acc스코어 : ', acc_sc)
+print('시간: ', end-start)
 
-# loss :  [0.06552130728960037, 0.9810000061988831]
-# acc스코어 :  0.981
+# loss :  [0.0747639536857605, 0.9764999747276306]
+# acc스코어 :  0.9765
+# 시간:  152.1847949028015
