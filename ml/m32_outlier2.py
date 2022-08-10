@@ -29,8 +29,6 @@ for i in range(aaa.shape[1]):
 plt.show()
 
 
-
-
 # 1사분위:  4.0
 # q2:  7.0
 # 3사분위:  10.0
