@@ -13,7 +13,7 @@ x = datasets.data
 y = datasets.target
 print(x.shape, y.shape) # (569, 30) (569,)
 
-for i in range(x.shape[1]+1):
+for i in range(x.shape[1]):
     pca = PCA(n_components=i+1)
     x2 = pca.fit_transform(x)
     x_train, x_test, y_train, y_test = train_test_split(x2, y, train_size=0.8, random_state=123, shuffle=True)
