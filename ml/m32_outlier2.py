@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import numpy as np
 aaa = np.array([[-10,2,3,4,5,6,7,8,9,10,11,12,50],
                 [100,200,-30,400,500,600,-70000,800,900,1000,210,420,350]])
@@ -22,11 +23,11 @@ for i in range(aaa.shape[1]):
     w = aaa[:, i]
     outliers_loc = outliers(w)
     print(i, '열의 이상치의 위치: ', outliers_loc, '\n')
+    plt.subplot(aaa.shape[1],1,i+1)
+    plt.boxplot(w)
 
-# import matplotlib.pyplot as plt
-# plt.boxplot(aaa)
-# # plt.boxplot(aaa[1])
-# plt.show()
+plt.show()
+
 
 
 
