@@ -15,7 +15,6 @@ def outliers(data_out):
     upper_bound = quartile_3 + (iqr * 1.5) # 19
     print(upper_bound)
     return np.where((data_out>upper_bound) | (data_out<lower_bound)) # 괄호 안의 조건을 만족하는 값의 인덱스를 반환함
-    # | 표시는 or임 아마도
 
 outliers_loc = outliers(aaa)
 print('이상치의 위치: ', outliers_loc)
