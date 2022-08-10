@@ -19,11 +19,19 @@ print(x.shape)
 # le = LabelEncoder()  // stratify=y 쓰면 라벨인코더 안해도 됨
 # y = le.fit_transform(y)
 
+pca = PCA(n_components=x.shape[1])
+x = pca.fit_transform(x)
+pca_EVR = pca.explained_variance_ratio_
+print(pca_EVR)
+cumsum = np.cumsum(pca_EVR)
+print(cumsum)
+
+
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, random_state=123, shuffle=True, stratify=y)
 print(np.unique(y_train, return_counts=True))
 # (array([0, 1, 2, 3, 4, 5, 6], dtype=int64), array([169472, 226640,  28603,   2198,   7594,  13894,  16408],
 #       dtype=int64))
-lda = LinearDiscriminantAnalysis(n_components=1) # y라벨 개수보다 작아야만 한다
+lda = LinearDiscriminantAnalysis(n_components=1)
 lda.fit(x_train, y_train)
 x_train = lda.transform(x_train)
 x_test = lda.transform(x_test)
