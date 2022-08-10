@@ -31,7 +31,7 @@ print(data.dropna(axis=1))
 
 # 2-1. 특정값 - 평균
 print('-------------------- 결측치 처리 mean() ------------------------')
-means = data.mean() # 칼럼 별 평균
+means = data.mean() # 칼럼 별 평 
 print(means)
 data2 = data.fillna(means)
 print(data2)
