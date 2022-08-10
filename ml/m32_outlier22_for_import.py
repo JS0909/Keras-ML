@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+# outlier 뽑을때 앞으로 이거 임포트해서 써먹기~~
+
 def outliers(data_out):
     quartile_1, q2, quartile_3 = np.percentile(data_out, [25, 50, 75])
 
