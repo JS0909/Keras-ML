@@ -20,11 +20,11 @@ def outliers(data_out):
    
 def outliers_printer(dataset):
     for i in range(dataset.shape[1]):
-        cols = dataset[:, i]
-        outliers_loc = outliers(cols)
+        col = dataset[:, i]
+        outliers_loc = outliers(col)
         print(i, '열의 이상치의 위치: ', outliers_loc, '\n')
         plt.subplot(dataset.shape[1],1,i+1)
-        plt.boxplot(cols)
+        plt.boxplot(col)
         
     plt.show()
 
