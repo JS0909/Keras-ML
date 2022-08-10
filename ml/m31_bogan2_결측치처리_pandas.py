@@ -40,5 +40,33 @@ print(data2)
 print('-------------------- 결측치 처리 median() ------------------------')
 median = data.median()
 print(median)
-data2 = data.fillna(median)
-print(data2)
+data3 = data.fillna(median)
+print(data3)
+
+# 2-3. 특정값 - ffill, bfill (front fill, back fill)
+print('-------------------- 결측치 처리 ffill, bfill ------------------------')
+data4 = data.fillna(method='ffill') # 첫번째에 결측치 있으면 못 채운다
+print(data4)
+data5 = data.fillna(method='bfill') # 맨 마지막에 결측치 있으면 못 채운다
+print(data5)
+
+# 2-4. 특정값 - 임의값으로 채우기
+print('-------------------- 결측치 처리 임의값으로 채우기 ------------------------')
+# data6 = data.fillna(77777)
+data6 = data.fillna(value = 77777)
+print(data6)
+
+#========================================= < 특정 칼럼만 결측치 채우기 > =====================================================
+
+means = data['x1'].mean()
+print(means) # 6.5
+data['x1'] = data['x1'].fillna(means)
+print(data)
+
+meds = data['x2'].median()
+print(meds) # 4.0
+data['x2'] = data['x2'].fillna(means)
+print(data)
+
+data['x4'] = data['x4'].fillna(77777)
+print(data)
