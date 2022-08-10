@@ -18,16 +18,17 @@ def outliers(data_out):
     print(upper_bound)
     return np.where((data_out>upper_bound) | (data_out<lower_bound))
    
+def outliers_printer(dataset):
+    for i in range(dataset.shape[1]):
+        cols = dataset[:, i]
+        outliers_loc = outliers(cols)
+        print(i, '열의 이상치의 위치: ', outliers_loc, '\n')
+        plt.subplot(aaa.shape[1],1,i+1)
+        plt.boxplot(cols)
 
-for i in range(aaa.shape[1]):
-    w = aaa[:, i]
-    outliers_loc = outliers(w)
-    print(i, '열의 이상치의 위치: ', outliers_loc, '\n')
-    plt.subplot(aaa.shape[1],1,i+1)
-    plt.boxplot(w)
+    plt.show()
 
-plt.show()
-
+outliers_printer(aaa)
 
 # 1사분위:  4.0
 # q2:  7.0
