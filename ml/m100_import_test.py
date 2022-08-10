@@ -7,6 +7,6 @@ aaa = np.transpose(aaa)
 print(aaa.shape)
 print(aaa)
 
-import m32_outlier2 as m32
+import m32_outlier22_for_import as m32
 
 m32.outliers_printer(aaa)
