@@ -10,8 +10,8 @@ def outliers(data_out):
     print('q2: ', q2)
     print('3사분위: ', quartile_3)
     iqr = quartile_3-quartile_1 # interquartile range
-    lower_bound = quartile_1 - (iqr * 1.5) # -5.0
-    upper_bound = quartile_3 + (iqr * 1.5) # 19
+    lower_bound = quartile_1 - (iqr * 1.5)
+    upper_bound = quartile_3 + (iqr * 1.5)
     print(upper_bound)
     return np.where((data_out>upper_bound) | (data_out<lower_bound))
    
