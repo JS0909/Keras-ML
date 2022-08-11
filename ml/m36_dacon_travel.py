@@ -24,7 +24,7 @@ submission = pd.read_csv(filepath+'submission.csv', index_col=0)
 # print(train.info())
 # print(train.isnull().sum())
 
-# 결측치 TypeofContact 빼고 중간값으로 대체함, 데이터 수치들 보면 중간값이 제일 무난할거 같음
+# 결측치 TypeofContact 빼고 중간값으로 대체함, 데이터 수치들 보면 중간값이 제일 무난할거 같음--------------------
 train['Age'].fillna(train['Age'].median(), inplace=True)
 train['TypeofContact'].fillna('N', inplace=True) # N으로 채운 이유는 콘택 타입 없는 건 '없음'으로 주고 처리하기 위해
 train['DurationOfPitch'].fillna(train['DurationOfPitch'].median(), inplace=True)
@@ -43,8 +43,9 @@ test['NumberOfTrips'].fillna(test['NumberOfTrips'].median(), inplace=True)
 test['NumberOfChildrenVisiting'].fillna(test['NumberOfChildrenVisiting'].median(), inplace=True)
 test['MonthlyIncome'].fillna(test['MonthlyIncome'].median(), inplace=True)
 # print(train.isnull().sum())
+#-----------------------------------------------------------------------------------------------------------
 
-# object타입 라벨인코딩
+# object타입 라벨인코딩--------------------
 le = LabelEncoder()
 idxarr = train.columns
 idxarr = np.array(idxarr)
@@ -53,19 +54,20 @@ for i in idxarr:
       if train[i].dtype == 'object':
         train[i] = le.fit_transform(train[i])
         test[i] = le.fit_transform(test[i])
+# print(train.info())
+# ------------------------------------------
 
-
-print(train.info())
-
+# 피처임포턴스 그래프 보기 위해 데이터프레임형태의 x_, y_ 놔둠 / 훈련용 넘파이어레이형태의 x, y 생성-----------
 x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1)
 y_ = train['ProdTaken']
 x = np.array(x_)
 y = np.array(y_)
 y = y.reshape(-1, 1)
 
-test = test.drop(['NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1)
+test = test.drop(['NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3
 test = np.array(test)
-print(x.shape, y.shape) # (1955, 19) (1955, 1)
+# print(x.shape, y.shape)
+#-----------------------------------------------------------------------------------------------------------
 
 '''
 # 이상치 그래프로 확인 ------------------------------------------------------------------
@@ -134,12 +136,12 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, random
 xgb = XGBClassifier(tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0)
 rnf = RandomForestClassifier()
 
+# model = xgb
+# model = rnf
 # model = make_pipeline(MinMaxScaler(), HalvingRandomSearchCV(xgb, parameters_xgb, cv=5, n_jobs=-1, verbose=2))
 model = make_pipeline(MinMaxScaler(), HalvingRandomSearchCV(rnf, parameters_rnf, cv=5, n_jobs=-1, verbose=2))
 # model = make_pipeline(MinMaxScaler(), xgb)
 # model = make_pipeline(MinMaxScaler(), rnf)
-# model = xgb
-# model = rnf
 
 # 3. 훈련
 start = time.time()
