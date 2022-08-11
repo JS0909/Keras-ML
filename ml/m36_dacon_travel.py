@@ -143,8 +143,7 @@ model = make_pipeline(MinMaxScaler(), HalvingRandomSearchCV(rnf, parameters_rnf,
 # model = make_pipeline(MinMaxScaler(), rnf)
 
 # 3. 훈련
-'''
-# 칼럼별 중요도 확인--------------------------------------------------
+''' Feature importances 확인
 def plot_feature_importances(model):
     plt.figure(figsize=(13,8))
     n_features = x_.shape[1]
