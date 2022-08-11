@@ -144,10 +144,6 @@ model = make_pipeline(MinMaxScaler(), HalvingRandomSearchCV(rnf, parameters_rnf,
 # model = make_pipeline(MinMaxScaler(), rnf)
 
 # 3. 훈련
-start = time.time()
-model.fit(x_train, y_train)
-end = time.time()
-
 '''
 # 칼럼별 중요도 확인--------------------------------------------------
 def plot_feature_importances(model):
@@ -159,7 +155,10 @@ def plot_feature_importances(model):
     plt.xlabel('Feature Importances')
     plt.ylabel('Features')
     plt.ylim(-1, n_features) # ylimit : 축의 한계치 설정
-    plt.title('XGBClassifier')
+    if str(models[i]).startswith('XGBClassifier'):
+        plt.title('XGB()')
+    else:
+        plt.title(model)
 
 plot_feature_importances(model)
 plt.show()
@@ -167,9 +166,13 @@ plt.show()
 # ----------------------------------------------------------------------
 '''
 
+start = time.time()
+model.fit(x_train, y_train)
+end = time.time()
+
 # 4. 평가, 예측
 results = model.score(x_test, y_test)
-print('결과: ', results)
+print('스코어: ', results)
 print('걸린 시간: ', end-start)
 
 # 5. 제출 준비
@@ -179,27 +182,27 @@ submission['ProdTaken'] = y_submit
 submission.to_csv(filepath + 'submission.csv', index = True)
 
 # submission 1번파일
-# 결과:  0.8673469387755102
+# 스코어:  0.8673469387755102
 # 걸린 시간:  22.424696445465088
 
 # submission 2번파일
-# 결과:  0.8567774936061381
+# 스코어:  0.8567774936061381
 # 걸린 시간:  147.84010410308838
 
 # submission 3번파일
-# 결과:  0.8695652173913043
+# 스코어:  0.8695652173913043
 # 걸린 시간:  0.6045560836791992
 
 # submission 4번파일 랜포
-# 결과:  0.8797953964194374
+# 스코어:  0.8797953964194374
 # 걸린 시간:  0.1614227294921875
 
 # submission 5번파일 랜포+halving
-# 결과:  0.8746803069053708
+# 스코어:  0.8746803069053708
 # 걸린 시간:  4.660583972930908
 
 # submission 6번파일 랜포+halving+랜덤시드 134로 바꿈
-# 결과:  0.887468030690537
+# 스코어:  0.887468030690537
 # 걸린 시간:  4.499013185501099
 
 #  #   Column                    Non-Null Count  Dtype
