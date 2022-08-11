@@ -19,7 +19,6 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 filepath = 'D:\study_data\_data\dacon_travel/'
 train = pd.read_csv(filepath+'train.csv', index_col=0)
 test = pd.read_csv(filepath+'test.csv', index_col=0)
-submission = pd.read_csv(filepath+'submission.csv', index_col=0)
 
 # print(train.head())
 # print(train.info())
@@ -178,8 +177,9 @@ print('걸린 시간: ', end-start)
 
 # 5. 제출 준비
 y_submit = model.predict(test)
-submission['ProdTaken'] = y_submit
 
+submission = pd.read_csv(filepath+'submission.csv', index_col=0)
+submission['ProdTaken'] = y_submit
 submission.to_csv(filepath + 'submission.csv', index = True)
 
 
