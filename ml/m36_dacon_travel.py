@@ -181,6 +181,10 @@ submission['ProdTaken'] = y_submit
 
 submission.to_csv(filepath + 'submission.csv', index = True)
 
+
+
+
+
 # submission 1번파일
 # 스코어:  0.8673469387755102
 # 걸린 시간:  22.424696445465088
@@ -205,24 +209,31 @@ submission.to_csv(filepath + 'submission.csv', index = True)
 # 스코어:  0.887468030690537
 # 걸린 시간:  4.499013185501099
 
-#  #   Column                    Non-Null Count  Dtype
-# ---  ------                    --------------  -----
-#  0   Age                       1955 non-null   float64
-#  1   TypeofContact             1955 non-null   int32
-#  2   CityTier                  1955 non-null   int64
-#  3   DurationOfPitch           1955 non-null   float64
-#  4   Occupation                1955 non-null   int32
-#  5   Gender                    1955 non-null   int32
-#  6   NumberOfPersonVisiting    1955 non-null   int64
-#  7   NumberOfFollowups         1955 non-null   float64
-#  8   ProductPitched            1955 non-null   int32
-#  9   PreferredPropertyStar     1955 non-null   float64
-#  10  MaritalStatus             1955 non-null   int32
-#  11  NumberOfTrips             1955 non-null   float64
-#  12  Passport                  1955 non-null   int64
-#  13  PitchSatisfactionScore    1955 non-null   int64
-#  14  OwnCar                    1955 non-null   int64
-#  15  NumberOfChildrenVisiting  1955 non-null   float64
-#  16  Designation               1955 non-null   int32
-#  17  MonthlyIncome             1955 non-null   float64
-#  18  ProdTaken                 1955 non-null   int64
+
+
+
+
+
+'''
+ #   Column                    Non-Null Count  Dtype
+---  ------                    --------------  -----
+ 0   Age                       1955 non-null   float64
+ 1   TypeofContact             1955 non-null   int32
+ 2   CityTier                  1955 non-null   int64
+ 3   DurationOfPitch           1955 non-null   float64
+ 4   Occupation                1955 non-null   int32
+ 5   Gender                    1955 non-null   int32
+ 6   NumberOfPersonVisiting    1955 non-null   int64
+ 7   NumberOfFollowups         1955 non-null   float64
+ 8   ProductPitched            1955 non-null   int32
+ 9   PreferredPropertyStar     1955 non-null   float64
+ 10  MaritalStatus             1955 non-null   int32
+ 11  NumberOfTrips             1955 non-null   float64
+ 12  Passport                  1955 non-null   int64
+ 13  PitchSatisfactionScore    1955 non-null   int64
+ 14  OwnCar                    1955 non-null   int64
+ 15  NumberOfChildrenVisiting  1955 non-null   float64
+ 16  Designation               1955 non-null   int32
+ 17  MonthlyIncome             1955 non-null   float64
+ 18  ProdTaken                 1955 non-null   int64
+ '''
