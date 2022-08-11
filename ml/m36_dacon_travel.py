@@ -15,6 +15,7 @@ from sklearn.model_selection import train_test_split, StratifiedKFold,\
     HalvingRandomSearchCV, RandomizedSearchCV, GridSearchCV
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
+# 1. 데이터
 filepath = 'D:\study_data\_data\dacon_travel/'
 train = pd.read_csv(filepath+'train.csv', index_col=0)
 test = pd.read_csv(filepath+'test.csv', index_col=0)
