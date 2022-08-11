@@ -21,9 +21,9 @@ submission = pd.read_csv(filepath+'submission.csv', index_col=0)
 # print(train.info())
 # print(train.isnull().sum())
 
-# 결측치 컨텍빼고 중간값으로 대체함
+# 결측치 컨텍빼고 중간값으로 대체함, 데이터 수치들 보면 중간값이 제일 무난할거 같음
 train['Age'].fillna(train['Age'].median(), inplace=True)
-train['TypeofContact'].fillna('N', inplace=True)
+train['TypeofContact'].fillna('N', inplace=True) # N으로 채운 이유는 콘택 타입 없는 건 '없음'으로 처리하기 위해
 train['DurationOfPitch'].fillna(train['DurationOfPitch'].median(), inplace=True)
 train['NumberOfFollowups'].fillna(train['NumberOfFollowups'].median(), inplace=True)
 train['PreferredPropertyStar'].fillna(train['PreferredPropertyStar'].median(), inplace=True)
