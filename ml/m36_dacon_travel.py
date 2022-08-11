@@ -1,10 +1,13 @@
 import pandas as pd
 import numpy as np
+from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 from sklearn.decomposition import PCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.preprocessing import LabelEncoder
 from sklearn.pipeline import make_pipeline
+import matplotlib.pyplot as plt
+import math
 import time
 
 from sklearn.experimental import enable_halving_search_cv
@@ -58,16 +61,18 @@ test['MaritalStatus'] = le.fit_transform(test['MaritalStatus'])
 test['Designation'] = le.fit_transform(test['Designation'])
 print(train.info())
 
-x = train.drop('ProdTaken', axis=1)
-y = train['ProdTaken']
-x = np.array(x)
-y = np.array(y)
+x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1)
+y_ = train['ProdTaken']
+x = np.array(x_)
+y = np.array(y_)
 y = y.reshape(-1, 1)
+
+test = test.drop(['NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1)
 test = np.array(test)
 print(x.shape, y.shape) # (1955, 19) (1955, 1)
 
-import matplotlib.pyplot as plt
-import math
+'''
+# 이상치 그래프로 확인 ------------------------------------------------------------------
 def outliers(data_out):
     quartile_1, q2, quartile_3 = np.percentile(data_out, [25, 50, 75])
 
@@ -92,19 +97,22 @@ def outliers_printer(dataset):
     plt.show()
 
 outliers_printer(x)
+# 이상치 그래프로 확인 ------------------------------------------------------------------
+'''
 
-# PCA 반복문
-# for i in range(x.shape[1]):
-#     pca = PCA(n_components=i+1)
-#     x2 = pca.fit_transform(x)
-#     x_train, x_test, y_train, y_test = train_test_split(x2, y, train_size=0.8, random_state=123, shuffle=True)
-#     model = XGBClassifier(tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0)
-#     model.fit(x_train, y_train)
-#     results = model.score(x_test, y_test)
-#     print(i+1, '의 결과: ', results)
+'''
+# PCA 반복문 - XGB 테스트 // 별로 안좋게 나옴, LDA는 y라벨 두개뿐이라 큰 의미 없음
+for i in range(x.shape[1]):
+    pca = PCA(n_components=i+1)
+    x2 = pca.fit_transform(x)
+    x_train, x_test, y_train, y_test = train_test_split(x2, y, train_size=0.8, random_state=123, shuffle=True)
+    model = XGBClassifier(tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0)
+    model.fit(x_train, y_train)
+    results = model.score(x_test, y_test)
+    print(i+1, '의 결과: ', results)
+'''
 
-
-parameters = {
+parameters_xgb = {
             'n_estimators':[100,200,300,400,500],
             'learning_rate':[0.1,0.2,0.3,0.5,1,0.01,0.001],
             'max_depth':[None,2,3,4,5,6,7,8,9,10],
@@ -115,17 +123,49 @@ parameters = {
             'reg_lambda':[0,0.1,0.01,0.001,1,2,10],
               } 
 
-x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, random_state=1234, shuffle=True)
+parameters_rnf = [
+    {'n_estimators':[100,200]},
+    {'max_depth':[6,8,10,12]},
+    {'min_samples_leaf':[3,5,7,10]},
+    {'min_samples_split':[2,3,5,10]},
+    {'n_jobs':[-1,2,4]}
+]
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, random_state=134, shuffle=True)
 # print(np.unique(y_train, return_counts=True))
 
 # 2. 모델
-xgb = XGBClassifier(tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0)
-model = make_pipeline(MinMaxScaler(), HalvingRandomSearchCV(xgb, parameters, cv=5, n_jobs=-1, verbose=2))
+# xgb = XGBClassifier(tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0)
+rnf = RandomForestClassifier()
+# model = make_pipeline(MinMaxScaler(), HalvingRandomSearchCV(xgb, parameters_xgb, cv=5, n_jobs=-1, verbose=2))
+model = make_pipeline(MinMaxScaler(), HalvingRandomSearchCV(rnf, parameters_rnf, cv=5, n_jobs=-1, verbose=2))
+# model = make_pipeline(MinMaxScaler(), xgb)
+# model = make_pipeline(MinMaxScaler(), rnf)
+# model = xgb
 
 # 3. 훈련
 start = time.time()
 model.fit(x_train, y_train)
 end = time.time()
+
+'''
+# 칼럼별 중요도 확인--------------------------------------------------
+def plot_feature_importances(model):
+    plt.figure(figsize=(13,8))
+    n_features = x_.shape[1]
+    plt.barh(np.arange(n_features), model.feature_importances_, align='center')
+                # x                     y
+    plt.yticks(np.arange(n_features), x_.columns) # 눈금 설정
+    plt.xlabel('Feature Importances')
+    plt.ylabel('Features')
+    plt.ylim(-1, n_features) # ylimit : 축의 한계치 설정
+    plt.title('XGBClassifier')
+
+plot_feature_importances(model)
+plt.show()
+# NumberOfChildrenVisiting, NumberOfPersonVisiting, OwnCar 가장 영향력 적음
+# ----------------------------------------------------------------------
+'''
 
 # 4. 평가, 예측
 results = model.score(x_test, y_test)
@@ -138,10 +178,29 @@ submission['ProdTaken'] = y_submit
 
 submission.to_csv(filepath + 'submission.csv', index = True)
 
+# submission 1번파일
 # 결과:  0.8673469387755102
 # 걸린 시간:  22.424696445465088
 
+# submission 2번파일
+# 결과:  0.8567774936061381
+# 걸린 시간:  147.84010410308838
 
+# submission 3번파일
+# 결과:  0.8695652173913043
+# 걸린 시간:  0.6045560836791992
+
+# submission 4번파일 랜포
+# 결과:  0.8797953964194374
+# 걸린 시간:  0.1614227294921875
+
+# submission 5번파일 랜포+halving
+# 결과:  0.8746803069053708
+# 걸린 시간:  4.660583972930908
+
+# submission 6번파일 랜포+halving+랜덤시드 134로 바꿈
+# 결과:  0.887468030690537
+# 걸린 시간:  4.499013185501099
 
 #  #   Column                    Non-Null Count  Dtype
 # ---  ------                    --------------  -----
