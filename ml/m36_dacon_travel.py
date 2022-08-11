@@ -182,8 +182,6 @@ submission.to_csv(filepath + 'submission.csv', index = True)
 
 
 
-
-
 # submission 1번파일
 # 스코어:  0.8673469387755102
 # 걸린 시간:  22.424696445465088
