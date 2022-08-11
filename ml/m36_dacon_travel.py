@@ -62,15 +62,14 @@ x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting'
 y_ = train['ProdTaken']
 x = np.array(x_)
 y = np.array(y_)
-y = y.reshape(-1, 1)
+y = y.reshape(-1, 1) # y값 reshape 해야되서 x도 넘파이로 바꿔 훈련하는 것
 
-test = test.drop(['NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3
+test = test.drop(['NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
 test = np.array(test)
 # print(x.shape, y.shape)
 #-----------------------------------------------------------------------------------------------------------
 
-'''
-# 이상치 그래프로 확인 ------------------------------------------------------------------
+''' 이상치 그래프로 확인
 def outliers(data_out):
     quartile_1, q2, quartile_3 = np.percentile(data_out, [25, 50, 75])
 
@@ -95,11 +94,10 @@ def outliers_printer(dataset):
     plt.show()
 
 outliers_printer(x)
-# 이상치 그래프로 확인 ------------------------------------------------------------------
+#------------------------------------------------------------------
 '''
 
-'''
-# PCA 반복문 - XGB 테스트 // 별로 안좋게 나옴, LDA는 y라벨 두개뿐이라 큰 의미 없음
+''' PCA 반복문 - XGB 테스트 // 별로 안좋게 나옴, LDA는 y라벨 두개뿐이라 큰 의미 없음
 for i in range(x.shape[1]):
     pca = PCA(n_components=i+1)
     x2 = pca.fit_transform(x)
@@ -108,6 +106,7 @@ for i in range(x.shape[1]):
     model.fit(x_train, y_train)
     results = model.score(x_test, y_test)
     print(i+1, '의 결과: ', results)
+#------------------------------------------------------------------
 '''
 
 parameters_xgb = {
