@@ -60,7 +60,7 @@ Outliers_to_drop = detect_outliers(train_set, 2, ['MSSubClass', 'LotFrontage', '
 
 
 train_set.loc[Outliers_to_drop]
-
+print(Outliers_to_drop)
 
 train_set = train_set.drop(Outliers_to_drop, axis = 0).reset_index(drop=True)
 train_set.shape

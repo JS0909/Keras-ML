@@ -67,7 +67,7 @@ x_train = lda.transform(x_train)
 x_test = lda.transform(x_test)
 
 # 2. 모델
-model = XGBClassifier(tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=1)
+model = XGBClassifier(tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0)
 
 # # 3. 훈련
 start = time.time()
