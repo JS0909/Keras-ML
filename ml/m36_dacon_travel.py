@@ -24,9 +24,9 @@ submission = pd.read_csv(filepath+'submission.csv', index_col=0)
 # print(train.info())
 # print(train.isnull().sum())
 
-# 결측치 컨텍빼고 중간값으로 대체함, 데이터 수치들 보면 중간값이 제일 무난할거 같음
+# 결측치 TypeofContact 빼고 중간값으로 대체함, 데이터 수치들 보면 중간값이 제일 무난할거 같음
 train['Age'].fillna(train['Age'].median(), inplace=True)
-train['TypeofContact'].fillna('N', inplace=True) # N으로 채운 이유는 콘택 타입 없는 건 '없음'으로 처리하기 위해
+train['TypeofContact'].fillna('N', inplace=True) # N으로 채운 이유는 콘택 타입 없는 건 '없음'으로 주고 처리하기 위해
 train['DurationOfPitch'].fillna(train['DurationOfPitch'].median(), inplace=True)
 train['NumberOfFollowups'].fillna(train['NumberOfFollowups'].median(), inplace=True)
 train['PreferredPropertyStar'].fillna(train['PreferredPropertyStar'].median(), inplace=True)
@@ -46,19 +46,15 @@ test['MonthlyIncome'].fillna(test['MonthlyIncome'].median(), inplace=True)
 
 # object타입 라벨인코딩
 le = LabelEncoder()
-train['TypeofContact'] = le.fit_transform(train['TypeofContact'])
-train['Occupation'] = le.fit_transform(train['Occupation'])
-train['Gender'] = le.fit_transform(train['Gender'])
-train['ProductPitched'] = le.fit_transform(train['ProductPitched'])
-train['MaritalStatus'] = le.fit_transform(train['MaritalStatus'])
-train['Designation'] = le.fit_transform(train['Designation'])
+idxarr = train.columns
+idxarr = np.array(idxarr)
 
-test['TypeofContact'] = le.fit_transform(test['TypeofContact'])
-test['Occupation'] = le.fit_transform(test['Occupation'])
-test['Gender'] = le.fit_transform(test['Gender'])
-test['ProductPitched'] = le.fit_transform(test['ProductPitched'])
-test['MaritalStatus'] = le.fit_transform(test['MaritalStatus'])
-test['Designation'] = le.fit_transform(test['Designation'])
+for i in idxarr:
+      if train[i].dtype == 'object':
+        train[i] = le.fit_transform(train[i])
+        test[i] = le.fit_transform(test[i])
+
+
 print(train.info())
 
 x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1)
@@ -135,13 +131,15 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, random
 # print(np.unique(y_train, return_counts=True))
 
 # 2. 모델
-# xgb = XGBClassifier(tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0)
+xgb = XGBClassifier(tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0)
 rnf = RandomForestClassifier()
+
 # model = make_pipeline(MinMaxScaler(), HalvingRandomSearchCV(xgb, parameters_xgb, cv=5, n_jobs=-1, verbose=2))
 model = make_pipeline(MinMaxScaler(), HalvingRandomSearchCV(rnf, parameters_rnf, cv=5, n_jobs=-1, verbose=2))
 # model = make_pipeline(MinMaxScaler(), xgb)
 # model = make_pipeline(MinMaxScaler(), rnf)
 # model = xgb
+# model = rnf
 
 # 3. 훈련
 start = time.time()
