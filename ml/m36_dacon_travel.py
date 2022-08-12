@@ -5,6 +5,8 @@ from xgboost import XGBClassifier
 from sklearn.decomposition import PCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import r2_score, accuracy_score
+from sklearn.feature_selection import SelectFromModel
 from sklearn.pipeline import make_pipeline
 import matplotlib.pyplot as plt
 import math
@@ -58,7 +60,7 @@ for i in idxarr:
 # ------------------------------------------
 
 # 피처임포턴스 그래프 보기 위해 데이터프레임형태의 x_, y_ 놔둠 / 훈련용 넘파이어레이형태의 x, y 생성-----------
-x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1)
+x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
 y_ = train['ProdTaken']
 x = np.array(x_)
 y = np.array(y_)
@@ -164,6 +166,42 @@ plt.show()
 # ----------------------------------------------------------------------
 '''
 
+scaler = MinMaxScaler()
+x_train = scaler.fit_transform(x_train)
+x_test = scaler.transform(x_test)
+
+# 2. 모델
+'''
+#----------------------------모델 셀렉션----------------------------------------------------------
+model = RandomForestClassifier(n_estimators=100, random_state=1234)
+
+model.fit(x_train, y_train)
+
+print('테스트 스코어: ', model.score(x_test, y_test))
+
+score = accuracy_score(y_test, model.predict(x_test))
+print('score 결과: ', score)
+
+print(model.feature_importances_)
+
+thresholds = model.feature_importances_
+print('-----------------------------------------------')
+for i in range(17):
+    selection = SelectFromModel(model, threshold=thresholds[i], prefit=True)
+    select_x_train = selection.transform(x_train)
+    select_x_test = selection.transform(x_test)
+    print(select_x_train.shape, select_x_train.shape)
+    
+    selection_model = RandomForestClassifier(n_estimators=100, random_state=1234)
+    
+    selection_model.fit(select_x_train, y_train)
+    
+    y_predict = selection_model.predict(select_x_test)
+    score = accuracy_score(y_test, y_predict)
+    print('Thresh=%.3f, n=%d, R2: %.2f%%'%(thresholds[i], select_x_train.shape[1], score*100), '\n')
+#-------------------------------------------------------------------------------------------------------------
+'''
+
 start = time.time()
 model.fit(x_train, y_train)
 end = time.time()
@@ -176,9 +214,9 @@ print('걸린 시간: ', end-start)
 # 5. 제출 준비
 y_submit = model.predict(test)
 
-submission = pd.read_csv(filepath+'submission.csv', index_col=0)
-submission['ProdTaken'] = y_submit
-submission.to_csv(filepath + 'submission.csv', index = True)
+# submission = pd.read_csv(filepath+'submission.csv', index_col=0)
+# submission['ProdTaken'] = y_submit
+# submission.to_csv(filepath + 'submission.csv', index = True)
 
 
 
@@ -206,9 +244,11 @@ submission.to_csv(filepath + 'submission.csv', index = True)
 # 스코어:  0.887468030690537
 # 걸린 시간:  4.499013185501099
 
-
-
-
+# submission 7번파일
+# (1564, 15) (1564, 15) + 랜포 디폴트 + 첨에 칼럼드랍 안했음
+# Thresh=0.028, n=15, R2: 88.24% 
+# 스코어:  0.8772378516624041
+# 걸린 시간:  0.16129612922668457
 
 
 '''
