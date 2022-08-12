@@ -48,8 +48,10 @@ print(model.feature_importances_)
 
 thresholds = model.feature_importances_
 print('-----------------------------------------------')
-for thresh in thresholds:
-    selection = SelectFromModel(model, threshold=thresh, prefit=True)
+bscore = 0
+idx_ = 0
+for i in range(len(thresholds)):
+    selection = SelectFromModel(model, threshold=thresholds[i], prefit=True)
     select_x_train = selection.transform(x_train)
     select_x_test = selection.transform(x_test)
     print(select_x_train.shape, select_x_train.shape)
@@ -62,8 +64,8 @@ for thresh in thresholds:
               subsample=1,
               colsample_bytree=0.5,
               colsample_bylevel=1,
-              colsample_bynode=1,
               reg_alpha=0.01,
+              colsample_bynode=1,
               tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0, random_state=1234,
               )
     
@@ -71,7 +73,29 @@ for thresh in thresholds:
     
     y_predict = selection_model.predict(select_x_test)
     score = r2_score(y_test, y_predict)
-    print('Thresh=%.3f, n=%d, R2: %.2f%%'%(thresh, select_x_train.shape[1], score*100), '\n')
+    print('Thresh=%.3f, n=%d, R2: %.2f%%'%(thresholds[i], select_x_train.shape[1], score*100), '\n')
+
+    if score >= bscore:
+        bscore = score
+        idx_=i
+
+f_to_drop = []
+for i in range(len(thresholds)):
+    if thresholds[idx_]>=thresholds[i]:
+        f_to_drop.append(i)
+        
+print(f_to_drop)
+
+xaf_train = np.delete(x_train, f_to_drop, axis=1)
+xaf_test = np.delete(x_test, f_to_drop, axis=1)
+
+model.fit(xaf_train, y_train)
+
+print('드랍 후 테스트 스코어: ', model.score(xaf_test, y_test))
+
+score = r2_score(y_test, model.predict(xaf_test))
+print('드랍 후 score 결과: ', score)
+
 
 
 # 테스트 스코어:  0.7779620382147857
@@ -81,3 +105,6 @@ for thresh in thresholds:
 # -----------------------------------------------
 # (16512, 6) (16512, 6)
 # Thresh=0.038, n=6, R2: 78.97% 
+
+# 드랍 후 테스트 스코어:  0.7742322363898451
+# 드랍 후 score 결과:  0.7742322363898451

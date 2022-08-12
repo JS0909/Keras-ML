@@ -85,7 +85,6 @@ for i in range(len(thresholds)):
         f_to_drop.append(i)
         
 print(f_to_drop)
-# [0, 7, 8, 11, 15, 16, 22, 24, 31, 32, 39, 40, 47, 48, 55, 56, 57]
 
 xaf_train = np.delete(x_train, f_to_drop, axis=1)
 xaf_test = np.delete(x_test, f_to_drop, axis=1)
