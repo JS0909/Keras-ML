@@ -3,7 +3,8 @@ import pandas as pd
 from collections import Counter
 from sklearn.experimental import enable_halving_search_cv
 from sklearn.model_selection import train_test_split, KFold,\
-    HalvingRandomSearchCV
+    HalvingRandomSearchCV, RandomizedSearchCV
+from xgboost import XGBRegressor
 from sklearn.preprocessing import MinMaxScaler
 import warnings
 warnings.filterwarnings('ignore') # warnig 출력 안함
@@ -193,21 +194,38 @@ y = train_set['SalePrice']
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.75, random_state=99)
 
+scaler = MinMaxScaler()
+x_train = scaler.fit_transform(x_train)
+x_test = scaler.transform(x_test)
+
+n_splits = 5
+kfold = KFold(n_splits=n_splits, shuffle=True, random_state=1234)
+
+parameters = {
+            'n_estimators':[100],
+            'learning_rate':[1],
+            'max_depth':[None,2,3,4,5,6,7,8,9,10],
+            'gamma':[0],
+            'min_child_weight':[1],
+            'subsample':[1],
+            'colsample_bytree':[0,0.1,0.2,0.3,0.5,0.7,1] ,
+            'colsample_bylevel':[1],
+            'colsample_bynode':[0,0.1,0.2,0.3,0.5,0.7,1],
+            'alpha':[0,0.1,0.01,0.001,1,2,10],
+            'lambda':[0,0.1,0.01,0.001,1,2,10]
+              }  
+
 # 2. 모델
-from sklearn.svm import LinearSVR, SVR
-from sklearn.ensemble import RandomForestRegressor
+xgb = XGBRegressor(tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0, random_state=1234)
+model = RandomizedSearchCV(xgb, parameters, cv=kfold, n_jobs=-1, verbose=2)
 
-from sklearn.pipeline import make_pipeline
-
-model = make_pipeline(MinMaxScaler(), RandomForestRegressor()) # 굳이 변수명으로 정의하지 않아도 바로 갖다 쓸 수 있음
-
-# 3. 훈련
-model.fit(x_train, y_train) # pipeline의 fit에는 알아서 fit_transform이 들어가 있음
+model.fit(x_train, y_train)
 
 # 4. 평가, 예측
-result = model.score(x_test, y_test) # pipeline의 score에는 알아서 transform이 들어가 있음
+print('최상의 매개변수: ', model.best_params_)
+print('최상의 점수: ', model.best_score_)
+print('테스트 스코어: ', model.score(x_test, y_test))
 
-print('model.score: ', result)
 
 # model.score:  0.8658751409367458
 
@@ -219,3 +237,6 @@ print('model.score: ', result)
 # KNeighborsRegressor 결과:  0.7636827308027394
 # DecisionTreeRegressor 결과:  0.7544631851132991
 # RandomForestRegressor 결과:  0.8658854609346692
+
+# 최상의 점수:  0.8610732885351424
+# 테스트 스코어:  0.8483958517588139
