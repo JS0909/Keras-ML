@@ -60,13 +60,14 @@ for i in idxarr:
 # ------------------------------------------
 
 # 피처임포턴스 그래프 보기 위해 데이터프레임형태의 x_, y_ 놔둠 / 훈련용 넘파이어레이형태의 x, y 생성-----------
-x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
+# x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
+x_ = train.drop(['ProdTaken'], axis=1)
 y_ = train['ProdTaken']
 x = np.array(x_)
 y = np.array(y_)
 y = y.reshape(-1, 1) # y값 reshape 해야되서 x도 넘파이로 바꿔 훈련하는 것
 
-test = test.drop(['NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
+# test = test.drop(['NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
 test = np.array(test)
 # print(x.shape, y.shape)
 #-----------------------------------------------------------------------------------------------------------
@@ -186,19 +187,55 @@ print(model.feature_importances_)
 
 thresholds = model.feature_importances_
 print('-----------------------------------------------')
-for i in range(17):
+bscore = 0
+idx_ = 0
+for i in range(len(thresholds)):
     selection = SelectFromModel(model, threshold=thresholds[i], prefit=True)
     select_x_train = selection.transform(x_train)
     select_x_test = selection.transform(x_test)
     print(select_x_train.shape, select_x_train.shape)
     
-    selection_model = RandomForestClassifier(n_estimators=100, random_state=1234)
+    selection_model = XGBClassifier(n_estimators=100,
+              learning_rate=1,
+              max_depth=2,
+              gamma=0,
+              min_child_weight=1,
+              subsample=1,
+              colsample_bytree=0.5,
+              colsample_bylevel=1,
+              colsample_bynode=1,
+              reg_alpha=0.01,
+              tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0, random_state=1234,
+              )
     
     selection_model.fit(select_x_train, y_train)
     
     y_predict = selection_model.predict(select_x_test)
     score = accuracy_score(y_test, y_predict)
     print('Thresh=%.3f, n=%d, R2: %.2f%%'%(thresholds[i], select_x_train.shape[1], score*100), '\n')
+
+    if score >= bscore:
+        bscore = score
+        idx_=i
+
+f_to_drop = []
+for i in range(len(thresholds)):
+    if thresholds[idx_]>=thresholds[i]:
+        f_to_drop.append(i)
+        
+print(f_to_drop)
+# [0, 7, 8, 11, 15, 16, 22, 24, 31, 32, 39, 40, 47, 48, 55, 56, 57]
+
+xaf_train = np.delete(x_train, f_to_drop, axis=1)
+xaf_test = np.delete(x_test, f_to_drop, axis=1)
+
+model.fit(xaf_train, y_train)
+
+print('드랍 후 테스트 스코어: ', model.score(xaf_test, y_test))
+
+score = accuracy_score(y_test, model.predict(xaf_test))
+print('드랍 후 acc_score 결과: ', score)
+
 #-------------------------------------------------------------------------------------------------------------
 '''
 
@@ -250,6 +287,8 @@ y_submit = model.predict(test)
 # 스코어:  0.8772378516624041
 # 걸린 시간:  0.16129612922668457
 
+# 드랍 후 테스트 스코어:  0.8772378516624041
+# 드랍 후 acc_score 결과:  0.8772378516624041
 
 '''
  #   Column                    Non-Null Count  Dtype

@@ -41,7 +41,7 @@ model.fit(x_train, y_train, early_stopping_rounds=10,
 
 print('테스트 스코어: ', model.score(x_test, y_test))
 
-r2 = r2_score(y_test, model.predict(x_test))
+r2 = accuracy_score(y_test, model.predict(x_test))
 print('acc_score 결과: ', r2)
 
 print(model.feature_importances_)
