@@ -48,8 +48,10 @@ print(model.feature_importances_)
 
 thresholds = model.feature_importances_
 print('-----------------------------------------------')
-for thresh in thresholds:
-    selection = SelectFromModel(model, threshold=thresh, prefit=True)
+bscore = 0
+idx_ = 0
+for i in range(len(thresholds)):
+    selection = SelectFromModel(model, threshold=thresholds[i], prefit=True)
     select_x_train = selection.transform(x_train)
     select_x_test = selection.transform(x_test)
     print(select_x_train.shape, select_x_train.shape)
@@ -70,8 +72,32 @@ for thresh in thresholds:
     selection_model.fit(select_x_train, y_train)
     
     y_predict = selection_model.predict(select_x_test)
-    score = r2_score(y_test, y_predict)
-    print('Thresh=%.3f, n=%d, R2: %.2f%%'%(thresh, select_x_train.shape[1], score*100), '\n')
+    score = accuracy_score(y_test, y_predict)
+    print('Thresh=%.3f, n=%d, R2: %.2f%%'%(thresholds[i], select_x_train.shape[1], score*100), '\n')
+
+    if score >= bscore:
+        bscore = score
+        idx_=i
+
+f_to_drop = []
+for i in range(len(thresholds)):
+    if thresholds[idx_]>=thresholds[i]:
+        f_to_drop.append(i)
+        
+print(f_to_drop)
+# [0, 7, 8, 11, 15, 16, 22, 24, 31, 32, 39, 40, 47, 48, 55, 56, 57]
+
+xaf_train = np.delete(x_train, f_to_drop, axis=1)
+xaf_test = np.delete(x_test, f_to_drop, axis=1)
+
+model.fit(xaf_train, y_train, early_stopping_rounds=10, 
+          eval_set=[(xaf_train, y_train), (xaf_test, y_test)],
+          )
+
+print('드랍 후 테스트 스코어: ', model.score(xaf_test, y_test))
+
+score = accuracy_score(y_test, model.predict(xaf_test))
+print('드랍 후 acc_score 결과: ', score)
 
 
 # 테스트 스코어:  0.9649122807017544
@@ -88,3 +114,6 @@ for thresh in thresholds:
 
 # (455, 13) (455, 13)
 # Thresh=0.005, n=13, R2: 92.46% 
+
+# 드랍 후 테스트 스코어:  0.9736842105263158
+# 드랍 후 acc_score 결과:  0.9736842105263158
