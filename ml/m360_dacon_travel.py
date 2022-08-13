@@ -60,14 +60,14 @@ for i in idxarr:
 # ------------------------------------------
 
 # 피처임포턴스 그래프 보기 위해 데이터프레임형태의 x_, y_ 놔둠 / 훈련용 넘파이어레이형태의 x, y 생성-----------
-# x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
-x_ = train.drop(['ProdTaken'], axis=1)
+x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
+# x_ = train.drop(['ProdTaken'], axis=1)
 y_ = train['ProdTaken']
 x = np.array(x_)
 y = np.array(y_)
 y = y.reshape(-1, 1) # y값 reshape 해야되서 x도 넘파이로 바꿔 훈련하는 것
 
-# test = test.drop(['NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
+test = test.drop(['NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
 test = np.array(test)
 # print(x.shape, y.shape)
 #-----------------------------------------------------------------------------------------------------------
@@ -131,7 +131,7 @@ parameters_rnf = [
     {'n_jobs':[-1,2,4]}
 ]
 
-x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, random_state=134, shuffle=True)
+x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, random_state=999, shuffle=True)
 # print(np.unique(y_train, return_counts=True))
 
 # 2. 모델
@@ -286,6 +286,10 @@ y_submit = model.predict(test)
 
 # 드랍 후 테스트 스코어:  0.8772378516624041
 # 드랍 후 acc_score 결과:  0.8772378516624041
+
+# submission 8번파일
+# 스코어:  0.8746803069053708
+# 걸린 시간:  4.406193733215332
 
 '''
  #   Column                    Non-Null Count  Dtype
