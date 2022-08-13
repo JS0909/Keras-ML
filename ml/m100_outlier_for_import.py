@@ -16,6 +16,7 @@ def outliers(data_out):
     print(upper_bound)
     return np.where((data_out>upper_bound) | (data_out<lower_bound))
 
+
 def outliers_printer(dataset):
     plt.figure(figsize=(10,8))
     for i in range(dataset.shape[1]):
@@ -37,6 +38,7 @@ a3 =  [  89,  110,  120,  121,  137,  147,  172,  210,  211,  247,  310,
 for i in range(len(a3)):
     x[a3[i]][3] = 20    
 '''    
+
 
 # outliers z스코어 처리 함수
 def outliers(df, col):
