@@ -24,6 +24,7 @@ def outliers_printer(dataset):
         print(i, '열의 이상치의 위치: ', outliers_loc, '\n')
         plt.subplot(math.ceil(dataset.shape[1]/2),2,i+1)
         plt.boxplot(col)
+        plt.title(i)
         
     plt.show()
     
