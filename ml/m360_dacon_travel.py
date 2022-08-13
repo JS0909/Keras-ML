@@ -167,9 +167,6 @@ plt.show()
 # ----------------------------------------------------------------------
 '''
 
-scaler = MinMaxScaler()
-x_train = scaler.fit_transform(x_train)
-x_test = scaler.transform(x_test)
 
 # 2. 모델
 '''
