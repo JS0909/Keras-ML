@@ -399,6 +399,8 @@ submission.to_csv(filepath + 'submission.csv', index = True)
 # 스코어:  0.9002557544757033
 # 걸린 시간:  6.224222183227539
 
+# 랜덤포레 랜덤시드가 제일 유의미한듯;
+
 '''
  #   Column                    Non-Null Count  Dtype
 ---  ------                    --------------  -----
