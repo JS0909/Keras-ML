@@ -56,7 +56,7 @@ train_x = pd.DataFrame(imp.fit_transform(train_x))
 
 print(train_x)
 
-model = MultiOutputRegressor(XGBRegressor(n_estimators=100, learning_rate=0.08, gamma = 0, subsample=0.75, colsample_bytree = 1, max_depth=7) ).fit(train_x, train_y)
+model = MultiOutputRegressor(XGBRegressor(n_estimators=200, learning_rate=0.08, gamma = 1, subsample=0.75, colsample_bytree = 1, max_depth=7) ).fit(train_x, train_y)
 # model = XGBRFRegressor().fit(train_x, train_y)
 print('Done.')
 
@@ -78,3 +78,5 @@ submit.to_csv(path + 'submmit.csv', index=False)
 
 
 # 0.28798862985210744
+
+# 0.38385531397806155 / 08
