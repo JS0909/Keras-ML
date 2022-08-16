@@ -21,7 +21,7 @@ from sklearn.impute import IterativeImputer, KNNImputer
 
 
 # 1. 데이터
-filepath = 'D:\study_home\_data\dacon_travel/'
+filepath = 'D:\study_data\_data\dacon_travel/'
 train = pd.read_csv(filepath+'train.csv', index_col=0)
 test = pd.read_csv(filepath+'test.csv', index_col=0)
 
@@ -64,15 +64,15 @@ for i in idxarr:
 
 # 피처임포턴스 그래프 보기 위해 데이터프레임형태의 x_, y_ 놔둠 / 훈련용 넘파이어레이형태의 x, y 생성-----------
 # x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
-x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar', 'MonthlyIncome'], axis=1)
-# x_ = train.drop(['ProdTaken'], axis=1)
+# x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar', 'MonthlyIncome'], axis=1)
+x_ = train.drop(['ProdTaken'], axis=1)
 y_ = train['ProdTaken']
 x = np.array(x_)
 y = np.array(y_)
-y = y.reshape(-1, 1) # y값 reshape 해야되서 x도 넘파이로 바꿔 훈련하는 것
+# y = y.reshape(-1, 1) # y값 reshape 해야되서 x도 넘파이로 바꿔 훈련하는 것
 
 # test = test.drop(['NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
-test = test.drop(['NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar', 'MonthlyIncome'], axis=1)
+# test = test.drop(['NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar', 'MonthlyIncome'], axis=1)
 test = np.array(test)
 # print(x.shape, y.shape)
 #-----------------------------------------------------------------------------------------------------------
@@ -143,8 +143,8 @@ for i in range(len(a3)):
 
 # x[485][4] = np.nan # Occupation
 
-# for i in range(len(a6)): # ProductPitched
-#     x[a6[i]][6] = np.nan
+for i in range(len(a6)): # ProductPitched
+    x[a6[i]][6] = np.nan
     
 for i in range(len(a10)): # NumberOfTrips
     x[a10[i]][10] = np.nan
@@ -158,7 +158,7 @@ x = pd.DataFrame(x, columns=[x_.columns])
 
 # x['Occupation'].fillna(x['Occupation'].median, inplace=True)
 x['ProductPitched'].fillna(x['ProductPitched'].median, inplace=True)
-x['Designation'].fillna(x['Designation'].median, inplace=True)
+# x['Designation'].fillna(x['Designation'].median, inplace=True)
 x['NumberOfTrips'].fillna(x['NumberOfTrips'].median, inplace=True)
 
 ipt = IterativeImputer(max_iter = 100, random_state = 999)
@@ -180,23 +180,23 @@ for i in range(x.shape[1]):
 '''
 
 parameters_xgb = {
-            'n_estimators':[100,200,300,400,500],
-            'learning_rate':[0.1,0.2,0.3,0.5,1,0.01,0.001],
-            'max_depth':[None,2,3,4,5,6,7,8,9,10],
-            'gamma':[0,1,2,3,4,5,7,10,100],
-            'min_child_weight':[0,0.1,0.001,0.5,1,5,10,100],
-            'subsample':[0,0.1,0.2,0.3,0.5,0.7,1],
-            'reg_alpha':[0,0.1,0.01,0.001,1,2,10],
-            'reg_lambda':[0,0.1,0.01,0.001,1,2,10],
+            'n_estimators':[400],
+            'learning_rate':[0.3],
+            'max_depth':[8],
+            'gamma':[2],
+            'min_child_weight':[5],
+            'subsample':[0.7],
+            'reg_alpha':[1],
+            'reg_lambda':[0.001],
               } 
 
-parameters_rnf = [
-    {'n_estimators':[100,200,300]},
-    {'max_depth':[None,6,8,10,12]},
-    {'min_samples_leaf':[3,5,7,10,11,13]},
-    {'min_samples_split':[2,3,5,7,10]},
-    {'n_jobs':[-1]}
-]
+parameters_rnf = {
+    'n_estimators':[300],
+    'max_depth':[11],
+    'min_samples_leaf':[11],
+    'min_samples_split':[2],
+    'n_jobs':[-1]
+}
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, random_state=999, shuffle=True)
 # print(np.unique(y_train, return_counts=True))
@@ -207,8 +207,9 @@ rnf = RandomForestClassifier(random_state=704) # 704 : 0.9053708439897699
 
 # model = xgb
 # model = rnf
-# model = make_pipeline(MinMaxScaler(), HalvingRandomSearchCV(xgb, parameters_xgb, cv=5, n_jobs=-1, verbose=2))
-model = make_pipeline(MinMaxScaler(), HalvingRandomSearchCV(rnf, parameters_rnf, cv=5, n_jobs=-1, verbose=2, random_state=999))
+model = RandomizedSearchCV(xgb, parameters_xgb, cv=6, n_jobs=-1, verbose=2)
+# HRS = GridSearchCV(rnf,  parameters_rnf, cv=5, n_jobs=-1, verbose=2)
+# model = make_pipeline(MinMaxScaler(), HRS)
 # model = make_pipeline(MinMaxScaler(), GridSearchCV(rnf, parameters_rnf, cv=5, n_jobs=-1, verbose=2))
 # model = make_pipeline(MinMaxScaler(), xgb)
 # model = make_pipeline(MinMaxScaler(), rnf)
@@ -236,7 +237,7 @@ plt.show()
 '''
 
 import joblib
-joblib.dump(model,'D:\study_home\_data\dacon_travel\_dat/m360_travel6.dat')
+joblib.dump(model,'D:\study_data\_data\dacon_travel\_dat/m360_travel6.dat')
 # model = joblib.load('D:\study_home\_data\dacon_travel\_dat/m360_travel.dat')
 
 
@@ -324,6 +325,7 @@ submission = pd.read_csv(filepath+'submission.csv', index_col=0)
 submission['ProdTaken'] = y_submit
 submission.to_csv(filepath + 'submission.csv', index = True)
 
+# print(HRS.best_params_)
 
 
 # submission 1번파일
@@ -400,6 +402,9 @@ submission.to_csv(filepath + 'submission.csv', index = True)
 # 걸린 시간:  6.224222183227539
 
 # 랜덤포레 랜덤시드가 제일 유의미한듯;
+
+# {'subsample': 0.7, 'reg_lambda': 0.001, 'reg_alpha': 1, 
+# 'n_estimators': 400, 'min_child_weight': 5, 'max_depth': 8, 'learning_rate': 0.3, 'gamma': 2}
 
 '''
  #   Column                    Non-Null Count  Dtype

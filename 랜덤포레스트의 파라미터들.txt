@@ -1,8 +1,8 @@
 랜덤포레스트의 파라미터들!
-parameters = [
-    {'n_estimators':[100,200]},
-    {'max_depth':[6,8,10,12]},
-    {'min_samples_leaf':[3,5,7,10]},
-    {'min_samples_split':[2,3,5,10]},
-    {'n_jobs':[-1,2,4]}
-]
+parameters_rnf = {
+    'n_estimators':[100,200,300,400,500],
+    'max_depth':[None,2,3,4,5,6,7,8,9,10,11,12,13,14],
+    'min_samples_leaf':[3,5,7,10,11,13],
+    'min_samples_split':[2,3,5,7,10],
+    'n_jobs':[-1]
+}
