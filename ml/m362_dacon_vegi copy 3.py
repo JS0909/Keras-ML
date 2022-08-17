@@ -85,31 +85,15 @@ print(loss)
 test_pred = model.predict(test_input)
 print(test_pred.shape) # (195, 1)
 
-# test1 = pd.read_csv(test_target+'TEST_01.csv', index_col=False)
-# test1['rate'] = test_pred[:30][:]
 
-# test2 = pd.read_csv(test_target+'TEST_02.csv', index_col=False)
-# test2['rate'] = test_pred[30:30+35][:]
-
-# test3 = pd.read_csv(test_target+'TEST_03.csv', index_col=False)
-# test3['rate'] = test_pred[30+35:30+35+26][:]
-
-# test4 = pd.read_csv(test_target+'TEST_04.csv', index_col=False)
-# test4['rate'] = test_pred[30+35+26:30+35+26+32][:]
-
-# test5 = pd.read_csv(test_target+'TEST_05.csv', index_col=False)
-# test5['rate'] = test_pred[30+35+26+32:30+35+26+32+37][:]
-
-# test6 = pd.read_csv(test_target+'TEST_05.csv', index_col=False)
-# test6['rate'] = test_pred[30+35+26+32+37:][:]
-
-for i, con in enumerate(test_pred):
+for i in range(6):
+    i2=0
     a = i+1
-    thisfile = test_target+'TEST_0'+a+'.csv'
+    thisfile = 'D:\study_data\_data\dacon_vegi/test_target/'+'TEST_0'+str(a)+'.csv'
     test = pd.read_csv(thisfile, index_col=False)
-    test['rate'] = test_pred[i:i+len(test['rate'])][:]
-    i+=len(test['rate'])
-
+    test['rate'] = test_pred[i2:i2+len(test['rate'])]
+    test.to_csv(thisfile, index=False)
+    i2+=len(test['rate'])
 
 
 import zipfile
