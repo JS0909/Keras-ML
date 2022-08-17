@@ -28,7 +28,7 @@ print(data.info())
 # plt.bar로 quality칼럼 그리기
 import matplotlib.pylab as plt
 
-count_data = data.groupby('quality')['quality'].count()
+count_data = data.groupby('quality')['quality'].count() # quality 별로 quality의 갯수를 각각 표시해주겠다
 
 plt.bar(count_data.index, count_data)
            # x              # y

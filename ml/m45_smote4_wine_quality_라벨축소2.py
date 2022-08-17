@@ -82,29 +82,38 @@ a9=[  80,  154,  209,  245,  339,  357,  411,  415,  530,  563,  701,
        3764, 3904, 3915, 3975, 3982, 3998, 3999, 4000, 4012, 4023, 4026,
        4065, 4072, 4239, 4391, 4401, 4582, 4617, 4696, 4753, 4792, 4815,
        4818, 4886, 4887]
-for i in range(len(a9)):
-    x[a9[i]][9] = data['sulphates'].median()
+for i, a9 in enumerate(a9):
+    x[a9][9] = data['sulphates'].median()
 
 
 # print(y[:20])
 #[6. 6. 6. 6. 6. 6. 6. 6. 6. 6. 5. 5. 5. 7. 5. 7. 6. 8. 6. 5.]
 
 # 라벨 축소 / 바꾸기
-newlist=[]
-for i in y:
-    if i<=5:
-        newlist+=[0]
-    elif i==6:
-        newlist+=[1]
+for index, value in enumerate(y): # for 인덱스, 리스트내의내용 in enumerate(리스트)
+    if value==9:
+        y[index]=8
+    elif value == 8:
+        y[index]=8
+    elif value == 7:
+        y[index]=8
+    elif value == 6:
+        y[index]=6
+    elif value == 5:
+        y[index]=6
+    elif value == 4:
+        y[index]=4
+    elif value == 3:
+        y[index]=4
     else:
-        newlist+=[2]
-        
-print(np.unique(newlist, return_counts=True)) # (array([0, 1, 2]), array([ 183, 1457, 3258], dtype=int64))
+        y[index] = 0
 
-x_train, x_test, y_train, y_test = train_test_split(x, newlist, random_state=1234, shuffle=True, train_size=0.85, stratify=y)
+print(np.unique(y, return_counts=True)) # (array([4., 5., 6., 7.]), array([ 183, 1457, 2198, 1060], dtype=int64))
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=124, shuffle=True, train_size=0.85, stratify=y)
 
 # 2. 모델
-model = RandomForestClassifier(random_state=666)
+model = RandomForestClassifier(random_state=66)
 
 # 3. 훈련
 model.fit(x_train, y_train)
@@ -129,16 +138,65 @@ print('f1_micro: ', f1_score(y_pred, y_test, average='micro')) # micro f1 = acc 
 # f1_macro:  0.4556941766626644
 # f1_micro:  0.710204081632653
 
-# 라벨묶어서 축소(퀄리티니까 그냥 축소가 가능한 것)
+# 3개로 라벨묶어서 축소(퀄리티니까 그냥 축소가 가능한 것)
 # model.score:  0.7210884353741497
 # acc_score:  0.7210884353741497
 # f1_macro:  0.7216544833426769
 # f1_micro:  0.7210884353741498
 
-# 라벨묶어서 축소(퀄리티니까 그냥 축소가 가능한 것) + outlier 처리
+# 3개로 라벨묶어서 축소 + outlier 처리
 # model.score:  0.7319727891156462
 # acc_score:  0.7319727891156462
 # f1_macro:  0.7323489411901273
 # f1_micro:  0.7319727891156461
 
+print('======================= SMOTE ============================')
 
+from imblearn.over_sampling import SMOTE
+smote = SMOTE(random_state=1234, k_neighbors=5)
+
+x_train, y_train = smote.fit_resample(x_train, y_train)
+print(pd.Series(y_train).value_counts())
+
+# 2. 모델
+model = RandomForestClassifier(random_state=666)
+
+# 3. 훈련
+model.fit(x_train, y_train)
+
+# 4. 평가, 예측
+y_pred = model.predict(x_test)
+
+score = model.score(x_test, y_test)
+print('model.score: ', score)
+print('acc_score: ', accuracy_score(y_pred, y_test))
+
+from sklearn.metrics import f1_score
+print('f1_macro: ', f1_score(y_pred, y_test, average='macro')) # 칼럼별로 f1을 따져서 평균을 내서 비교함
+print('f1_micro: ', f1_score(y_pred, y_test, average='micro')) # micro f1 = acc score 
+
+
+# 7,8,9 = 7 / 5 = 5 / 6 = 6 / 3,4 = 4
+# 라벨축소 4개로 + 아웃라이어처리 + SMOTE 전
+# model.score:  0.7238095238095238
+# acc_score:  0.7238095238095238
+# f1_macro:  0.6065327752702224
+# f1_micro:  0.7238095238095238
+
+# 라벨축소 4개로 + 아웃라이어처리 + SMOTE 후
+# model.score:  0.7115646258503401
+# acc_score:  0.7115646258503401
+# f1_macro:  0.6499147788164417
+# f1_micro:  0.7115646258503401
+#------------------------------------------
+
+
+# model.score:  0.8653061224489796
+# acc_score:  0.8653061224489796
+# f1_macro:  0.6499742687332891
+# f1_micro:  0.8653061224489796
+
+# model.score:  0.817687074829932
+# acc_score:  0.817687074829932
+# f1_macro:  0.6483963449257351
+# f1_micro:  0.817687074829932
