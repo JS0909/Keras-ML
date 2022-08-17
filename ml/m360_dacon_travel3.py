@@ -113,7 +113,7 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, random
 
 # 2. 모델
 xgb = XGBClassifier(tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0)
-rnf = RandomForestClassifier(random_state=1267) # 0.8951406649616368 / 1234  //  0.9028132992327366 // 777
+rnf = RandomForestClassifier(random_state=987) # 0.8951406649616368 / 1234  //  0.9028132992327366 // 777
 # 1267 / 스코어:  0.8900255754475703
 
 # 3. 훈련
