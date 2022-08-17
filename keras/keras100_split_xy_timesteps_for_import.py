@@ -23,3 +23,14 @@ def split_xy3(dataset, time_steps, y_column):
         x.append(tmp_x)
         y.append(tmp_y)
     return np.array(x), np.array(y)
+
+def split_xy1(dataset, time_steps):
+    x, y = list(), list() # 빈 튜플리스트 생성
+    for i in range(len(dataset)):
+        end_number = i + time_steps
+        if end_number > len(dataset)-1:
+            break
+        tmp_x, tmp_y = dataset[i:end_number], dataset[end_number]
+        x.append(tmp_x)
+        y.append(tmp_y)
+    return np.array(x), np.array(y)

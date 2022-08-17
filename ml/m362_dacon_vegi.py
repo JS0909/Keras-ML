@@ -10,8 +10,6 @@ from sklearn.feature_selection import SelectFromModel
 from sklearn.pipeline import make_pipeline
 import matplotlib.pyplot as plt
 import math
-import time
-import glob
 import joblib
 
 
@@ -98,8 +96,8 @@ test_target = joblib.load(file+'datasets/test_target.dat')
 # print(train_target.head)
 # print(test_target.head)
 
-print(np.array(train_input).shape) # (2653267, 43)
-print(np.array(test_input).shape) # (335520, 42)
+# print(np.array(train_input).shape) # (2653267, 43)
+# print(np.array(test_input).shape) # (335520, 42)
 
 # print(train_input.describe())
 # print(train_input.info())
@@ -107,8 +105,30 @@ print(np.array(test_input).shape) # (335520, 42)
 
 # print(test_input.describe())
 # print(test_input.info())
-print(test_input.isnull().sum())
+# print(test_input.isnull().sum())
+
+# 24시간 데이터로 다음날 0시의 잎 증감률을 예측
+# 하루 = 1440 행
+
+train_input=train_input.drop(['시간'], axis=1)
+
+imp = IterativeImputer()
+train_input = imp.fit_transform(train_input)
+train_target = imp.fit_transform(train_target)
+
+
+train_input_arr = train_input.values
+train_input_arr = train_input_arr[1:1440][:]
+print(train_input_arr)
+
+
+# 2. 모델
 
 
 
+
+# 3. 컴파일, 훈련
+
+
+# 4. 평가, 예측
 

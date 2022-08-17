@@ -1,3 +1,12 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+
+# ## Import
+
+# In[1]:
+
+
 import random
 import pandas as pd
 import numpy as np
@@ -13,9 +22,19 @@ from torch.utils.data import Dataset, DataLoader
 from tqdm.auto import tqdm
 
 import warnings
-warnings.filterwarnings(action='ignore')
+warnings.filterwarnings(action='ignore') 
+
+
+# In[2]:
+
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+
+
+# ## Hyperparameter Setting
+
+# In[3]:
+
 
 CFG = {
     'EPOCHS':5,
@@ -23,6 +42,12 @@ CFG = {
     'BATCH_SIZE':16,
     'SEED':41
 }
+
+
+# ## Fixed RandomSeed
+
+# In[4]:
+
 
 def seed_everything(seed):
     random.seed(seed)
@@ -35,14 +60,30 @@ def seed_everything(seed):
 
 seed_everything(CFG['SEED']) # Seed 고정
 
-all_input_list = sorted(glob.glob('./train_input/*.csv'))
-all_target_list = sorted(glob.glob('./train_target/*.csv'))
+
+# ## Data Pre-processing
+
+# In[5]:
+
+
+all_input_list = sorted(glob.glob('D:\study_data\_data\dacon_vegi/train_input/*.csv'))
+all_target_list = sorted(glob.glob('D:\study_data\_data\dacon_vegi/train_target/*.csv'))
+
+
+# In[6]:
+
 
 train_input_list = all_input_list[:50]
 train_target_list = all_target_list[:50]
 
 val_input_list = all_input_list[50:]
 val_target_list = all_target_list[50:]
+
+
+# ## CustomDataset
+
+# In[7]:
+
 
 class CustomDataset(Dataset):
     def __init__(self, input_paths, target_paths, infer_mode):
@@ -80,14 +121,22 @@ class CustomDataset(Dataset):
         
     def __len__(self):
         return len(self.data_list)
-    
+
+
+# In[8]:
 
 
 train_dataset = CustomDataset(train_input_list, train_target_list, False)
-train_loader = DataLoader(train_dataset, batch_size = CFG['BATCH_SIZE'], shuffle=True, num_workers=6)
+train_loader = DataLoader(train_dataset, batch_size = CFG['BATCH_SIZE'], shuffle=True, num_workers=0)
 
 val_dataset = CustomDataset(val_input_list, val_target_list, False)
-val_loader = DataLoader(val_dataset, batch_size=CFG['BATCH_SIZE'], shuffle=False, num_workers=6)
+val_loader = DataLoader(val_dataset, batch_size=CFG['BATCH_SIZE'], shuffle=False, num_workers=0)
+
+
+# ## Model Define
+
+# In[9]:
+
 
 class BaseModel(nn.Module):
     def __init__(self):
@@ -101,8 +150,13 @@ class BaseModel(nn.Module):
         hidden, _ = self.lstm(x)
         output = self.classifier(hidden[:,-1,:])
         return output
-    
-    
+
+
+# ## Train
+
+# In[10]:
+
+
 def train(model, optimizer, train_loader, val_loader, scheduler, device):
     model.to(device)
     criterion = nn.L1Loss().to(device)
@@ -138,6 +192,10 @@ def train(model, optimizer, train_loader, val_loader, scheduler, device):
             best_model = model
     return best_model
 
+
+# In[11]:
+
+
 def validation(model, val_loader, criterion, device):
     model.eval()
     val_loss = []
@@ -153,6 +211,12 @@ def validation(model, val_loader, criterion, device):
             
     return np.mean(val_loss)
 
+
+# ## Run!!
+
+# In[12]:
+
+
 model = BaseModel()
 model.eval()
 optimizer = torch.optim.Adam(params = model.parameters(), lr = CFG["LEARNING_RATE"])
@@ -160,8 +224,18 @@ scheduler = None
 
 best_model = train(model, optimizer, train_loader, val_loader, scheduler, device)
 
-test_input_list = sorted(glob.glob('./test_input/*.csv'))
-test_target_list = sorted(glob.glob('./test_target/*.csv'))
+
+# ## Inference
+
+# In[13]:
+
+
+test_input_list = sorted(glob.glob('D:\study_data\_data\dacon_vegi/test_input/*.csv'))
+test_target_list = sorted(glob.glob('D:\study_data\_data\dacon_vegi/test_target/*.csv'))
+
+
+# In[14]:
+
 
 def inference_per_case(model, test_loader, test_path, device):
     model.to(device)
@@ -180,16 +254,24 @@ def inference_per_case(model, test_loader, test_path, device):
     submit_df = pd.read_csv(test_path)
     submit_df['rate'] = pred_list
     submit_df.to_csv(test_path, index=False)
-    
+
+
+# In[15]:
+
+
 for test_input_path, test_target_path in zip(test_input_list, test_target_list):
     test_dataset = CustomDataset([test_input_path], [test_target_path], True)
     test_loader = DataLoader(test_dataset, batch_size = CFG['BATCH_SIZE'], shuffle=False, num_workers=0)
     inference_per_case(best_model, test_loader, test_target_path, device)
-    
+
+
+# In[16]:
+
+
 import zipfile
-os.chdir("./test_target/")
-submission = zipfile.ZipFile("../submission.zip", 'w')
-for path in test_target_list:
-    path = path.split('/')[-1]
-    submission.write(path)
-submission.close()
+filelist = ['TEST_01.csv','TEST_02.csv','TEST_03.csv','TEST_04.csv','TEST_05.csv', 'TEST_06.csv']
+os.chdir("D:\study_data\_data\dacon_vegi/test_target")
+with zipfile.ZipFile("submission.zip", 'w') as my_zip:
+    for i in filelist:
+        my_zip.write(i)
+    my_zip.close()
