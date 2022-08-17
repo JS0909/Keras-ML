@@ -18,6 +18,8 @@ from sklearn.model_selection import train_test_split, StratifiedKFold,\
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer, KNNImputer
+from imblearn.over_sampling import SMOTE
+
 
 
 # 1. 데이터
@@ -63,16 +65,16 @@ for i in idxarr:
 # ------------------------------------------
 
 # 피처임포턴스 그래프 보기 위해 데이터프레임형태의 x_, y_ 놔둠 / 훈련용 넘파이어레이형태의 x, y 생성-----------
-x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
-# x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar', 'MonthlyIncome'], axis=1)
+# x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
+x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar', 'MonthlyIncome'], axis=1)
 # x_ = train.drop(['ProdTaken'], axis=1)
 y_ = train['ProdTaken']
 x = np.array(x_)
 y = np.array(y_)
 # y = y.reshape(-1, 1) # y값 reshape 해야되서 x도 넘파이로 바꿔 훈련하는 것
 
-test = test.drop(['NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
-# test = test.drop(['NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar', 'MonthlyIncome'], axis=1)
+# test = test.drop(['NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
+test = test.drop(['NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar', 'MonthlyIncome'], axis=1)
 test = np.array(test)
 # print(x.shape, y.shape)
 #-----------------------------------------------------------------------------------------------------------
@@ -89,26 +91,28 @@ parameters_xgb = {
               } 
 
 parameters_rnf = {
-    'n_estimators':[300],
-    'max_depth':[11],
-    'min_samples_leaf':[11],
+    'n_estimators':[400],
+    'max_depth':[None],
+    'min_samples_leaf':[1],
     'min_samples_split':[2],
-    'n_jobs':[-1]
 }
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, random_state=999, shuffle=True)
 # print(np.unique(y_train, return_counts=True))
 
+smote = SMOTE(random_state=1234)
+x_train, y_train = smote.fit_resample(x_train, y_train)
+print(pd.Series(y_train).value_counts())
+
 # 2. 모델
 xgb = XGBClassifier(tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0)
-rnf = RandomForestClassifier(random_state=777) # 0.8951406649616368 / 1234     //  0.9028132992327366 // 777
-
+rnf = RandomForestClassifier(random_state=704) # 0.8951406649616368 / 1234  //  0.9028132992327366 // 777
 
 # 3. 훈련
 # model = xgb
-model = rnf
+# model = rnf
 # model = RandomizedSearchCV(xgb, parameters_xgb, cv=6, n_jobs=-1, verbose=2)
-# model = GridSearchCV(rnf,  parameters_rnf, cv=5, n_jobs=-1, verbose=2)
+model = GridSearchCV(rnf,  parameters_rnf, cv=5, n_jobs=-1, verbose=2)
 # model = make_pipeline(MinMaxScaler(), HRS)
 # model = make_pipeline(MinMaxScaler(), GridSearchCV(rnf, parameters_rnf, cv=5, n_jobs=-1, verbose=2))
 # model = make_pipeline(MinMaxScaler(), xgb)
@@ -136,7 +140,13 @@ submission = pd.read_csv(filepath+'submission.csv', index_col=0)
 submission['ProdTaken'] = y_submit
 submission.to_csv(filepath + 'submission.csv', index = True)
 
-# print(HRS.best_params_)
+print(model.best_params_)
+
+# 1379
+# 스코어:  0.9002557544757033
+
+# 1379
+# 스코어:  0.9028132992327366
 
 
 

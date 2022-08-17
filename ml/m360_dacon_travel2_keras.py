@@ -15,10 +15,11 @@ from sklearn.model_selection import train_test_split, StratifiedKFold,\
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer, KNNImputer
+from imblearn.over_sampling import SMOTE
 
 
 # 1. 데이터
-filepath = 'D:\study_home\_data\dacon_travel/'
+filepath = 'D:\study_data\_data\dacon_travel/'
 train = pd.read_csv(filepath+'train.csv', index_col=0)
 test = pd.read_csv(filepath+'test.csv', index_col=0)
 
@@ -179,6 +180,9 @@ for i in range(x.shape[1]):
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, random_state=999, shuffle=True)
 # print(np.unique(y_train, return_counts=True))
 # print(x_train.shape) # (1564, 13)
+smote = SMOTE(random_state=1234)
+x_train, y_train = smote.fit_resample(x_train, y_train)
+print(pd.Series(y_train).value_counts())
 
 # 2. 모델구성
 from tensorflow.python.keras.models import Sequential
