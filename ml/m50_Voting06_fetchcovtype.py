@@ -11,12 +11,15 @@ from catboost import CatBoostClassifier
 from sklearn.datasets import fetch_covtype
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, LabelEncoder
 
 # 1. 데이터
 dataset = fetch_covtype()
+y = dataset.target
+le = LabelEncoder()
+y = le.fit_transform(y)
 
-x_train, x_test, y_train, y_test = train_test_split(dataset.data, dataset.target, train_size=0.8, random_state=704, stratify=dataset.target)
+x_train, x_test, y_train, y_test = train_test_split(dataset.data, y, train_size=0.8, random_state=704, stratify=dataset.target)
 
 scl = MinMaxScaler()
 x_train = scl.fit_transform(x_train)
@@ -36,7 +39,7 @@ cat = CatBoostClassifier(verbose=0)
 rf = RandomForestClassifier(n_estimators=400, max_depth=None, min_samples_leaf=1 ,min_samples_split=2)
 
 model = VotingClassifier(estimators=[('XG', xg), ('LG', lg), ('CAT', cat), ('RF', rf)],
-                         voting='soft'
+                         voting='soft', verbose=2
                          )
 
 # 3. 훈련
@@ -57,3 +60,8 @@ for model2 in classifiers:
     class_name = model2.__class__.__name__
     print('{0} 정확도: {1:.4f}'.format(class_name, acc2))
     
+# voting result:  0.891
+# XGBClassifier 정확도: 0.7718
+# LGBMClassifier 정확도: 0.8473
+# CatBoostClassifier 정확도: 0.8816
+# RandomForestClassifier 정확도: 0.9481

@@ -1,13 +1,13 @@
 import numpy as np
 import pandas as pd
 
-from sklearn.datasets import load_boston
+from sklearn.datasets import fetch_covtype
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
 # 1. 데이터
-datasets = load_boston()
+datasets = fetch_covtype()
 x, y = datasets.data, datasets.target
 
 print(x.shape, y.shape)
@@ -33,4 +33,4 @@ model.fit(x_train, y_train)
 print(model.score(x_test, y_test))
 
 
-# 0.9012080375361788
+# 0.7550106236591115
