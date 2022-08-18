@@ -192,6 +192,10 @@ model.add(Dense(32, input_dim=13))
 model.add(Dense(32, activation='relu'))
 model.add(Dropout(0.3))
 model.add(Dense(64, activation='swish'))
+model.add(Dense(64, activation='swish'))
+model.add(Dense(128, activation='swish'))
+model.add(Dense(64, activation='swish'))
+model.add(Dense(64, activation='swish'))
 model.add(Dropout(0.3))
 model.add(Dense(128, activation='relu'))
 model.add(Dropout(0.3))
@@ -223,46 +227,9 @@ y_submit = model.predict(test)
 
 submission = pd.read_csv(filepath+'submission.csv', index_col=0)
 submission['ProdTaken'] = y_submit
-submission.to_csv(filepath + 'submission.csv', index = True)
+submission.to_csv(filepath + 'submissionK.csv', index = True)
 
 
-# submission 10번파일 + 월급 제외 + 3 DurationOfPitch의 이상치 제거
-# 스코어:  0.9028132992327366
-# 걸린 시간:  4.258755207061768
-
-# ProductPitched 제거
-# 스코어:  0.9002557544757033
-# 걸린 시간:  4.518233060836792
-
-# 랜포 시드 704 travel3.dat
-# 스코어:  0.9053708439897699
-# 걸린 시간:  5.0596325397491455
-
-# 12
-# 스코어:  0.9028132992327366
-# 걸린 시간:  5.500649452209473
-
-# 13 m360_travel2
-# 스코어:  0.907928388746803
-# 걸린 시간:  5.145014524459839
-
-# 14 m360_travel4 + occupation 중간값 + 랜포 704
-# 스코어:  0.907928388746803
-# 걸린 시간:  7.033788442611694
-
-# 15 m360_travel5 + occupation 놔둠 + 랜포 704
-# 스코어:  0.9053708439897699
-# 걸린 시간:  6.28637433052063
-
-# 16 m360_travel6 + ProductPitched 이상치 처리안함
-# 스코어:  0.9002557544757033
-# 걸린 시간:  6.224222183227539
-
-# 17
-# 스코어:  0.9028132992327366
-
-# 18
-# 0.907928388746803
 
 '''
  #   Column                    Non-Null Count  Dtype

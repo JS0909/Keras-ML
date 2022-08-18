@@ -11,6 +11,7 @@ from sklearn.pipeline import make_pipeline
 import matplotlib.pyplot as plt
 import math
 import time
+from icecream import ic
 
 from sklearn.experimental import enable_halving_search_cv
 from sklearn.model_selection import train_test_split, StratifiedKFold,\
@@ -19,8 +20,10 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer, KNNImputer
 from imblearn.over_sampling import SMOTE
-from sklearn.ensemble import BaggingClassifier
+from sklearn.ensemble import BaggingClassifier, VotingClassifier
 from sklearn.linear_model import LogisticRegression
+from lightgbm import LGBMClassifier
+from catboost import CatBoostClassifier
 
 
 # 1. 데이터
@@ -117,10 +120,15 @@ xgb = XGBClassifier(tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0)
 rnf = RandomForestClassifier(random_state=987) # 0.8951406649616368 / 1234  //  0.9028132992327366 // 777
 # 1267 / 스코어:  0.8900255754475703
 
+lg = LGBMClassifier()
+cat = CatBoostClassifier(verbose=0)
+
 # 3. 훈련
 # model = xgb
 # model = rnf
-model = BaggingClassifier(xgb, n_estimators=100, n_jobs=-1, random_state=1234)
+model = cat
+# model = VotingClassifier(estimators=[('XG', xgb), ('LG', lg), ('CAT', cat), ('RF', rnf)],
+#                          voting='soft', verbose=2)
 # model = RandomizedSearchCV(xgb, parameters_xgb, cv=6, n_jobs=-1, verbose=2)
 # model = GridSearchCV(rnf,  parameters_rnf, cv=5, n_jobs=-1, verbose=2)
 # model = make_pipeline(MinMaxScaler(), HRS)
@@ -140,7 +148,7 @@ end = time.time()
 
 # 4. 평가, 예측
 results = model.score(x_test, y_test)
-print('스코어: ', results)
+ic(results)
 print('걸린 시간: ', end-start)
 
 # 5. 제출 준비
