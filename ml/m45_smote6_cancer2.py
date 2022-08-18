@@ -80,3 +80,13 @@ print('acc_score: ', accuracy_score(y_pred, y_test))
 from sklearn.metrics import f1_score
 print('f1_macro: ', f1_score(y_pred, y_test))
 
+# model.score:  0.9790209790209791
+# acc_score:  0.9790209790209791
+# f1_macro:  0.983050847457627
+# ==================== SMOTE 적용 후 ========================
+# 1    267
+# 0    267
+# dtype: int64
+# model.score:  0.9790209790209791
+# acc_score:  0.9790209790209791
+# f1_macro:  0.983050847457627

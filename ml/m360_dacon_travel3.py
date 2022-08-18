@@ -19,7 +19,8 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer, KNNImputer
 from imblearn.over_sampling import SMOTE
-
+from sklearn.ensemble import BaggingClassifier
+from sklearn.linear_model import LogisticRegression
 
 
 # 1. 데이터
@@ -118,7 +119,8 @@ rnf = RandomForestClassifier(random_state=987) # 0.8951406649616368 / 1234  //  
 
 # 3. 훈련
 # model = xgb
-model = rnf
+# model = rnf
+model = BaggingClassifier(xgb, n_estimators=100, n_jobs=-1, random_state=1234)
 # model = RandomizedSearchCV(xgb, parameters_xgb, cv=6, n_jobs=-1, verbose=2)
 # model = GridSearchCV(rnf,  parameters_rnf, cv=5, n_jobs=-1, verbose=2)
 # model = make_pipeline(MinMaxScaler(), HRS)

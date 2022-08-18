@@ -86,14 +86,45 @@ test_pred = model.predict(test_input)
 print(test_pred.shape) # (195, 1)
 
 
-for i in range(6):
-    i2=0
-    a = i+1
-    thisfile = 'D:\study_data\_data\dacon_vegi/test_target/'+'TEST_0'+str(a)+'.csv'
-    test = pd.read_csv(thisfile, index_col=False)
-    test['rate'] = test_pred[i2:i2+len(test['rate'])]
-    test.to_csv(thisfile, index=False)
-    i2+=len(test['rate'])
+
+test1 = pd.read_csv(path+'test_target/TEST_01.csv', index_col=False)
+test1['rate'] = test_pred[:30][0]
+test1.to_csv(test_target+'test_target/TEST_01.csv', index=False)
+
+test2 = pd.read_csv(test_target+'test_target/TEST_02.csv', index_col=False)
+test2['rate'] = test_pred[30:30+35][0]
+test2.to_csv(test_target+'test_target/TEST_02.csv', index=False)
+
+
+test3 = pd.read_csv(test_target+'test_target/TEST_03.csv', index_col=False)
+test3['rate'] = test_pred[30+35:30+35+26][0]
+test3.to_csv(test_target+'test_target/TEST_03.csv', index=False)
+
+
+test4 = pd.read_csv(test_target+'test_target/TEST_04.csv', index_col=False)
+test4['rate'] = test_pred[30+35+26:30+35+26+32][0]
+test4.to_csv(test_target+'test_target/TEST_04.csv', index=False)
+
+
+test5 = pd.read_csv(test_target+'test_target/TEST_05.csv', index_col=False)
+test5['rate'] = test_pred[30+35+26+32:30+35+26+32+37][0]
+test5.to_csv(test_target+'test_target/TEST_05.csv', index=False)
+
+
+test6 = pd.read_csv(test_target+'test_target/TEST_05.csv', index_col=False)
+test6['rate'] = test_pred[30+35+26+32+37:][0]
+test6.to_csv(test_target+'test_target/TEST_06.csv', index=False)
+
+
+# for i in range(6):
+#     i2=0
+#     a = i+1
+#     thisfile = 'D:\study_data\_data\dacon_vegi/test_target/'+'TEST_0'+str(a)+'.csv'
+#     test = pd.read_csv(thisfile, index_col=False)
+#     test['rate'] = test_pred[i2:i2+len(test['rate'])]
+#     test.to_csv(thisfile, index=False)
+#     i2+=len(test['rate'])
+
 
 
 import zipfile

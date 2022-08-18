@@ -19,6 +19,8 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer, KNNImputer
 from imblearn.over_sampling import SMOTE
+from sklearn.ensemble import BaggingClassifier
+from sklearn.linear_model import LogisticRegression
 
 
 # 1. 데이터
@@ -50,6 +52,10 @@ test['NumberOfChildrenVisiting'].fillna(test['NumberOfChildrenVisiting'].median(
 test['MonthlyIncome'].fillna(test['MonthlyIncome'].median(), inplace=True)
 # print(train.isnull().sum())
 #-----------------------------------------------------------------------------------------------------------
+
+scaler = MinMaxScaler()
+train[['Age','DurationOfPitch','MonthlyIncome']] = scaler.fit_transform(train[['Age','DurationOfPitch','MonthlyIncome']])
+test[['Age','DurationOfPitch','MonthlyIncome']] = scaler.transform(test[['Age','DurationOfPitch','MonthlyIncome']])
 
 # object타입 라벨인코딩--------------------
 le = LabelEncoder()

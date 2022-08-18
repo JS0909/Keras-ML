@@ -40,7 +40,7 @@ CFG = {
     'EPOCHS':5,
     'LEARNING_RATE':1e-3,
     'BATCH_SIZE':16,
-    'SEED':41
+    'SEED':65
 }
 
 
@@ -141,7 +141,7 @@ val_loader = DataLoader(val_dataset, batch_size=CFG['BATCH_SIZE'], shuffle=False
 class BaseModel(nn.Module):
     def __init__(self):
         super(BaseModel, self).__init__()
-        self.lstm = nn.LSTM(input_size=37, hidden_size=256, batch_first=True, bidirectional=False)
+        self.lstm = nn.GRU(input_size=37, hidden_size=256, batch_first=True, bidirectional=False)
         self.classifier = nn.Sequential(
             nn.Linear(256, 1),
         )
@@ -275,3 +275,13 @@ with zipfile.ZipFile("submission.zip", 'w') as my_zip:
     for i in filelist:
         my_zip.write(i)
     my_zip.close()
+
+
+# In[17]:
+
+
+# Train Loss : [0.28610] Valid Loss : [0.25106]
+# 'EPOCHS':5,
+# 'LEARNING_RATE':1e-3,
+# 'BATCH_SIZE':16,
+# 'SEED':65
