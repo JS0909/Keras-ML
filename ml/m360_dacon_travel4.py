@@ -1,15 +1,14 @@
 from cProfile import label
-import os
 from re import I, X
 import sys
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import MinMaxScaler,StandardScaler,RobustScaler,MaxAbsScaler
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.model_selection import train_test_split, GridSearchCV
 
 # 데이터 준비
 path='D:\study_data\_data\dacon_travel/'
@@ -52,7 +51,7 @@ mean_cols = ['Age','NumberOfFollowups','PreferredPropertyStar', 'MonthlyIncome',
             'NumberOfTrips','NumberOfChildrenVisiting']
 for these in [train_set, test_set]:
     for col in mean_cols:
-        these[col] = these[col].fillna(train_set[col].mean())
+        these[col] = these[col].fillna(train_set[col].median())
 
 print(train_set.info())
 
@@ -73,8 +72,16 @@ y = train_set[['ProdTaken']]
 
 from catboost import CatBoostClassifier
 
+parameters_rnf = {
+    'n_estimators':[300],
+    'max_depth':[None,2,3,4,5,6,7,8,9,10,11,12,13,14],
+    # 'min_samples_leaf':[3,5,7,10,11,13],
+    # 'min_samples_split':[2,3,5,7,10],
+    'n_jobs':[-1]
+}
 
-model = CatBoostClassifier()
+
+model = GridSearchCV(RandomForestClassifier(), parameters_rnf, refit=True, n_jobs=-1)
 model.fit(x, y.values.ravel())
 score=model.score(x,y)
 # print('score:',score) score: 1.0
@@ -83,4 +90,6 @@ score=model.score(x,y)
 y_summit = model.predict(test_set)
 submission['ProdTaken'] = y_summit
 submission.to_csv(path + 'submissionJ.csv', index = True)
+
+print(model.best_params_)
 
