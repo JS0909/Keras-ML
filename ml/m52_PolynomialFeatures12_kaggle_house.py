@@ -2,19 +2,13 @@ import numpy as np
 import pandas as pd
 
 from collections import Counter
-from sklearn.ensemble import VotingRegressor, RandomForestRegressor
-from sklearn.linear_model import LogisticRegression
-from sklearn.neighbors import KNeighborsRegressor
-from xgboost import XGBRegressor
-from lightgbm import LGBMRegressor
-from catboost import CatBoostRegressor
-
 from sklearn.experimental import enable_halving_search_cv
 from sklearn.model_selection import train_test_split, KFold,\
     HalvingRandomSearchCV
-from sklearn.metrics import r2_score
 import time
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler, PolynomialFeatures
+from sklearn.linear_model import LinearRegression
+from sklearn.pipeline import make_pipeline
 import warnings
 warnings.filterwarnings('ignore') # warnig 출력 안함
 
@@ -201,50 +195,41 @@ test_set.drop(['MSZoning', 'Neighborhood' , 'Condition2', 'MasVnrType', 'ExterQu
 
 x = train_set.drop(['SalePrice'], axis=1)
 y = train_set['SalePrice']
+print(x.shape, y.shape) # (1338, 12) (1338,)
 
-x_train, x_test, y_train, y_test = train_test_split(x, y, shuffle=True, train_size=0.8, random_state=1234)
-
-scl = MinMaxScaler()
-x_train = scl.fit_transform(x_train)
-x_test = scl.fit_transform(x_test)
-
-
-
-parameters_rnf = {'n_estimators':[400],'max_depth':[None],'min_samples_leaf':[1],'min_samples_split':[2],
-}
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=13)
 
 # 2. 모델
-xg = XGBRegressor(n_estimators=100, learning_rate=1, max_depth=2, gamma=0, min_child_weight=1, subsample=1, colsample_bytree=0.5, 
-                   colsample_bylevel=1, colsample_bynode=1, reg_alpha=0.01,
-                   tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0, random_state=1234,)
-lg = LGBMRegressor()
-cat = CatBoostRegressor(verbose=0)
-rf = RandomForestRegressor(n_estimators=400, max_depth=None, min_samples_leaf=1 ,min_samples_split=2)
+model = make_pipeline(MinMaxScaler(), LinearRegression())
+model.fit(x_train, y_train)
+print('그냥 스코어: ',model.score(x_test, y_test))
 
-model = VotingRegressor(estimators=[('XG', xg), ('LG', lg), ('CAT', cat), ('RF', rf)],
-                        #  voting='hard'
-                         )
+from sklearn.model_selection import cross_val_score
+kfold = KFold(n_splits=5, shuffle=True, random_state=1234)
+score = cross_val_score(model, x_train, y_train, cv=kfold, scoring='r2')
+print('CV: ', score)
+print('CV n빵: ', np.mean(score))
+print('-------------------------------------------------------------')
+#============================ PolynomialFeatures 후 ================================
+pf = PolynomialFeatures(degree=2, include_bias=False) # include_bias = False 하면 기본으로 생기는 1이 안나옴
+xp = pf.fit_transform(x)
+print(xp.shape) # (1338, 90)
 
-# 3. 훈련
-model.fit(x_train,y_train)
+x_train, x_test, y_train, y_test = train_test_split(xp, y, test_size=0.2, random_state=13)
 
-# 4. 평가, 예측
-y_pred = model.predict(x_test)
-r2 = r2_score(y_test, y_pred)
-print('voting result: ', round(r2, 4))
+# 2. 모델
+model = make_pipeline(MinMaxScaler(), LinearRegression())
+model.fit(x_train, y_train)
+print('폴리스코어: ', model.score(x_test, y_test))
 
+score = cross_val_score(model, x_train, y_train, cv=kfold, scoring='r2')
+print('폴리 CV: ', score)
+print('폴리 CV n빵: ', np.mean(score))
 
-
-classifiers = [xg, lg, cat, rf]
-for model2 in classifiers:
-    model2.fit(x_train, y_train)
-    y_pred = model2.predict(x_test)
-    r22 = r2_score(y_test, y_pred)
-    class_name = model2.__class__.__name__
-    print('{0} 정확도: {1:.4f}'.format(class_name, r22))
-    
-# voting result:  0.6676
-# XGBRegressor 정확도: 0.5966
-# LGBMRegressor 정확도: 0.6022
-# CatBoostRegressor 정확도: 0.5845
-# RandomForestRegressor 정확도: 0.6479
+# 그냥 스코어:  0.849587029545504
+# CV:  [0.86283994 0.8633604  0.86193715 0.86612188 0.85026751]
+# CV n빵:  0.8609053754462398
+# -------------------------------------------------------------
+# 폴리스코어:  0.8624354238585736
+# 폴리 CV:  [0.85856305 0.86893255 0.90799113 0.88995967 0.88113843]
+# 폴리 CV n빵:  0.8813169659174231

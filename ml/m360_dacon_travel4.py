@@ -53,7 +53,7 @@ for these in [train_set, test_set]:
     for col in mean_cols:
         these[col] = these[col].fillna(train_set[col].median())
 
-print(train_set.info())
+# print(train_set.info())
 
 # 스케일링
 scaler = MinMaxScaler()
@@ -69,22 +69,25 @@ test_set.drop(columns=['id'], inplace=True)
 x = train_set.drop(columns=['ProdTaken'])
 y = train_set[['ProdTaken']]
 
+x_train, x_test, y_train, y_test = train_test_split(x,y, train_size=0.9)
 
 from catboost import CatBoostClassifier
 
 parameters_rnf = {
     'n_estimators':[300],
-    'max_depth':[None,2,3,4,5,6,7,8,9,10,11,12,13,14],
-    # 'min_samples_leaf':[3,5,7,10,11,13],
-    # 'min_samples_split':[2,3,5,7,10],
+    'max_depth':[18,19,20],
+    'min_samples_leaf':[3,5,7],
+    'min_samples_split':[2,3,4],
     'n_jobs':[-1]
 }
 
 
-model = GridSearchCV(RandomForestClassifier(), parameters_rnf, refit=True, n_jobs=-1)
-model.fit(x, y.values.ravel())
-score=model.score(x,y)
-# print('score:',score) score: 1.0
+model = GridSearchCV(RandomForestClassifier(random_state=124), parameters_rnf, refit=True, n_jobs=-1)
+model.fit(x_train, y_train.values.ravel())
+score=model.score(x_test,y_test)
+print('score:',score)
+
+model.fit(x,y.values.ravel())
 
 # 데이터 submit
 y_summit = model.predict(test_set)
@@ -93,3 +96,5 @@ submission.to_csv(path + 'submissionJ.csv', index = True)
 
 print(model.best_params_)
 
+
+# 124

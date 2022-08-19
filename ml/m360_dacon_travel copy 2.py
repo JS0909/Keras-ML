@@ -11,7 +11,6 @@ from sklearn.pipeline import make_pipeline
 import matplotlib.pyplot as plt
 import math
 import time
-from icecream import ic
 
 from sklearn.experimental import enable_halving_search_cv
 from sklearn.model_selection import train_test_split, StratifiedKFold,\
@@ -20,10 +19,8 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer, KNNImputer
 from imblearn.over_sampling import SMOTE
-from sklearn.ensemble import BaggingClassifier, VotingClassifier
+from sklearn.ensemble import BaggingClassifier
 from sklearn.linear_model import LogisticRegression
-from lightgbm import LGBMClassifier
-from catboost import CatBoostClassifier
 
 
 # 1. 데이터
@@ -36,18 +33,16 @@ test = pd.read_csv(filepath+'test.csv', index_col=0)
 # print(train.isnull().sum())
 
 # 결측치 TypeofContact 빼고 중간값으로 대체함, 데이터 수치들 보면 중간값이 제일 무난할거 같음--------------------
-train['Age'].fillna(train['Age'].median(), inplace=True)
-train['TypeofContact'].fillna('N', inplace=True) # N으로 채운 이유: 콘택 타입 없는 건 '없음'으로 주고 처리하기 위해
-train['DurationOfPitch'].fillna(train['DurationOfPitch'].median(), inplace=True)
+train['Age'].fillna(train['Age'].mean(), inplace=True)
+train['DurationOfPitch'].fillna(0, inplace=True)
 train['NumberOfFollowups'].fillna(train['NumberOfFollowups'].median(), inplace=True)
 train['PreferredPropertyStar'].fillna(train['PreferredPropertyStar'].median(), inplace=True)
 train['NumberOfTrips'].fillna(train['NumberOfTrips'].median(), inplace=True)
 train['NumberOfChildrenVisiting'].fillna(train['NumberOfChildrenVisiting'].median(), inplace=True)
 train['MonthlyIncome'].fillna(train['MonthlyIncome'].median(), inplace=True)
 
-test['Age'].fillna(test['Age'].median(), inplace=True)
-test['TypeofContact'].fillna('N', inplace=True)
-test['DurationOfPitch'].fillna(test['DurationOfPitch'].median(), inplace=True)
+test['Age'].fillna(test['Age'].mean(), inplace=True)
+test['DurationOfPitch'].fillna(0, inplace=True)
 test['NumberOfFollowups'].fillna(test['NumberOfFollowups'].median(), inplace=True)
 test['PreferredPropertyStar'].fillna(test['PreferredPropertyStar'].median(), inplace=True)
 test['NumberOfTrips'].fillna(test['NumberOfTrips'].median(), inplace=True)
@@ -56,14 +51,14 @@ test['MonthlyIncome'].fillna(test['MonthlyIncome'].median(), inplace=True)
 # print(train.isnull().sum())
 #-----------------------------------------------------------------------------------------------------------
 
+# scaler = MinMaxScaler()
+# train[['Age','DurationOfPitch','MonthlyIncome']] = scaler.fit_transform(train[['Age','DurationOfPitch','MonthlyIncome']])
+# test[['Age','DurationOfPitch','MonthlyIncome']] = scaler.transform(test[['Age','DurationOfPitch','MonthlyIncome']])
+
 # object타입 라벨인코딩--------------------
 le = LabelEncoder()
 idxarr = train.columns
 idxarr = np.array(idxarr)
-
-scaler = MinMaxScaler()
-train[['Age','DurationOfPitch','MonthlyIncome']] = scaler.fit_transform(train[['Age','DurationOfPitch','MonthlyIncome']])
-test[['Age','DurationOfPitch','MonthlyIncome']] = scaler.transform(test[['Age','DurationOfPitch','MonthlyIncome']])
 
 for i in idxarr:
       if train[i].dtype == 'object':
@@ -72,11 +67,21 @@ for i in idxarr:
 # print(train.info())
 # ------------------------------------------
 
+train['TypeofContact'].fillna(0, inplace=True)
+test['TypeofContact'].fillna(0, inplace=True)
+
+scaler = MinMaxScaler()
+train[['Age', 'DurationOfPitch', 'MonthlyIncome']] = scaler.fit_transform(train[['Age', 'DurationOfPitch', 'MonthlyIncome']])
+test[['Age', 'DurationOfPitch', 'MonthlyIncome']] = scaler.transform(test[['Age', 'DurationOfPitch', 'MonthlyIncome']])
+
+
 # 피처임포턴스 그래프 보기 위해 데이터프레임형태의 x_, y_ 놔둠 / 훈련용 넘파이어레이형태의 x, y 생성-----------
 x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
 # x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar', 'MonthlyIncome'], axis=1)
 # x_ = train.drop(['ProdTaken'], axis=1)
 y_ = train['ProdTaken']
+x = np.array(x_)
+y = np.array(y_)
 # y = y.reshape(-1, 1) # y값 reshape 해야되서 x도 넘파이로 바꿔 훈련하는 것
 
 test = test.drop(['NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
@@ -85,10 +90,65 @@ test = np.array(test)
 # print(x.shape, y.shape)
 #-----------------------------------------------------------------------------------------------------------
 
+a3 =  [  89,  110,  120,  121,  137,  147,  172,  210,  211,  247,  310,
+        365,  397,  398,  426,  448,  450,  567,  755,  802,  865,  935,
+       1033, 1036, 1100, 1136, 1237, 1241, 1387, 1413, 1435, 1447, 1449,
+       1461, 1471, 1521, 1540, 1652, 1665, 1722, 1782, 1919, 1936, 1947]
 
-x = np.array(x_)
-y = np.array(y_)
+# a6 = [   8,   10,   13,   33,   40,   53,   80,   85,  108,  127,  129,
+#         150,  151,  172,  178,  199,  206,  214,  233,  254,  256,  281,
+#         327,  335,  344,  355,  364,  367,  380,  420,  426,  438,  462,
+#         496,  498,  512,  575,  610,  631,  689,  711,  714,  718,  726,
+#         757,  761,  768,  777,  778,  790,  816,  827,  829,  834,  840,
+#         857,  871,  875,  904,  913,  946,  960,  971,  972,  994, 1007,
+#        1009, 1021, 1024, 1060, 1077, 1081, 1098, 1099, 1121, 1124, 1142,
+#        1182, 1208, 1237, 1245, 1259, 1289, 1296, 1314, 1322, 1337, 1344,
+#        1348, 1362, 1365, 1377, 1389, 1400, 1422, 1436, 1473, 1505, 1558,
+#        1591, 1598, 1606, 1610, 1621, 1631, 1641, 1677, 1715, 1724, 1726,
+#        1750, 1766, 1817, 1825, 1852, 1858, 1873, 1881, 1887, 1925, 1930]
 
+# a10 = [  90,  106,  129,  161,  177,  248,  302,  303,  316,  348,  425,
+#         552,  623,  698,  769,  873,  927,  987, 1055, 1076, 1175, 1325,
+#        1360, 1404, 1425, 1514, 1525, 1598, 1611, 1663, 1731, 1749, 1753,
+#        1768, 1828, 1844, 1853, 1933]
+
+# a13 = [  14,   59,   93,  105,  142,  167,  187,  203,  209,  218,  230,
+#         250,  265,  311,  314,  322,  342,  378,  447,  479,  503,  536,
+#         570,  592,  643,  662,  727,  729,  749,  768,  817,  819,  827,
+#         851,  852,  869,  912,  917,  944,  964,  995, 1020, 1097, 1101,
+#        1110, 1121, 1123, 1156, 1157, 1203, 1277, 1311, 1316, 1336, 1355,
+#        1363, 1380, 1398, 1417, 1474, 1486, 1502, 1507, 1518, 1526, 1536,
+#        1561, 1571, 1576, 1578, 1597, 1640, 1643, 1668, 1676, 1716, 1719,
+#        1739, 1750, 1783, 1791, 1818, 1822, 1823, 1856, 1870, 1887, 1899,
+#        1927]
+
+for i in range(len(a3)):
+    x[a3[i]][3] = 20
+
+# # x[485][4] = np.nan # Occupation
+
+# for i in range(len(a6)): # ProductPitched
+#     x[a6[i]][6] = np.nan
+    
+# for i in range(len(a10)): # NumberOfTrips
+#     x[a10[i]][10] = 5.7
+
+# for i in range(len(a13)): # Designation
+#     x[a13[i]][13] = np.nan
+    
+# # outliers_printer(x)
+
+# x = pd.DataFrame(x, columns=[x_.columns])
+
+# x['Occupation'].fillna(x['Occupation'].median, inplace=True)
+# x['ProductPitched'].fillna(x['ProductPitched'].median, inplace=True)
+# x['Designation'].fillna(x['Designation'].median, inplace=True)
+# x['NumberOfTrips'].fillna(x['NumberOfTrips'].median, inplace=True)
+
+# ipt = IterativeImputer(max_iter = 100, random_state = 254)
+# # ipt = KNNImputer()
+# x = ipt.fit_transform(x)
+# x = np.array(x)
 
 parameters_xgb = {
             'n_estimators':[400],
@@ -98,76 +158,52 @@ parameters_xgb = {
             'min_child_weight':[5],
             'subsample':[0.7],
             'reg_alpha':[1],
+            'reg_lambda':[0.001],
               } 
 
 parameters_rnf = {
-    'n_estimators':[400],
-    'max_depth':[None],
-    'min_samples_leaf':[1],
-    'min_samples_split':[2],
+       'n_estimators':[100,200,300,400,500],
+    'max_depth':[None,2,3,4,5,6,7,8,9,10,11,12,13,14],
+    'min_samples_leaf':[3,5,7,10,11,13],
+    'min_samples_split':[2,3,5,7,10],
 }
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, random_state=999, shuffle=True)
-# print(np.unique(y_train, return_counts=True))
-
-# smote = SMOTE(random_state=1234)
-# x_train, y_train = smote.fit_resample(x_train, y_train)
-# print(pd.Series(y_train).value_counts())
 
 # 2. 모델
 xgb = XGBClassifier(tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0)
-rnf = RandomForestClassifier(random_state=777) # 0.8951406649616368 / 1234  //  0.9028132992327366 // 777
-# 1267 / 스코어:  0.8900255754475703
+rnf = RandomForestClassifier(random_state=704) # 704 : 0.9053708439897699
 
-lg = LGBMClassifier()
-cat = CatBoostClassifier(verbose=0)
+# model = xgb
+# model = rnf
+# model = RandomizedSearchCV(xgb, parameters_xgb, cv=6, n_jobs=-1, verbose=2)
+model = GridSearchCV(rnf,  parameters_rnf, cv=5, n_jobs=-1, verbose=2)
 
 # 3. 훈련
-# model = xgb
-model = rnf
-# model = cat
-# model = VotingClassifier(estimators=[('XG', xgb), ('LG', lg), ('CAT', cat), ('RF', rnf)],
-#                          voting='soft', verbose=2)
-# model = RandomizedSearchCV(xgb, parameters_xgb, cv=6, n_jobs=-1, verbose=2)
-# model = GridSearchCV(xgb,  parameters_xgb, cv=6, n_jobs=-1, verbose=2)
-# model = GridSearchCV(rnf,  parameters_rnf, cv=5, n_jobs=-1, verbose=2)
-# model = make_pipeline(MinMaxScaler(), HRS)
-# model = make_pipeline(MinMaxScaler(), GridSearchCV(rnf, parameters_rnf, cv=5, n_jobs=-1, verbose=2))
-# model = make_pipeline(MinMaxScaler(), xgb)
-# model = make_pipeline(MinMaxScaler(), rnf)
-
 import joblib
 joblib.dump(model,'D:\study_data\_data\dacon_travel\_dat/m360_travel6.dat')
-# model = joblib.load('D:\study_home\_data\dacon_travel\_dat/m360_travel.dat')
+# model = joblib.load('D:\study_data\_data\dacon_travel\_dat/m360_travel2.dat')
 
 
 # 2. 모델
-start = time.time()
 model.fit(x_train, y_train)
-end = time.time()
 
 # 4. 평가, 예측
 results = model.score(x_test, y_test)
-ic(results)
-print('걸린 시간: ', end-start)
 
 # 5. 제출 준비
-model.fit(x,y)
-y_submit = model.predict(test)
+# model.fit(x,y)
+# y_submit = model.predict(test)
 
-submission = pd.read_csv(filepath+'submission.csv', index_col=0)
-submission['ProdTaken'] = y_submit
-submission.to_csv(filepath + 'submission.csv', index = True)
+# submission = pd.read_csv(filepath+'submission.csv', index_col=0)
+# submission['ProdTaken'] = y_submit
+# submission.to_csv(filepath + 'submission991.csv', index = True)
 
-# print(model.best_params_)
+print('스코어: ', results)
+print(model.best_params_)
 
-# 1379
-# 스코어:  0.9002557544757033
-
-# 1379
-# 스코어:  0.9028132992327366
-
-# ic| results: 0.9053708439897699
+# submission99
+# 스코어:  0.9053708439897699
 
 '''
  #   Column                    Non-Null Count  Dtype

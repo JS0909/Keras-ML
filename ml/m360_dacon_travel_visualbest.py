@@ -53,9 +53,9 @@ test['MonthlyIncome'].fillna(test['MonthlyIncome'].median(), inplace=True)
 # print(train.isnull().sum())
 #-----------------------------------------------------------------------------------------------------------
 
-# scaler = MinMaxScaler()
-# train[['Age','DurationOfPitch','MonthlyIncome']] = scaler.fit_transform(train[['Age','DurationOfPitch','MonthlyIncome']])
-# test[['Age','DurationOfPitch','MonthlyIncome']] = scaler.transform(test[['Age','DurationOfPitch','MonthlyIncome']])
+scaler = MinMaxScaler()
+train[['Age','DurationOfPitch','MonthlyIncome']] = scaler.fit_transform(train[['Age','DurationOfPitch','MonthlyIncome']])
+test[['Age','DurationOfPitch','MonthlyIncome']] = scaler.transform(test[['Age','DurationOfPitch','MonthlyIncome']])
 
 # object타입 라벨인코딩--------------------
 le = LabelEncoder()
@@ -68,6 +68,7 @@ for i in idxarr:
         test[i] = le.fit_transform(test[i])
 # print(train.info())
 # ------------------------------------------
+
 
 # 피처임포턴스 그래프 보기 위해 데이터프레임형태의 x_, y_ 놔둠 / 훈련용 넘파이어레이형태의 x, y 생성-----------
 # x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
@@ -150,11 +151,11 @@ for i in range(len(a3)):
 
 # x[485][4] = np.nan # Occupation
 
-for i in range(len(a6)): # ProductPitched
-    x[a6[i]][6] = np.nan
+# for i in range(len(a6)): # ProductPitched
+#     x[a6[i]][6] = np.nan
     
 for i in range(len(a10)): # NumberOfTrips
-    x[a10[i]][10] = 5
+    x[a10[i]][10] = 5.7
 
 for i in range(len(a13)): # Designation
     x[a13[i]][13] = np.nan
@@ -216,13 +217,13 @@ xgb = XGBClassifier(tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0)
 rnf = RandomForestClassifier(random_state=704) # 704 : 0.9053708439897699
 
 # model = xgb
-# model = rnf
+model = rnf
 # model = RandomizedSearchCV(xgb, parameters_xgb, cv=6, n_jobs=-1, verbose=2)
 # model = GridSearchCV(rnf,  parameters_rnf, cv=5, n_jobs=-1, verbose=2)
 # model = make_pipeline(MinMaxScaler(), HRS)
 # model = make_pipeline(MinMaxScaler(), GridSearchCV(rnf, parameters_rnf, cv=5, n_jobs=-1, verbose=2))
 # model = make_pipeline(MinMaxScaler(), xgb)
-model = make_pipeline(MinMaxScaler(), rnf)
+# model = make_pipeline(MinMaxScaler(), rnf)
 
 # 3. 훈련
 ''' Feature importances 확인
@@ -252,73 +253,6 @@ joblib.dump(model,'D:\study_data\_data\dacon_travel\_dat/m360_travel6.dat')
 
 
 # 2. 모델
-'''
-#----------------------------모델 셀렉션----------------------------------------------------------
-model = RandomForestClassifier(n_estimators=100, random_state=1234)
-
-model.fit(x_train, y_train)
-
-print('테스트 스코어: ', model.score(x_test, y_test))
-
-score = accuracy_score(y_test, model.predict(x_test))
-print('score 결과: ', score)
-
-print(model.feature_importances_)
-
-thresholds = model.feature_importances_
-print('-----------------------------------------------')
-bscore = 0
-idx_ = 0
-for i in range(len(thresholds)):
-    selection = SelectFromModel(model, threshold=thresholds[i], prefit=True)
-    select_x_train = selection.transform(x_train)
-    select_x_test = selection.transform(x_test)
-    print(select_x_train.shape, select_x_train.shape)
-    
-    selection_model = XGBClassifier(n_estimators=100,
-              learning_rate=1,
-              max_depth=2,
-              gamma=0,
-              min_child_weight=1,
-              subsample=1,
-              colsample_bytree=0.5,
-              colsample_bylevel=1,
-              colsample_bynode=1,
-              reg_alpha=0.01,
-              tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0, random_state=1234,
-              )
-    
-    selection_model.fit(select_x_train, y_train)
-    
-    y_predict = selection_model.predict(select_x_test)
-    score = accuracy_score(y_test, y_predict)
-    print('Thresh=%.3f, n=%d, R2: %.2f%%'%(thresholds[i], select_x_train.shape[1], score*100), '\n')
-
-    if score >= bscore:
-        bscore = score
-        idx_=i
-
-f_to_drop = []
-for i in range(len(thresholds)):
-    if thresholds[idx_]>=thresholds[i]:
-        f_to_drop.append(i)
-        
-print(f_to_drop)
-# [0, 7, 8, 11, 15, 16, 22, 24, 31, 32, 39, 40, 47, 48, 55, 56, 57]
-
-xaf_train = np.delete(x_train, f_to_drop, axis=1)
-xaf_test = np.delete(x_test, f_to_drop, axis=1)
-
-model.fit(xaf_train, y_train)
-
-print('드랍 후 테스트 스코어: ', model.score(xaf_test, y_test))
-
-score = accuracy_score(y_test, model.predict(xaf_test))
-print('드랍 후 acc_score 결과: ', score)
-
-#-------------------------------------------------------------------------------------------------------------
-'''
-
 start = time.time()
 model.fit(x_train, y_train)
 end = time.time()
@@ -338,68 +272,10 @@ submission.to_csv(filepath + 'submission.csv', index = True)
 
 # print(HRS.best_params_)
 
-
-# submission 5번파일 랜포+halving
-# 스코어:  0.8746803069053708
-# 걸린 시간:  4.660583972930908
-
-# submission 6번파일 랜포+halving+랜덤시드 134로 바꿈
-# 스코어:  0.887468030690537
-# 걸린 시간:  4.499013185501099
-
-# submission 7번파일
-# (1564, 15) (1564, 15) + 랜포 디폴트 + 첨에 칼럼드랍 안했음
-# Thresh=0.028, n=15, R2: 88.24% 
-# 스코어:  0.8772378516624041
-# 걸린 시간:  0.16129612922668457
-
-# 드랍 후 테스트 스코어:  0.8772378516624041
-# 드랍 후 acc_score 결과:  0.8772378516624041
-
-# submission 8번파일
-# 스코어:  0.8746803069053708
-# 걸린 시간:  4.406193733215332
-
-# submission 9번파일 + 월급 제외
-# 스코어:  0.8976982097186701
-# 걸린 시간:  4.571194648742676
-
-# submission 10번파일 + 월급 제외 + 3 DurationOfPitch의 이상치 제거
-# 스코어:  0.9028132992327366
-# 걸린 시간:  4.258755207061768
-
-# ProductPitched 제거
-# 스코어:  0.9002557544757033
-# 걸린 시간:  4.518233060836792
-
-# 랜포 시드 704 travel3.dat
-# 스코어:  0.9053708439897699
-# 걸린 시간:  5.0596325397491455
-
-# 12
-# 스코어:  0.9028132992327366
-# 걸린 시간:  5.500649452209473
-
-# 13 m360_travel2
 # 스코어:  0.907928388746803
-# 걸린 시간:  5.145014524459839
+# 제출상으로는 좀 낮음
 
-# 14 m360_travel4 + occupation 중간값 + 랜포 704
-# 스코어:  0.907928388746803
-# 걸린 시간:  7.033788442611694
-
-# 15 m360_travel5 + occupation 놔둠 + 랜포 704
-# 스코어:  0.9053708439897699
-# 걸린 시간:  6.28637433052063
-
-# 16 m360_travel6 + ProductPitched 이상치 처리안함
-# 스코어:  0.9002557544757033
-# 걸린 시간:  6.224222183227539
-
-# 바꾸지 말고
-# 스코어:  0.9002557544757033
-# 제출 상 최고성적
-
+# 스코어:  0.9130434782608695
 
 '''
  #   Column                    Non-Null Count  Dtype
