@@ -21,13 +21,22 @@ x_train = scl.fit_transform(x_train)
 x_test = scl.transform(x_test)
 
 # 2. 모델
+# bayseian_params = {
+#     'colsample_bytree' : (0.5, 1),
+#     'max_depth' : (6,16),
+#     'min_child_weight' : (1, 50),
+#     'reg_alpha' : (0.01, 50),
+#     'reg_lambda' : (0.001, 1),
+#     'subsample' : (0.5, 1)
+# }
+
 bayseian_params = {
-    'colsample_bytree' : (0.5, 1),
-    'max_depth' : (6,16),
-    'min_child_weight' : (1, 50),
-    'reg_alpha' : (0.01, 50),
-    'reg_lambda' : (0.001, 1),
-    'subsample' : (0.5, 1)
+    'colsample_bytree' : (0.8, 1),
+    'max_depth' : (10,13),
+    'min_child_weight' : (20, 30),
+    'reg_alpha' : (15, 25),
+    'reg_lambda' : (0.1, 0.5),
+    'subsample' : (0.7, 1)
 }
 
 
@@ -55,15 +64,25 @@ lgb_bo = BayesianOptimization(f=lgb_function, pbounds=bayseian_params, random_st
 
 lgb_bo.maximize(init_points=3, n_iter=50)
 print(lgb_bo.max)
-# {'target': 0.9649122807017544, 'params': {'colsample_bytree': 0.9003559394136385, 'max_depth': 15.89580769784502, 
-#                                           'min_child_weight': 1.3889393871782438, 'reg_alpha': 2.4634258423625535, 
-#                                           'reg_lambda': 9.486715165377287, 'subsample': 0.6476197036705579}}
 
-model = XGBClassifier(colsample_bytree =max(min(0.6392938371195723,1),0) , max_depth=int(round(8.716836009702277)), min_child_weight =int(round(1.226851453564203)),
-                      reg_alpha= max(18.269721536243367,0), reg_lambda=max(0.7197495008157775,0), subsample=max(min(0.5846212920248922,1),0))
+# {'target': 0.956140350877193, 'params': {'colsample_bytree': 0.9903820991923078, 'max_depth': 12.848297385848632, 
+#                                          'min_child_weight': 24.565663172733686, 'reg_alpha': 19.611954734525586, 
+#                                          'reg_lambda': 0.34383483813471855, 'subsample': 0.8645248536920208}}
+
+# {'target': 0.956140350877193, 'params': {'colsample_bytree': 0.9392938371195724, 'max_depth': 10.858418004851139, 
+#                                          'min_child_weight': 22.26851453564203, 'reg_alpha': 20.513147690828912, 
+#                                          'reg_lambda': 0.3877875879142253, 'subsample': 0.8269319380373382}}
+
+
+
+
+
+model = XGBClassifier(n_estimators = 500, learning_rate= 0.02, colsample_bytree =max(min(0.9392938371195724,1),0) , max_depth=int(round(10.858418004851139)), min_child_weight =int(round(22.26851453564203)),
+                      reg_alpha= max(20.513147690828912,0), reg_lambda=max(0.3877875879142253,0), subsample=max(min(0.8269319380373382,1),0))
 
 model.fit(x_train, y_train)
 y_pred = model.predict(x_test)
 score = accuracy_score(y_test, y_pred)
 print(score)
 
+# 0.956140350877193
