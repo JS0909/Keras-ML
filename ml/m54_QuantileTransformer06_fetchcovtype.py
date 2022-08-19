@@ -37,7 +37,6 @@ for scl in sclist:
 
     if str(scl) == str(PowerTransformer(method='box-cox')):
         try:
-            scl = PowerTransformer(method='box-cox')
             x_train = scl.fit_transform(x_train)
         except:
             print('box-cox 안됨')
