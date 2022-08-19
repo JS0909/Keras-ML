@@ -56,8 +56,6 @@ df['worst area'] = np.log1p(df['worst area']) # 0.6696
 
 # 둘다 0.7063
 
-
-
 x_train, x_test, y_train, y_test = train_test_split(df, y, test_size=0.2, random_state=1234)
 
 # scl = StandardScaler()
