@@ -15,7 +15,7 @@ import time
 from sklearn.experimental import enable_halving_search_cv
 from sklearn.model_selection import train_test_split, StratifiedKFold,\
     HalvingRandomSearchCV, RandomizedSearchCV, GridSearchCV
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler, QuantileTransformer, PowerTransformer
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer, KNNImputer
 from imblearn.over_sampling import SMOTE
@@ -33,7 +33,7 @@ test = pd.read_csv(filepath+'test.csv', index_col=0)
 # print(train.isnull().sum())
 
 # 결측치 TypeofContact 빼고 중간값으로 대체함, 데이터 수치들 보면 중간값이 제일 무난할거 같음--------------------
-train['Age'].fillna(train['Age'].median(), inplace=True)
+train['Age'].fillna(train['Age'].mean(), inplace=True)
 train['TypeofContact'].fillna('N', inplace=True) # N으로 채운 이유: 콘택 타입 없는 건 '없음'으로 주고 처리하기 위해
 train['DurationOfPitch'].fillna(train['DurationOfPitch'].median(), inplace=True)
 train['NumberOfFollowups'].fillna(train['NumberOfFollowups'].median(), inplace=True)
@@ -42,7 +42,7 @@ train['NumberOfTrips'].fillna(train['NumberOfTrips'].median(), inplace=True)
 train['NumberOfChildrenVisiting'].fillna(train['NumberOfChildrenVisiting'].median(), inplace=True)
 train['MonthlyIncome'].fillna(train['MonthlyIncome'].median(), inplace=True)
 
-test['Age'].fillna(test['Age'].median(), inplace=True)
+test['Age'].fillna(test['Age'].mean(), inplace=True)
 test['TypeofContact'].fillna('N', inplace=True)
 test['DurationOfPitch'].fillna(test['DurationOfPitch'].median(), inplace=True)
 test['NumberOfFollowups'].fillna(test['NumberOfFollowups'].median(), inplace=True)
@@ -53,9 +53,9 @@ test['MonthlyIncome'].fillna(test['MonthlyIncome'].median(), inplace=True)
 # print(train.isnull().sum())
 #-----------------------------------------------------------------------------------------------------------
 
-scaler = MinMaxScaler()
-train[['Age','DurationOfPitch','MonthlyIncome']] = scaler.fit_transform(train[['Age','DurationOfPitch','MonthlyIncome']])
-test[['Age','DurationOfPitch','MonthlyIncome']] = scaler.transform(test[['Age','DurationOfPitch','MonthlyIncome']])
+# scaler = PowerTransformer()
+# train[['Age','DurationOfPitch','MonthlyIncome']] = scaler.fit_transform(train[['Age','DurationOfPitch','MonthlyIncome']])
+# test[['Age','DurationOfPitch','MonthlyIncome']] = scaler.transform(test[['Age','DurationOfPitch','MonthlyIncome']])
 
 # object타입 라벨인코딩--------------------
 le = LabelEncoder()
@@ -68,7 +68,6 @@ for i in idxarr:
         test[i] = le.fit_transform(test[i])
 # print(train.info())
 # ------------------------------------------
-
 
 # 피처임포턴스 그래프 보기 위해 데이터프레임형태의 x_, y_ 놔둠 / 훈련용 넘파이어레이형태의 x, y 생성-----------
 # x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
@@ -118,16 +117,16 @@ a13 = [  14,   59,   93,  105,  142,  167,  187,  203,  209,  218,  230,
        1739, 1750, 1783, 1791, 1818, 1822, 1823, 1856, 1870, 1887, 1899,
        1927]
 
-for i in range(len(a3)): # CityTier
+for i in range(len(a3)):
     x[a3[i]][3] = 20
 
 # x[485][4] = np.nan # Occupation
 
-# for i in range(len(a6)): # ProductPitched
-#     x[a6[i]][6] = np.nan
+for i in range(len(a6)): # ProductPitched
+    x[a6[i]][6] = np.nan
     
 for i in range(len(a10)): # NumberOfTrips
-    x[a10[i]][10] = 5.7
+    x[a10[i]][10] = 5
 
 for i in range(len(a13)): # Designation
     x[a13[i]][13] = np.nan
@@ -145,6 +144,7 @@ ipt = IterativeImputer(max_iter = 100, random_state = 254)
 # ipt = KNNImputer()
 x = ipt.fit_transform(x)
 x = np.array(x)
+
 
 parameters_xgb = {
             'n_estimators':[400],
@@ -175,25 +175,31 @@ xgb = XGBClassifier(tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0)
 rnf = RandomForestClassifier(random_state=704) # 704 : 0.9053708439897699
 
 # model = xgb
-model = rnf
+# model = rnf
 # model = RandomizedSearchCV(xgb, parameters_xgb, cv=6, n_jobs=-1, verbose=2)
-# model = GridSearchCV(rnf,  parameters_rnf, cv=5, n_jobs=-1, verbose=2)
-# model = make_pipeline(MinMaxScaler(), HRS)
-# model = make_pipeline(MinMaxScaler(), GridSearchCV(rnf, parameters_rnf, cv=5, n_jobs=-1, verbose=2))
+model = GridSearchCV(xgb,  parameters_rnf, cv=5, n_jobs=-1, verbose=2)
+# model = make_pipeline(MinMaxScaler(), GridSearchCV(xgb, parameters_rnf, cv=5, n_jobs=-1, verbose=2))
 # model = make_pipeline(MinMaxScaler(), xgb)
 # model = make_pipeline(MinMaxScaler(), rnf)
 
-# 3. 훈련
+
+
 import joblib
 joblib.dump(model,'D:\study_data\_data\dacon_travel\_dat/m360_travel6.dat')
 # model = joblib.load('D:\study_data\_data\dacon_travel\_dat/m360_travel2.dat')
 
 
+# 2. 모델
+
+
+start = time.time()
 model.fit(x_train, y_train)
+end = time.time()
 
 # 4. 평가, 예측
 results = model.score(x_test, y_test)
 print('스코어: ', results)
+print('걸린 시간: ', end-start)
 
 # 5. 제출 준비
 model.fit(x,y)
@@ -203,12 +209,11 @@ submission = pd.read_csv(filepath+'submission.csv', index_col=0)
 submission['ProdTaken'] = y_submit
 submission.to_csv(filepath + 'submission.csv', index = True)
 
-# print(HRS.best_params_)
+print(model.best_params_)
 
-# 스코어:  0.907928388746803
-# 제출상으로는 좀 낮음
 
-# 스코어:  0.9130434782608695
+
+
 
 '''
  #   Column                    Non-Null Count  Dtype
