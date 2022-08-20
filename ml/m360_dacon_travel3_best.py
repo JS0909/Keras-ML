@@ -107,7 +107,7 @@ parameters_rnf = {
     'min_samples_split':[2],
 }
 
-x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, random_state=999, shuffle=True)
+x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, random_state=998, shuffle=True)
 # print(np.unique(y_train, return_counts=True))
 
 # smote = SMOTE(random_state=1234)
@@ -116,7 +116,7 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, random
 
 # 2. 모델
 xgb = XGBClassifier(tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0)
-rnf = RandomForestClassifier(random_state=777) # 0.8951406649616368 / 1234  //  0.9028132992327366 // 777
+rnf = RandomForestClassifier(random_state=51) # 0.8951406649616368 / 1234  //  0.9028132992327366 // 777
 # 1267 / 스코어:  0.8900255754475703
 
 lg = LGBMClassifier()
@@ -142,14 +142,11 @@ joblib.dump(model,'D:\study_data\_data\dacon_travel\_dat/m360_travel6.dat')
 
 
 # 2. 모델
-start = time.time()
 model.fit(x_train, y_train)
-end = time.time()
 
 # 4. 평가, 예측
 results = model.score(x_test, y_test)
-ic(results)
-print('걸린 시간: ', end-start)
+print(results)
 
 # 5. 제출 준비
 model.fit(x,y)
@@ -168,6 +165,8 @@ submission.to_csv(filepath + 'submission.csv', index = True)
 # 스코어:  0.9028132992327366
 
 # ic| results: 0.9053708439897699 베스트
+
+# 0.907928388746803
 
 '''
  #   Column                    Non-Null Count  Dtype
