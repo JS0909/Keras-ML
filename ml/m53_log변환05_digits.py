@@ -50,8 +50,6 @@ plt.show()
 
 # df['magnesium'] = np.log1p(df['magnesium']) #  0.8946
 
-
-
 x_train, x_test, y_train, y_test = train_test_split(df, y, test_size=0.2, random_state=1234)
 
 # scl = StandardScaler()

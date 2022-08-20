@@ -50,3 +50,11 @@ for scl in sclist:
     print(scl.__class__.__name__+'결과: ', round(result,4))
 
 
+
+# StandardScaler결과:  0.9566
+# MinMaxScaler결과:  0.9567
+# MaxAbsScaler결과:  0.9564
+# RobustScaler결과:  0.9568
+# QuantileTransformer결과:  0.9571
+# PowerTransformer결과:  0.9563
+# box-cox 안됨
