@@ -167,7 +167,7 @@ submission.to_csv(filepath + 'submission.csv', index = True)
 # 1379
 # 스코어:  0.9028132992327366
 
-# ic| results: 0.9053708439897699
+# ic| results: 0.9053708439897699 베스트
 
 '''
  #   Column                    Non-Null Count  Dtype
