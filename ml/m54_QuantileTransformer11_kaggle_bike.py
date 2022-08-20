@@ -78,7 +78,7 @@ for scl in sclist:
     model.fit(x_train, y_train)
     y_pred = model.predict(x_test)
     result = r2_score(y_test, y_pred)
-    print(str(scl).strip('()')+'결과: ', round(result,4))
+    print(scl.__class__.__name__+'결과: ', round(result,4))
     
 
 
