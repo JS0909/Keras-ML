@@ -36,7 +36,7 @@ y_pred = model.predict(x_test)
 result = accuracy_score(y_test, y_pred)
 print('그냥 결과: ', round(result,4))
 
-# 0.9374
+# 0.9694
 
 #=================== 로그 변환 ======================
 df = pd.DataFrame(datasets.data, columns=[datasets.feature_names])
@@ -46,9 +46,9 @@ df.plot.box()
 plt.title('digits')
 plt.xlabel('Feature')
 plt.ylabel('데이터값')
-plt.show()
+# plt.show()
 
-# df['magnesium'] = np.log1p(df['magnesium']) #  0.8946
+df['pixel_7_4'] = np.log1p(df['pixel_7_4']) #  0.9694
 
 x_train, x_test, y_train, y_test = train_test_split(df, y, test_size=0.2, random_state=1234)
 
@@ -67,4 +67,6 @@ model.fit(x_train, y_train)
 y_pred = model.predict(x_test)
 result = accuracy_score(y_test, y_pred)
 print('로그 변환 결과: ', round(result,4))
+
+
 

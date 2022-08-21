@@ -107,7 +107,7 @@ parameters_rnf = {
     'min_samples_split':[2],
 }
 
-x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, random_state=998, shuffle=True)
+x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, random_state=999, shuffle=True)
 # print(np.unique(y_train, return_counts=True))
 
 # smote = SMOTE(random_state=1234)
@@ -167,6 +167,8 @@ submission.to_csv(filepath + 'submission.csv', index = True)
 # ic| results: 0.9053708439897699 베스트
 
 # 0.907928388746803
+
+# 0.8925831202046036
 
 '''
  #   Column                    Non-Null Count  Dtype
