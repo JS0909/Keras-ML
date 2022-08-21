@@ -157,7 +157,7 @@ print(results)
 # submission['ProdTaken'] = y_submit
 # submission.to_csv(filepath + 'submission.csv', index = True)
 
-print(model.best_params_)
+# print(model.best_params_)
 
 # 1379
 # 스코어:  0.9002557544757033
