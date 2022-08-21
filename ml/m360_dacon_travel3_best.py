@@ -122,16 +122,16 @@ rnf = RandomForestClassifier(random_state=51) # 0.8951406649616368 / 1234  //  0
 # 1267 / 스코어:  0.8900255754475703
 
 lg = LGBMClassifier()
-cat = CatBoostClassifier(verbose=0)
+cat = CatBoostClassifier(random_seed=0,learning_rate=0.5, verbose=0, bagging_temperature=66, subsample=0.5)
 
 # 3. 훈련
 # model = xgb
 # model = rnf
-# model = cat
+model = cat
 # model = VotingClassifier(estimators=[('XG', xgb), ('LG', lg), ('CAT', cat), ('RF', rnf)],
 #                          voting='soft', verbose=2)
 # model = GridSearchCV(xgb,  parameters_xgb, cv=6, n_jobs=-1, verbose=2)
-model = GridSearchCV(rnf,  parameters_rnf, cv=5, n_jobs=-1, verbose=2)
+# model = GridSearchCV(rnf,  parameters_rnf, cv=5, n_jobs=-1, verbose=2)
 # model = make_pipeline(MinMaxScaler(), HRS)
 # model = make_pipeline(MinMaxScaler(), GridSearchCV(rnf, parameters_rnf, cv=5, n_jobs=-1, verbose=2))
 # model = make_pipeline(MinMaxScaler(), xgb)
@@ -150,12 +150,12 @@ results = model.score(x_test, y_test)
 print(results)
 
 # 5. 제출 준비
-# model.fit(x,y)
-# y_submit = model.predict(test)
+model.fit(x,y)
+y_submit = model.predict(test)
 
-# submission = pd.read_csv(filepath+'submission.csv', index_col=0)
-# submission['ProdTaken'] = y_submit
-# submission.to_csv(filepath + 'submission.csv', index = True)
+submission = pd.read_csv(filepath+'submission.csv', index_col=0)
+submission['ProdTaken'] = y_submit
+submission.to_csv(filepath + 'submission.csv', index = True)
 
 # print(model.best_params_)
 
