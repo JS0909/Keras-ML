@@ -1,17 +1,16 @@
-from json import load
 from bayes_opt import BayesianOptimization
 from xgboost import XGBClassifier, XGBRegressor
 import numpy as np
 import warnings
 warnings.filterwarnings('ignore')
 
-from sklearn.datasets import load_boston
+from sklearn.datasets import fetch_california_housing
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, r2_score
 
 # 1. 데이터
-datasets = load_boston()
+datasets = fetch_california_housing()
 x, y = datasets.data, datasets.target
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=134, train_size=0.8)
@@ -31,12 +30,12 @@ x_test = scl.transform(x_test)
 # }
 
 bayseian_params = {
-    'colsample_bytree' : (0.5, 0.7),
-    'max_depth' : (10,18),
-    'min_child_weight' : (1, 10),
-    'reg_alpha' : (18, 25),
-    'reg_lambda' : (0.001, 0.01),
-    'subsample' : (0.5, 2)
+    'colsample_bytree' : (0.3, 0.9),
+    'max_depth' : (5,15),
+    'min_child_weight' : (15, 25),
+    'reg_alpha' : (0.01, 1),
+    'reg_lambda' : (0.01, 1),
+    'subsample' : (0.5, 1.5)
 }
 
 
@@ -65,22 +64,21 @@ lgb_bo = BayesianOptimization(f=lgb_function, pbounds=bayseian_params, random_st
 lgb_bo.maximize(init_points=3, n_iter=50)
 print(lgb_bo.max)
 
-# {'target': 0.8950011210156895, 'params': {'colsample_bytree': 0.5, 'max_depth': 16.0, 
-#                                           'min_child_weight': 1.0, 'reg_alpha': 20.672286248228946, 
-#                                           'reg_lambda': 0.001, 'subsample': 1.0}}
+# {'target': 0.8466475775331651, 'params': {'colsample_bytree': 0.65311540647911, 'max_depth': 10.816414070677556, 
+#                                           'min_child_weight': 21.02753480389905, 'reg_alpha': 0.2862378674095809, 
+#                                           'reg_lambda': 0.7080594884897791, 'subsample': 0.9730104828479126}}
 
-# {'target': 0.8998489902867821, 'params': {'colsample_bytree': 0.5891265430103463, 'max_depth': 11.546880229781138, 
-#                                           'min_child_weight': 1.0700731224688869, 'reg_alpha': 20.045355080648324, 
-#                                           'reg_lambda': 0.006682110747391839, 'subsample': 1.7005764032133333}}
+# {'target': 0.8465945485898457, 'params': {'colsample_bytree': 0.7330057357620108, 'max_depth': 13.783683510607842, 
+#                                           'min_child_weight': 15.034221970820731, 'reg_alpha': 0.9316372938750783, 
+#                                           'reg_lambda': 0.8363767216896922, 'subsample': 1.407362530421373}}
 
-
-model = XGBRegressor(n_estimators = 500, learning_rate= 0.02, colsample_bytree =max(min(0.5891265430103463,1),0) ,
-                     max_depth=int(round(11.546880229781138)), min_child_weight =int(round(1.0700731224688869)),
-                      reg_alpha= max(20.045355080648324,0), reg_lambda=max(0.006682110747391839,0), subsample=max(min(1.7005764032133333,1),0))
+model = XGBRegressor(n_estimators = 500, learning_rate= 0.02, colsample_bytree =max(min(0.65311540647911,1),0) ,
+                     max_depth=int(round(10.816414070677556)), min_child_weight =int(round(21.02753480389905)),
+                      reg_alpha= max(0.2862378674095809,0), reg_lambda=max(0.7080594884897791,0), subsample=max(min(0.9730104828479126,1),0))
 
 model.fit(x_train, y_train)
 y_pred = model.predict(x_test)
 score = r2_score(y_test, y_pred)
 print(score)
 
-# 0.8998489902867821
+# 0.8466475775331651

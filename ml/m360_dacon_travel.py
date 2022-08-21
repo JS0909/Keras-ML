@@ -400,6 +400,7 @@ submission.to_csv(filepath + 'submission.csv', index = True)
 # 스코어:  0.9002557544757033
 # 제출 상 최고성적
 
+# 0.9028132992327366
 
 '''
  #   Column                    Non-Null Count  Dtype

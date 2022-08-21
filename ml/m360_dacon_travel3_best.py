@@ -101,11 +101,13 @@ parameters_xgb = {
               } 
 
 parameters_rnf = {
-    'n_estimators':[400],
+    'n_estimators':[100],
     'max_depth':[None],
     'min_samples_leaf':[1],
-    'min_samples_split':[2],
+    'min_samples_split':[2]
 }
+
+
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, random_state=999, shuffle=True)
 # print(np.unique(y_train, return_counts=True))
@@ -124,13 +126,12 @@ cat = CatBoostClassifier(verbose=0)
 
 # 3. 훈련
 # model = xgb
-model = rnf
+# model = rnf
 # model = cat
 # model = VotingClassifier(estimators=[('XG', xgb), ('LG', lg), ('CAT', cat), ('RF', rnf)],
 #                          voting='soft', verbose=2)
-# model = RandomizedSearchCV(xgb, parameters_xgb, cv=6, n_jobs=-1, verbose=2)
 # model = GridSearchCV(xgb,  parameters_xgb, cv=6, n_jobs=-1, verbose=2)
-# model = GridSearchCV(rnf,  parameters_rnf, cv=5, n_jobs=-1, verbose=2)
+model = GridSearchCV(rnf,  parameters_rnf, cv=5, n_jobs=-1, verbose=2)
 # model = make_pipeline(MinMaxScaler(), HRS)
 # model = make_pipeline(MinMaxScaler(), GridSearchCV(rnf, parameters_rnf, cv=5, n_jobs=-1, verbose=2))
 # model = make_pipeline(MinMaxScaler(), xgb)
@@ -149,14 +150,14 @@ results = model.score(x_test, y_test)
 print(results)
 
 # 5. 제출 준비
-model.fit(x,y)
-y_submit = model.predict(test)
+# model.fit(x,y)
+# y_submit = model.predict(test)
 
-submission = pd.read_csv(filepath+'submission.csv', index_col=0)
-submission['ProdTaken'] = y_submit
-submission.to_csv(filepath + 'submission.csv', index = True)
+# submission = pd.read_csv(filepath+'submission.csv', index_col=0)
+# submission['ProdTaken'] = y_submit
+# submission.to_csv(filepath + 'submission.csv', index = True)
 
-# print(model.best_params_)
+print(model.best_params_)
 
 # 1379
 # 스코어:  0.9002557544757033
@@ -164,7 +165,7 @@ submission.to_csv(filepath + 'submission.csv', index = True)
 # 1379
 # 스코어:  0.9028132992327366
 
-# ic| results: 0.9053708439897699 베스트
+# results: 0.9053708439897699 베스트
 
 # 0.907928388746803
 

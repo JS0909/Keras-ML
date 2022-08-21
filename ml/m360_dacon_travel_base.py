@@ -107,10 +107,11 @@ test[['Age', 'DurationOfPitch', 'MonthlyIncome']] = scaler.transform(test[['Age'
 
 
 from sklearn.ensemble import RandomForestClassifier
+from xgboost import XGBClassifier
 from sklearn.model_selection import train_test_split
 
 # 모델 선언
-model = RandomForestClassifier(random_state=9)
+model = XGBClassifier(random_state=522)
 
 
 # 분석할 의미가 없는 칼럼을 제거합니다.

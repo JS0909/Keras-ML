@@ -47,7 +47,6 @@ train_set.drop('registered',axis=1,inplace=True) # registered 드랍 이유 모�
 
 x = train_set.drop(['count'], axis=1)
 y = train_set['count']
-x = np.array(x)
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=1234)
 

@@ -5,16 +5,16 @@ import numpy as np
 import warnings
 warnings.filterwarnings('ignore')
 
-from sklearn.datasets import load_boston
+from sklearn.datasets import load_digits
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, r2_score
 
 # 1. 데이터
-datasets = load_boston()
+datasets = load_digits()
 x, y = datasets.data, datasets.target
 
-x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=134, train_size=0.8)
+x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=134, train_size=0.8, stratify=y)
 
 scl = StandardScaler()
 x_train = scl.fit_transform(x_train)
@@ -31,12 +31,12 @@ x_test = scl.transform(x_test)
 # }
 
 bayseian_params = {
-    'colsample_bytree' : (0.5, 0.7),
-    'max_depth' : (10,18),
-    'min_child_weight' : (1, 10),
-    'reg_alpha' : (18, 25),
-    'reg_lambda' : (0.001, 0.01),
-    'subsample' : (0.5, 2)
+    'colsample_bytree' : (0.8, 1),
+    'max_depth' : (13,19),
+    'min_child_weight' : (1, 7),
+    'reg_alpha' : (0.005, 0.1),
+    'reg_lambda' : (0.5, 2.0),
+    'subsample' : (0.1, 1)
 }
 
 
@@ -53,10 +53,10 @@ def lgb_function(max_depth, min_child_weight,subsample, colsample_bytree, reg_la
     
     # *여러개의인자를받겠다
     # **키워드받겠다(딕셔너리형태)
-    model = XGBRegressor(**params)
+    model = XGBClassifier(**params)
     model.fit(x_train, y_train)
     y_pred = model.predict(x_test)
-    score = r2_score(y_test, y_pred)
+    score = accuracy_score(y_test, y_pred)
     
     return score
 
@@ -65,22 +65,22 @@ lgb_bo = BayesianOptimization(f=lgb_function, pbounds=bayseian_params, random_st
 lgb_bo.maximize(init_points=3, n_iter=50)
 print(lgb_bo.max)
 
-# {'target': 0.8950011210156895, 'params': {'colsample_bytree': 0.5, 'max_depth': 16.0, 
-#                                           'min_child_weight': 1.0, 'reg_alpha': 20.672286248228946, 
-#                                           'reg_lambda': 0.001, 'subsample': 1.0}}
+# {'target': 0.9777777777777777, 'params': {'colsample_bytree': 0.5, 'max_depth': 16.0, 
+#                                           'min_child_weight': 1.0, 'reg_alpha': 0.01, 
+#                                           'reg_lambda': 1.0, 'subsample': 0.5}}
 
-# {'target': 0.8998489902867821, 'params': {'colsample_bytree': 0.5891265430103463, 'max_depth': 11.546880229781138, 
-#                                           'min_child_weight': 1.0700731224688869, 'reg_alpha': 20.045355080648324, 
-#                                           'reg_lambda': 0.006682110747391839, 'subsample': 1.7005764032133333}}
+# {'target': 0.9722222222222222, 'params': {'colsample_bytree': 0.996152839676923, 'max_depth': 17.10897843150918, 
+#                                           'min_child_weight': 3.8855914089061656, 'reg_alpha': 0.0422511642284443, 
+#                                           'reg_lambda': 1.014767024226304, 'subsample': 0.7561447366456374}}
 
 
-model = XGBRegressor(n_estimators = 500, learning_rate= 0.02, colsample_bytree =max(min(0.5891265430103463,1),0) ,
-                     max_depth=int(round(11.546880229781138)), min_child_weight =int(round(1.0700731224688869)),
-                      reg_alpha= max(20.045355080648324,0), reg_lambda=max(0.006682110747391839,0), subsample=max(min(1.7005764032133333,1),0))
+
+model = XGBClassifier(n_estimators = 500, learning_rate= 0.02, colsample_bytree =max(min(0.5,1),0) , max_depth=int(round(16.0)), min_child_weight =int(round(1.0)),
+                      reg_alpha= max(0.01,0), reg_lambda=max(1.0,0), subsample=max(min(0.5,1),0))
 
 model.fit(x_train, y_train)
 y_pred = model.predict(x_test)
-score = r2_score(y_test, y_pred)
+score = accuracy_score(y_test, y_pred)
 print(score)
 
-# 0.8998489902867821
+# 0.9777777777777777
