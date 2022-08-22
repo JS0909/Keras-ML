@@ -75,8 +75,6 @@ print(lgb_bo.max)
 
 
 
-
-
 model = XGBClassifier(n_estimators = 500, learning_rate= 0.02, colsample_bytree =max(min(0.9392938371195724,1),0) , max_depth=int(round(10.858418004851139)), min_child_weight =int(round(22.26851453564203)),
                       reg_alpha= max(20.513147690828912,0), reg_lambda=max(0.3877875879142253,0), subsample=max(min(0.8269319380373382,1),0))
 
