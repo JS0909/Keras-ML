@@ -26,8 +26,13 @@ conda env list 명령어 치고 설치된거 확인
 	pip list
 	pip uninstall tensorflow
 
+	텐서플로우 버전확인
 	import tensorflow as tf
 	print(tf.__version__)
+
+	파이썬 버전확인
+	python -V
+
 
 
 	그래픽드라이버 버전 확인 명령어: nvidia-smi
@@ -45,3 +50,13 @@ conda activate D:/tmp/가상환경이름
 
 tf282gpu : 텐서플로 버전 282, 파이썬 3.9.7
 tf281cpu : 텐서플로 버전 281, 파이썬 3.9.12
+
+
+이 콘다에서 설치 가능한 파이썬 버전 확인
+conda search python
+
+가상환경 들어가기
+activate 가상환경이름
+
+!텐서플로 1은 pip 설치지원이 안되서 콘다 인스톨로 설치해야됨!
+conda install -c anaconda tensorflow==1.14
