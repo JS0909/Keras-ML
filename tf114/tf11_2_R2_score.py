@@ -36,7 +36,7 @@ for step in range(21):
 
 y_predict = x_test * w_v
 r2 = r2_score(y_test, y_predict)
-print('re: ', r2)
+print('r2: ', r2)
 
 mae = mean_absolute_error(y_test, y_predict)
 print('mae: ', mae)
@@ -44,5 +44,5 @@ print('mae: ', mae)
 sess.close()
     
     
-# re:  0.9999999999978115
+# r2:  0.9999999999978115
 # mae:  1.1920928955078125e-06

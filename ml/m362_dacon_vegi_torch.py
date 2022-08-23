@@ -37,10 +37,10 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 
 
 CFG = {
-    'EPOCHS':6,
+    'EPOCHS':7,
     'LEARNING_RATE':1e-3,
     'BATCH_SIZE':16,
-    'SEED':112
+    'SEED':1234
 }
 
 
@@ -298,10 +298,18 @@ with zipfile.ZipFile("submission.zip", 'w') as my_zip:
 
 # Train Loss : [0.27714] Valid Loss : [0.24321]
 
-# Train Loss : [0.28065] Valid Loss : [0.24487]
+# Train Loss : [0.28065] Valid Loss : [0.24487] / 리더보드 베스트
 # CFG = {
 #     'EPOCHS':6,
 #     'LEARNING_RATE':1e-3,
+#     'BATCH_SIZE':16,
+#     'SEED':106
+# }
+
+# Train Loss : [0.28042] Valid Loss : [0.24099]
+# CFG = {
+#     'EPOCHS':5,
+#     'LEARNING_RATE':2e-3,
 #     'BATCH_SIZE':16,
 #     'SEED':106
 # }
