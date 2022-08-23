@@ -39,9 +39,14 @@ with tf.compat.v1.Session() as sess:
     print('최종: ', step, loss_val, W_val, b_val)
 
 #================================= <Predict> ==============================================
-    x_data = [6, 7, 8]
+    x_test_data = [6, 7, 8]
     x_test = tf.compat.v1.placeholder(tf.float32, shape=[None])
 
     y_predict = x_test * W_val + b_val # y_predict = model.predict(x_test)
 
-    print('[6,7,8,] 예측: ', sess.run(y_predict, feed_dict={x_test:x_data}))
+    # print('[6,7,8,] 예측: ', sess.run(y_predict, feed_dict={x_test:x_test_data}))
+    print('[6,7,8,] 예측: ', sess.run(hypothesis, feed_dict={x_train:x_test_data,W:W_val,b:b_val}))
+    # y_predict를 새로 정의하지 않고 hypothesis로 predict 가능함!!
+    
+    # [6,7,8,] 예측:  [6.0002165 7.000307  8.000398 ]
+    # [6,7,8,] 예측:  [6.0002165 7.000307  8.000398 ]
