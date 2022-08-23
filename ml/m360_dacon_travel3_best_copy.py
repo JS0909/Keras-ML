@@ -90,26 +90,26 @@ le = LabelEncoder()
 idxarr = train.columns
 idxarr = np.array(idxarr)
 
-# for i in idxarr:
-#       if train[i].dtype == 'object':
-#         train[i] = le.fit_transform(train[i])
-#         test[i] = le.fit_transform(test[i])
-# print(train.info())
+for i in idxarr:
+      if train[i].dtype == 'object':
+        train[i] = le.fit_transform(train[i])
+        test[i] = le.fit_transform(test[i])
+print(train.info())
 # ------------------------------------------
 # 원핫인코더
-train = pd.get_dummies(train)
-test = pd.get_dummies(test)
+# train = pd.get_dummies(train)
+# test = pd.get_dummies(test)
 #-------------------------------------------
 
 # 피처임포턴스 그래프 보기 위해 데이터프레임형태의 x_, y_ 놔둠 / 훈련용 넘파이어레이형태의 x, y 생성-----------
-# x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
-x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar', 'MonthlyIncome'], axis=1)
+# x_ = train.drop(['ProdTaken','MonthlyIncome','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
+x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar', 'MonthlyIncome', 'NumberOfTrips','NumberOfFollowups'], axis=1)
 # x_ = train.drop(['ProdTaken'], axis=1)
 y_ = train['ProdTaken']
 # y = y.reshape(-1, 1) # y값 reshape 해야되서 x도 넘파이로 바꿔 훈련하는 것
 
-# test = test.drop(['NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
-test = test.drop(['NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar', 'MonthlyIncome'], axis=1)
+# test = test.drop(['MonthlyIncome','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
+test = test.drop(['NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar', 'MonthlyIncome', 'NumberOfTrips','NumberOfFollowups'], axis=1)
 test = np.array(test)
 # print(x.shape, y.shape)
 #-----------------------------------------------------------------------------------------------------------
@@ -152,8 +152,7 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, random
 
 # 2. 모델
 xgb = XGBClassifier(tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0)
-rnf = RandomForestClassifier(random_state=1234) # 0.8951406649616368 / 1234  //  0.9028132992327366 // 777
-# 1267 / 스코어:  0.8900255754475703
+rnf = RandomForestClassifier(random_state=1234)
 
 lg = LGBMClassifier()
 cat = CatBoostClassifier(random_seed=0,learning_rate=0.5, verbose=0, bagging_temperature=66, subsample=0.5)
@@ -210,6 +209,8 @@ submission.to_csv(filepath + 'submission.csv', index = True)
 # 0.8925831202046036
 
 # 0.9028132992327366
+
+# 0.9181585677749361 // rnf_randomstate= 1234
 
 '''
  #   Column                    Non-Null Count  Dtype

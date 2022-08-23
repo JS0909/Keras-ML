@@ -36,10 +36,13 @@ precent = [0.20,0.40,0.60,0.80]
 # print(train_df.columns.values)
 # print(train_df.isnull().sum())
 
-#  X_07, X_08, X_09
+#  'X_07', 'X_08', 'X_09'
  
 train_x = train_df.filter(regex='X') # Input : X Featrue
 train_y = train_df.filter(regex='Y') # Output : Y Feature
+
+train_x = train_x.drop(['X_07', 'X_08', 'X_09'], axis=1)
+test_x = test_x.drop(['X_07', 'X_08', 'X_09'], axis=1)
 
 cols = ["X_10","X_11"]
 train_x[cols] = train_x[cols].replace(0, np.nan)
@@ -53,6 +56,7 @@ imp = IterativeImputer(estimator = LinearRegression(),
                        imputation_order='roman')
 
 train_x = pd.DataFrame(imp.fit_transform(train_x))
+
 
 # print(train_x)
 
@@ -70,10 +74,12 @@ for idx, col in enumerate(submit.columns):
         continue
     submit[col] = preds[:,idx-1]
 
-submit.to_csv(path + 'submision.csv', index=False)
+submit.to_csv(path + 'submission.csv', index=False)
 
 
 
 # 0.28798862985210744
 
 # 0.38385531397806155 / 08
+
+# 0.3813003238320756
