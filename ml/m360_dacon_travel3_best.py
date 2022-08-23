@@ -16,7 +16,6 @@ from icecream import ic
 from sklearn.experimental import enable_halving_search_cv
 from sklearn.model_selection import train_test_split, StratifiedKFold,\
     HalvingRandomSearchCV, RandomizedSearchCV, GridSearchCV
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer, KNNImputer
 from imblearn.over_sampling import SMOTE
@@ -24,6 +23,8 @@ from sklearn.ensemble import BaggingClassifier, VotingClassifier
 from sklearn.linear_model import LogisticRegression
 from lightgbm import LGBMClassifier
 from catboost import CatBoostClassifier
+from sklearn.preprocessing import MinMaxScaler, StandardScaler, QuantileTransformer, PowerTransformer
+
 
 
 # 1. 데이터
@@ -36,7 +37,7 @@ test = pd.read_csv(filepath+'test.csv', index_col=0)
 # print(train.isnull().sum())
 
 # 결측치 TypeofContact 빼고 중간값으로 대체함, 데이터 수치들 보면 중간값이 제일 무난할거 같음--------------------
-train['Age'].fillna(train['Age'].median(), inplace=True)
+train['Age'].fillna(train['Age'].mean(), inplace=True)
 train['TypeofContact'].fillna('N', inplace=True) # N으로 채운 이유: 콘택 타입 없는 건 '없음'으로 주고 처리하기 위해
 train['DurationOfPitch'].fillna(train['DurationOfPitch'].median(), inplace=True)
 train['NumberOfFollowups'].fillna(train['NumberOfFollowups'].median(), inplace=True)
@@ -45,7 +46,7 @@ train['NumberOfTrips'].fillna(train['NumberOfTrips'].median(), inplace=True)
 train['NumberOfChildrenVisiting'].fillna(train['NumberOfChildrenVisiting'].median(), inplace=True)
 train['MonthlyIncome'].fillna(train['MonthlyIncome'].median(), inplace=True)
 
-test['Age'].fillna(test['Age'].median(), inplace=True)
+test['Age'].fillna(test['Age'].mean(), inplace=True)
 test['TypeofContact'].fillna('N', inplace=True)
 test['DurationOfPitch'].fillna(test['DurationOfPitch'].median(), inplace=True)
 test['NumberOfFollowups'].fillna(test['NumberOfFollowups'].median(), inplace=True)
@@ -56,14 +57,17 @@ test['MonthlyIncome'].fillna(test['MonthlyIncome'].median(), inplace=True)
 # print(train.isnull().sum())
 #-----------------------------------------------------------------------------------------------------------
 
+scaler = MinMaxScaler()
+train[['Age','DurationOfPitch','MonthlyIncome']] = scaler.fit_transform(train[['Age','DurationOfPitch','MonthlyIncome']])
+test[['Age','DurationOfPitch','MonthlyIncome']] = scaler.transform(test[['Age','DurationOfPitch','MonthlyIncome']])
+
+for these in [train, test]:
+    these['Gender'] = these['Gender'].map({'Male': 0, 'Female': 1, 'Fe Male': 1})
+
 # object타입 라벨인코딩--------------------
 le = LabelEncoder()
 idxarr = train.columns
 idxarr = np.array(idxarr)
-
-scaler = MinMaxScaler()
-train[['Age','DurationOfPitch','MonthlyIncome']] = scaler.fit_transform(train[['Age','DurationOfPitch','MonthlyIncome']])
-test[['Age','DurationOfPitch','MonthlyIncome']] = scaler.transform(test[['Age','DurationOfPitch','MonthlyIncome']])
 
 for i in idxarr:
       if train[i].dtype == 'object':
@@ -73,14 +77,14 @@ for i in idxarr:
 # ------------------------------------------
 
 # 피처임포턴스 그래프 보기 위해 데이터프레임형태의 x_, y_ 놔둠 / 훈련용 넘파이어레이형태의 x, y 생성-----------
-x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
-# x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar', 'MonthlyIncome'], axis=1)
+# x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
+x_ = train.drop(['ProdTaken','NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar', 'MonthlyIncome'], axis=1)
 # x_ = train.drop(['ProdTaken'], axis=1)
 y_ = train['ProdTaken']
 # y = y.reshape(-1, 1) # y값 reshape 해야되서 x도 넘파이로 바꿔 훈련하는 것
 
-test = test.drop(['NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
-# test = test.drop(['NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar', 'MonthlyIncome'], axis=1)
+# test = test.drop(['NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar'], axis=1) # 피처임포턴스로 확인한 중요도 낮은 탑3 제거
+test = test.drop(['NumberOfChildrenVisiting','NumberOfPersonVisiting','OwnCar', 'MonthlyIncome'], axis=1)
 test = np.array(test)
 # print(x.shape, y.shape)
 #-----------------------------------------------------------------------------------------------------------
@@ -126,8 +130,8 @@ cat = CatBoostClassifier(random_seed=0,learning_rate=0.5, verbose=0, bagging_tem
 
 # 3. 훈련
 # model = xgb
-# model = rnf
-model = cat
+model = rnf
+# model = cat
 # model = VotingClassifier(estimators=[('XG', xgb), ('LG', lg), ('CAT', cat), ('RF', rnf)],
 #                          voting='soft', verbose=2)
 # model = GridSearchCV(xgb,  parameters_xgb, cv=6, n_jobs=-1, verbose=2)
