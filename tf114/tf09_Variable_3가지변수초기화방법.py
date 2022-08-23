@@ -23,4 +23,5 @@ sess = tf.compat.v1.InteractiveSession()
 sess.run(tf.compat.v1.global_variables_initializer())
 ccc = 변수.eval() # 이 과정을 거쳐야 변수로 사용 가능
 print('ccc: ', ccc) # ccc:  [-0.13862522]
+sess.close()
 
