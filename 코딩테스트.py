@@ -2,8 +2,7 @@ import numpy as np
 
 def solution(number, k):
     
-    num_str = str(number)
-    nl = list(num_str)
+    nl = list(number)
     
     for i in range(len(nl)):
         nl[i] = int(nl[i])
@@ -27,6 +26,6 @@ def solution(number, k):
     answer = ''.join(new_list)
     return answer
     
-print(solution(1924,2))
-print(solution(1231234,3))
-print(solution(4177252841,4))
+print(solution('1924',2))
+print(solution('1231234',3))
+print(solution('4177252841',4))
