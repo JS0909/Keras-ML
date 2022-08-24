@@ -12,7 +12,7 @@ def solution(number, k):
     count = len(nl)-k # 현재 숫자들 개수에서 k개를 뺀 것만큼의 길이로 숫자를 만들거니까
     idx = 0           # 초기 인덱스 값 줌
     new_list = []     # 답이 될 숫자들을 넣을 공간
-    for i in range(len(nl)): # 입력받은 숫자길이만큼 반복할 것
+    while nl: # 입력받은 숫자길이만큼 반복할 것
         now_list = nl[idx:len(nl)-(count-1)] # 비교할 범위를 정해줄때 원래 숫자리스트에서 지금 count보다 -1개만큼 뒤에 남겨놔야됨, 그래야 남은 숫자를 뽑지
         idx = np.argmax(now_list)+idx        # 쉽게 말하면 1259에서 count가 2라면 처음 돌땐 125에서만 제일 큰 값을 뽑아야 적어도 다음에 뽑을 하나가 남을 수 있음
         new_list.append(nl[idx])             # 지정한 범위에서 제일 큰 곳의 인덱스 값을 반환해주고 해당 자리의 숫자를 답이 될 공간에 저장함                      
