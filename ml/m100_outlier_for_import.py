@@ -16,7 +16,7 @@ def outliers(data_out):
     print(upper_bound)
     return np.where((data_out>upper_bound) | (data_out<lower_bound))
 
-
+outliers_list=[]
 def outliers_printer(dataset):
     plt.figure(figsize=(10,8))
     for i in range(dataset.shape[1]):
@@ -26,6 +26,7 @@ def outliers_printer(dataset):
         plt.subplot(math.ceil(dataset.shape[1]/2),2,i+1)
         plt.boxplot(col)
         plt.title(i)
+        outliers_list.append([outliers_loc[0]])
         
     plt.show()
     

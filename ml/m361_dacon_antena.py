@@ -36,7 +36,6 @@ precent = [0.20,0.40,0.60,0.80]
 # print(train_df.columns.values)
 # print(train_df.isnull().sum())
 
-#  'X_07', 'X_08', 'X_09'
  
 train_x = train_df.filter(regex='X') # Input : X Featrue
 train_y = train_df.filter(regex='Y') # Output : Y Feature
