@@ -1,4 +1,4 @@
-
+import numpy as np
 
 def solution(number, k):
     
@@ -7,16 +7,24 @@ def solution(number, k):
     
     for i in range(len(nl)):
         nl[i] = int(nl[i])
-        
+    # 숫자를 하나하나 요소의 리스트로 만들었음
+    
     count = len(nl)-k
+    idx = 0
+    new_list = []
+    for i in range(len(nl)):
+        now_list = nl[idx:len(nl)-(count-1)]
+        idx = np.argmax(now_list)+idx
+        new_list.append(nl[idx])
+        count -= 1
+        idx += 1        
+        if count==0:
+            break
     
-    
-    ans_num=[]
-    for i in range(len(nl)-k):
-        ans_num.append(str(nl[i]))
-    
-    
-    answer = ''.join(ans_num)
+    for i in range(len(new_list)):
+        new_list[i] = str(new_list[i])
+
+    answer = ''.join(new_list)
     return answer
     
 print(solution(1924,2))
