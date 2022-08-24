@@ -46,7 +46,7 @@ print('최종: ', cost_val, hy_val)
 
 # 4. 평가, 예측
 predict = tf.cast(hypothesis>=0.5, dtype=tf.float32)
-_, y_predict, _ = sess.run([hypothesis,predict,accuracy], feed_dict={x:x_test, y:y_test})
+y_predict= sess.run([hypothesis], feed_dict={x:x_test, y:y_test})
 acc = accuracy_score(y_data, np.round(y_predict))
 print('acc: ', acc)
 
