@@ -151,5 +151,5 @@ x_test = tf.compat.v1.placeholder(tf.float32, shape=[None])
 
 y_predict = x_test * W_val + b_val # y_predict = model.predict(x_test)
 
-print('[6,7,8] 예측: ', sess.run(y_predict, feed_dict={x_test:x_test_data}))
+print('[6,7,8] 예측: ', y_predict.eval(feed_dict={x_test:x_test_data}))
 
