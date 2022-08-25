@@ -55,7 +55,7 @@ parameters_rnf = {'n_estimators':[400],'max_depth':[None],'min_samples_leaf':[1]
 # 2. 모델
 xg = XGBRegressor(n_estimators=100, learning_rate=1, max_depth=2, gamma=0, min_child_weight=1, subsample=1, colsample_bytree=0.5, 
                    colsample_bylevel=1, colsample_bynode=1, reg_alpha=0.01,
-                   tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0, random_state=1234,)
+                   tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0, random_state=1234)
 lg = LGBMRegressor()
 cat = CatBoostRegressor(verbose=0)
 rf = RandomForestRegressor(n_estimators=400, max_depth=None, min_samples_leaf=1 ,min_samples_split=2)

@@ -23,3 +23,6 @@ parameters_xgb={
     'reg_alpha':[0,0.1,0.01,0.001,1,2,10],
     'reg_lambda':[0,0.1,0.01,0.001,1,2,10]
     }
+
+~ 글카로 돌리기 ~
+tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0, random_state=1234
