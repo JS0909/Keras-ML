@@ -127,8 +127,7 @@ lead_outlier_index = np.concatenate((
                             train_01, #1 : 1145
                             # train_02, #2 : 6587
                             train_03, #3 : 699
-                            # train_04, #4 : 0
-                            # train_05, #5 : 0
+                            
                             train_06, #6 : 419
                             # train_07, #7 : 2052
                             # train_08, #8 : 8193
@@ -148,7 +147,7 @@ lead_outlier_index = np.concatenate((
                             
                             train_21, #21 : 61
                             train_22, #22 : 20
-                            # train_23, #23 : 0
+                            
                             train_24, #24 : 64
                             train_25, #25 : 135
                             train_26, #26 : 229
@@ -160,10 +159,7 @@ lead_outlier_index = np.concatenate((
                             train_31, #31 : 1848
                             train_32, #32 : 1862
                             # train_33, #33 : 3942
-                            # train_34, #34 : 0
-                            # train_35, #35 : 0
-                            # train_36, #36 : 0
-                            # train_37, #37 : 0
+                           
                             train_38, #38 : 1524
                             train_39, #39 : 1499
                             train_40, #40 : 1449
@@ -174,8 +170,7 @@ lead_outlier_index = np.concatenate((
                             train_44, #44 : 255
                             train_45, #45 : 59
                             # train_46, #46 : 5519
-                            # train_47, #47 : 0
-                            # train_48, #48 : 0
+                            
                             train_49, #49 : 2826
                             train_50, #50 : 464
                             
