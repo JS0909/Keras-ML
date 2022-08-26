@@ -124,62 +124,62 @@ train_56 = outliers(train_x['X_56'])[0]
 #     print(i+1, ':', len(t))
 
 lead_outlier_index = np.concatenate((
-                            train_01, #1 : 1145
-                            # train_02, #2 : 6587
-                            train_03, #3 : 699
+                            # train_01, #1 : 1145
+                            train_02, #2 : 6587
+                            # train_03, #3 : 699
                             
-                            train_06, #6 : 419
-                            # train_07, #7 : 2052
-                            # train_08, #8 : 8193
+                            # train_06, #6 : 419
+                            train_07, #7 : 2052
+                            train_08, #8 : 8193
                             train_09, #9 : 1400
-                            train_10, #10 : 783
+                            # train_10, #10 : 783
                             
-                            train_11, #11 : 878
-                            train_12, #12 : 315
-                            train_13, #13 : 820
-                            train_14, #14 : 282
-                            train_15, #15 : 60
-                            train_16, #16 : 257
-                            train_17, #17 : 513
-                            train_18, #18 : 247
-                            train_19, #19 : 152
-                            train_20, #20 : 18
+                            # train_11, #11 : 878
+                            # train_12, #12 : 315
+                            # train_13, #13 : 820
+                            # train_14, #14 : 282
+                            # train_15, #15 : 60
+                            # train_16, #16 : 257
+                            # train_17, #17 : 513
+                            # train_18, #18 : 247
+                            # train_19, #19 : 152
+                            # train_20, #20 : 18
                             
-                            train_21, #21 : 61
-                            train_22, #22 : 20
+                            # train_21, #21 : 61
+                            # train_22, #22 : 20
                             
-                            train_24, #24 : 64
-                            train_25, #25 : 135
-                            train_26, #26 : 229
-                            train_27, #27 : 589
+                            # train_24, #24 : 64
+                            # train_25, #25 : 135
+                            # train_26, #26 : 229
+                            # train_27, #27 : 589
                             train_28, #28 : 1034
                             train_29, #29 : 1168
-                            # train_30, #30 : 5926
+                            train_30, #30 : 5926
                             
                             train_31, #31 : 1848
                             train_32, #32 : 1862
-                            # train_33, #33 : 3942
+                            train_33, #33 : 3942
                            
                             train_38, #38 : 1524
                             train_39, #39 : 1499
                             train_40, #40 : 1449
                             
-                            train_41, #41 : 550
-                            train_42, #42 : 209
-                            train_43, #43 : 246
-                            train_44, #44 : 255
-                            train_45, #45 : 59
-                            # train_46, #46 : 5519
+                            # train_41, #41 : 550
+                            # train_42, #42 : 209
+                            # train_43, #43 : 246
+                            # train_44, #44 : 255
+                            # train_45, #45 : 59
+                            train_46, #46 : 5519
                             
                             train_49, #49 : 2826
-                            train_50, #50 : 464
+                            # train_50, #50 : 464
                             
-                            train_51, #51 : 487
-                            train_52, #52 : 442
-                            train_53, #53 : 423
-                            train_54, #54 : 411
-                            train_55, #55 : 384
-                            train_56  #56 : 433
+                            # train_51, #51 : 487
+                            # train_52, #52 : 442
+                            # train_53, #53 : 423
+                            # train_54, #54 : 411
+                            # train_55, #55 : 384
+                            # train_56  #56 : 433
     
     ),axis=None)
 
@@ -199,30 +199,30 @@ print(train_x.shape, train_y.shape)
 
 x_train, x_test, y_train, y_test = train_test_split(train_x, train_y, train_size=0.85, random_state=1234)
 
-
+'''
 # 베이지안옵티마이제이션-------------------------------------------------------------------------------------------------------------------
-bayseian_params = {
-    'colsample_bytree' : (0.5, 1),
-    'max_depth' : (6,16),
-    'min_child_weight' : (1, 50),
-    'reg_alpha' : (0.01, 50),
-    'reg_lambda' : (0.001, 1),
-    'subsample' : (0.5, 1)
-}
-
 # bayseian_params = {
-#     'colsample_bytree' : (0.7, 1.5),
-#     'max_depth' : (5,15),
-#     'min_child_weight' : (4, 11),
-#     'reg_alpha' : (15, 35),
-#     'reg_lambda' : (0.3, 1.5),
-#     'subsample' : (0.2, 1.3)
+#     'colsample_bytree' : (0.5, 1),
+#     'max_depth' : (6,16),
+#     'min_child_weight' : (1, 50),
+#     'reg_alpha' : (0.01, 50),
+#     'reg_lambda' : (0.001, 1),
+#     'subsample' : (0.5, 1)
 # }
+
+bayseian_params = {
+    'colsample_bytree' : (0.2, 1),
+    'max_depth' : (13,20),
+    'min_child_weight' : (0.5,5),
+    'reg_alpha' : (0.005,2),
+    'reg_lambda' : (0.0007, 0.1),
+    'subsample' : (0.2, 1.3)
+}
 
 
 def lgb_function(max_depth, min_child_weight,subsample, colsample_bytree, reg_lambda,reg_alpha):
     params ={
-        'n_estimators' : 500, 'learning_rate' : 0.02,
+        'n_estimators' : 150, 'learning_rate' : 0.02,
         'max_depth' : int(round(max_depth)),                    # 정수만
         'min_child_weight' : int(round(min_child_weight)),
         'subsample' : max(min(subsample,1),0),                  # 0~1 사이값만
@@ -242,13 +242,20 @@ def lgb_function(max_depth, min_child_weight,subsample, colsample_bytree, reg_la
 
 lgb_bo = BayesianOptimization(f=lgb_function, pbounds=bayseian_params, random_state=123)
 
-lgb_bo.maximize(init_points=3, n_iter=50)
+lgb_bo.maximize(init_points=3, n_iter=100)
 print(lgb_bo.max)
-#----------------------------------------------------------------------------------------------------------------------------------
+# {'target': -1.6002992959736153, 'params': {'colsample_bytree': 0.5, 'max_depth': 16.0, 
+#                                            'min_child_weight': 1.0, 'reg_alpha': 0.01, 
+#                                            'reg_lambda': 0.001, 'subsample': 0.5}}
 
+# {'target': -1.5939652333716374, 'params': {'colsample_bytree': 0.7243530482527165, 'max_depth': 18.8916304773852, 
+#                                            'min_child_weight': 5.0, 'reg_alpha': 0.005, 'reg_lambda': 0.0007, 
+#                                            mbda': 0.0007, 'subsample': 1.3}}
+#----------------------------------------------------------------------------------------------------------------------------------
+'''
 
 # 2. 모델
-model = MultiOutputRegressor(XGBRegressor(n_estimators=100, learning_rate=0.08, gamma = 0, subsample=0.75, colsample_bytree = 1, max_depth=7,
+model = MultiOutputRegressor(XGBRegressor(n_estimators=200, learning_rate=0.08, gamma = 0, subsample=0.75, colsample_bytree = 1, max_depth=7
                                          ))
 
 # 3. 훈련
@@ -282,3 +289,25 @@ submit.to_csv(path + 'submission.csv', index=False)
 # 0.3813003238320756
 
 # 0.38400226638667195
+
+# r2: 0.053852039194707504   100
+# 0.47303930841399816
+
+# r2: 0.05701061203625298  100 임퓨터x
+# 0.47080953501769623
+
+# r2: 0.05361191119799673  250
+# 0.5312149633638866
+
+# 300
+# r2: 0.05039903157066528
+# 0.5813124950916325
+
+# 400
+# r2: 0.04361099921639766
+# 0.6594191715984045
+
+# 500
+# r2: 0.03758423104341802
+# 0.7137545530514765
+

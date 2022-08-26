@@ -97,6 +97,18 @@ test_set['NumberOfChildrenVisiting'].fillna(test_set.groupby('MaritalStatus')['N
 train_set.loc[ train_set['Gender'] =='Fe Male' , 'Gender'] = 'Female'
 test_set.loc[ test_set['Gender'] =='Fe Male' , 'Gender'] = 'Female'
 cols = ['TypeofContact','Occupation','Gender','ProductPitched','MaritalStatus','Designation']
+
+#===================================================================
+# 천원받는 행 삭제
+# didx = train_set.loc[train_set['MonthlyIncome']<=1000].index
+# train_set.drop(didx, inplace=True)
+
+# 프리랜서 한명 삭제
+# didx = train_set.loc[train_set['Occupation']=='Free Lancer'].index
+# train_set.drop(didx, inplace=True)
+# 안한 게 나음
+#===================================================================
+
 from sklearn.preprocessing import LabelEncoder
 from tqdm import tqdm_notebook
 
@@ -105,6 +117,9 @@ for col in tqdm_notebook(cols):
     train_set[col]=le.fit_transform(train_set[col])
     test_set[col]=le.fit_transform(test_set[col])
 # print(train_set['TypeofContact'])
+
+
+
 def outliers(data_out):
     quartile_1, q2 , quartile_3 = np.percentile(data_out,
                                                [25,50,75]) # percentile 백분위
