@@ -16,6 +16,7 @@ def outliers(data_out):
     print(upper_bound)
     return np.where((data_out>upper_bound) | (data_out<lower_bound))
 
+
 outliers_list=[]
 def outliers_printer(dataset):
     plt.figure(figsize=(10,8))
