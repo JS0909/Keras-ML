@@ -8,5 +8,4 @@ print(aaa.shape)
 print(aaa)
 
 import m100_outlier_for_import as m100
-
 m100.outliers_printer(aaa)
