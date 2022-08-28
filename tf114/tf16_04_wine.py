@@ -53,5 +53,6 @@ print('acc: ', acc)
 mae = mean_absolute_error(np.argmax(y_test, axis=1), np.argmax(y_pred, axis=1))
 print('mae: ', mae)
 
+
 # acc:  0.7777777777777778
 # mae:  0.25
