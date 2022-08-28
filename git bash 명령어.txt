@@ -1,0 +1,14 @@
+<git bash 기본 커밋방법>
+git add . : 변경사항 스테이징
+git status : 변경사항 확인
+git commit -m '커밋할때쓰는메시지'
+git push origin 커밋할브랜치명
+
+<branch 관리방법>
+git branch 새브랜치명 : 새브랜치명으로 새로운 브랜치 생성
+git branch : 브랜치 목록 및 현재브랜치 확인
+git checkout 브랜치명 : 해당 브랜치로 들어감
+
+<폴더에서 바로 VS코드 열기>
+해당 폴더에서 우클릭, git bash 열기
+code .
