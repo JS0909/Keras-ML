@@ -1,3 +1,4 @@
+from requests import Session
 import tensorflow as tf
 from sklearn.metrics import accuracy_score, r2_score, mean_absolute_error
 import numpy as np
@@ -28,24 +29,26 @@ optimizer = tf.train.GradientDescentOptimizer(learning_rate=1e-1)
 train = optimizer.minimize(loss)
 
 # 3-2. 훈련
-with tf.compat.v1.Session() as sess:
-    sess.run(tf.global_variables_initializer())
-    
-    epochs = 1001
-    for step in range(epochs):
-        _, hy_val, cost_val = sess.run([train,hypothesis,loss], feed_dict={x:x_data, y:y_data})
-        if step%20 == 0:
-            print(step, cost_val, hy_val)
-            
-    print('최종: ', cost_val, hy_val)
+sess = tf.compat.v1.Session()
+sess.run(tf.global_variables_initializer())
 
-    y_predict = sess.run(tf.cast(hy_val>=0.5, dtype=tf.float32))
-    # tf.cast: 해당 조건이 참이면 1, 아니면 0 반환
-    # tf형이기 때문에 cast도 run 쳐줘야됨
+epochs = 1001
+for step in range(epochs):
+    _, hy_val, cost_val = sess.run([train,hypothesis,loss], feed_dict={x:x_data, y:y_data})
+    if step%20 == 0:
+        print(step, cost_val, hy_val)
+        
+print('최종: ', cost_val, hy_val)
 
-    acc = accuracy_score(y_data, y_predict)
-    print('acc: ', acc)
+y_predict = sess.run(tf.cast(hy_val>=0.5, dtype=tf.float32))
+# tf.cast: 해당 조건이 참이면 1, 아니면 0 반환
+# tf형이기 때문에 cast도 run 쳐줘야됨
 
-    mae = mean_absolute_error(y_data, hy_val)
-    print('mae: ', mae)
+acc = accuracy_score(y_data, y_predict)
+print('acc: ', acc)
 
+mae = mean_absolute_error(y_data, hy_val)
+print('mae: ', mae)
+
+# acc:  1.0
+# mae:  0.11115226149559021

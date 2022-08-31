@@ -8,7 +8,7 @@ from tensorflow.python.keras.callbacks import EarlyStopping
 from sklearn.preprocessing import MinMaxScaler
 
 # 1. 데이터
-path = './_data/ddarung/'
+path = 'D:/study_data/_data/ddarung/'
 train_set = pd.read_csv(path+'train.csv',index_col=0) # index_col = n : n번째 칼럼을 인덱스로 인식
 # print(train_set)
 # print(train_set.shape) # (1459, 10)

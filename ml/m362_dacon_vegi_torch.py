@@ -37,7 +37,7 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 
 
 CFG = {
-    'EPOCHS':6,
+    'EPOCHS':10,
     'LEARNING_RATE':1e-3,
     'BATCH_SIZE':16,
     'SEED':106
@@ -141,7 +141,7 @@ val_loader = DataLoader(val_dataset, batch_size=CFG['BATCH_SIZE'], shuffle=False
 class BaseModel(nn.Module):
     def __init__(self):
         super(BaseModel, self).__init__()
-        self.lstm = nn.LSTM(input_size=37, hidden_size=256, batch_first=True, bidirectional=False)
+        self.lstm = nn.LSTM(input_size=37, hidden_size=256, batch_first=True, bidirectional=False, dropout=0.2)
         self.classifier = nn.Sequential(
             nn.Linear(256, 1),
         )

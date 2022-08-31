@@ -21,15 +21,37 @@ scaler = MinMaxScaler()
 x_train = scaler.fit_transform(x_train)
 x_test = scaler.transform(x_test)
 
-
+# 2. 모델 / sigmoid
 x = tf.compat.v1.placeholder(tf.float32, shape=[None, 30])
 y = tf.compat.v1.placeholder(tf.float32, shape=[None, 1])
 
-w = tf.compat.v1.Variable(tf.compat.v1.zeros([30,1]), name='weight')
-b = tf.compat.v1.Variable(tf.compat.v1.zeros([1]), name='bias')
+w = tf.compat.v1.Variable(tf.compat.v1.zeros([30,5]), name='weight')
+b = tf.compat.v1.Variable(tf.compat.v1.zeros([5]), name='bias')
+hidden = tf.compat.v1.nn.relu(tf.compat.v1.matmul(x, w) + b)
 
-# 2. 모델 / sigmoid
-hypothesis = tf.compat.v1.sigmoid(tf.compat.v1.matmul(x, w) + b)
+w = tf.compat.v1.Variable(tf.compat.v1.zeros([5,50]), name='weight')
+b = tf.compat.v1.Variable(tf.compat.v1.zeros([50]), name='bias')
+hidden = tf.compat.v1.matmul(hidden, w) + b
+
+w = tf.compat.v1.Variable(tf.compat.v1.zeros([50,40]), name='weight')
+b = tf.compat.v1.Variable(tf.compat.v1.zeros([40]), name='bias')
+hidden = tf.compat.v1.nn.relu(tf.compat.v1.matmul(hidden, w) + b)
+
+w = tf.compat.v1.Variable(tf.compat.v1.zeros([40,100]), name='weight')
+b = tf.compat.v1.Variable(tf.compat.v1.zeros([100]), name='bias')
+hidden = tf.compat.v1.nn.relu(tf.compat.v1.matmul(hidden, w) + b)
+
+w = tf.compat.v1.Variable(tf.compat.v1.zeros([100,20]), name='weight')
+b = tf.compat.v1.Variable(tf.compat.v1.zeros([20]), name='bias')
+hidden = tf.compat.v1.nn.relu(tf.compat.v1.matmul(hidden, w) + b)
+
+w = tf.compat.v1.Variable(tf.compat.v1.zeros([20,10]), name='weight')
+b = tf.compat.v1.Variable(tf.compat.v1.zeros([10]), name='bias')
+hidden = tf.compat.v1.nn.relu(tf.compat.v1.matmul(hidden, w) + b)
+
+w = tf.compat.v1.Variable(tf.compat.v1.zeros([10,1]), name='weight')
+b = tf.compat.v1.Variable(tf.compat.v1.zeros([1]), name='bias')
+hypothesis = tf.compat.v1.sigmoid(tf.compat.v1.matmul(hidden, w) + b)
 
 # 3-1. 컴파일
 loss = -tf.reduce_mean(y*tf.log(hypothesis)+(1-y)*tf.log(1-hypothesis)) # binary_crossentropy
@@ -42,7 +64,7 @@ train = optimizer.minimize(loss)
 sess = tf.compat.v1.Session()
 sess.run(tf.global_variables_initializer())
 
-epochs = 101
+epochs = 1001
 for step in range(epochs):
     _, hy_val, cost_val, b_val = sess.run([train,hypothesis,loss,b], feed_dict={x:x_train, y:y_train})
     if step%20 == 0:
@@ -60,5 +82,5 @@ print('mae: ', mae)
 
 sess.close()
 
-# acc:  0.8043956043956044
-# mae:  0.24995636156643705
+# acc:  0.6263736263736264
+# mae:  0.24999260398557477

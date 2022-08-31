@@ -87,12 +87,12 @@ print(test_pred.shape) # (195, 1)
 
 
 
-test1 = pd.read_csv(path+'test_target/TEST_01.csv', index_col=False)
-test1['rate'] = test_pred[:30][0]
+test1 = pd.read_csv(path+'test_target/TEST_01.csv', index_col=False) # 29
+test1['rate'] = test_pred[:len(test1)][0]
 test1.to_csv(test_target+'test_target/TEST_01.csv', index=False)
 
-test2 = pd.read_csv(test_target+'test_target/TEST_02.csv', index_col=False)
-test2['rate'] = test_pred[30:30+35][0]
+test2 = pd.read_csv(test_target+'test_target/TEST_02.csv', index_col=False) # 35
+test2['rate'] = test_pred[len(test1):len(test1)+len(test2)][0]
 test2.to_csv(test_target+'test_target/TEST_02.csv', index=False)
 
 
@@ -130,7 +130,7 @@ test6.to_csv(test_target+'test_target/TEST_06.csv', index=False)
 import zipfile
 filelist = ['TEST_01.csv','TEST_02.csv','TEST_03.csv','TEST_04.csv','TEST_05.csv', 'TEST_06.csv']
 os.chdir("D:\study_data\_data\dacon_vegi/test_target")
-with zipfile.ZipFile("submission.zip", 'w') as my_zip:
+with zipfile.ZipFile("submissionKeras.zip", 'w') as my_zip:
     for i in filelist:
         my_zip.write(i)
     my_zip.close()
