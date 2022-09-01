@@ -12,6 +12,7 @@ import pandas as pd
 import numpy as np
 import optuna
 from optuna import Trial, visualization
+from optuna.visualization import plot_parallel_coordinate
 from optuna.samplers import TPESampler
 
 #1. 데이터
@@ -57,7 +58,7 @@ train_set['Age']=np.round(train_set['Age'],0).astype(int)
 test_set['Age']=np.round(test_set['Age'],0).astype(int)
 
 # print(train_set.isnull().sum()) #(1955, 19)
-print(train_set[train_set['MonthlyIncome'].notnull()].groupby(['Designation'])['MonthlyIncome'].mean())
+# print(train_set[train_set['MonthlyIncome'].notnull()].groupby(['Designation'])['MonthlyIncome'].mean())
 
 train_set['MonthlyIncome'].fillna(train_set.groupby('Designation')['MonthlyIncome'].transform('mean'), inplace=True)
 test_set['MonthlyIncome'].fillna(test_set.groupby('Designation')['MonthlyIncome'].transform('mean'), inplace=True)
@@ -87,15 +88,11 @@ for dataset in combine:
     dataset.loc[ dataset['Age'] > 52.4, 'Age'] = 4
 # train_set = train_set.drop(['AgeBand'], axis=1)
 
-# print(train_set[train_set['NumberOfTrips'].notnull()].groupby(['DurationOfPitch'])['PreferredPropertyStar'].mean())
 train_set['NumberOfTrips'].fillna(train_set.groupby('DurationOfPitch')['NumberOfTrips'].transform('mean'), inplace=True)
 test_set['NumberOfTrips'].fillna(test_set.groupby('DurationOfPitch')['NumberOfTrips'].transform('mean'), inplace=True)
-# print(train_set[train_set['NumberOfChildrenVisiting'].notnull()].groupby(['MaritalStatus'])['NumberOfChildrenVisiting'].mean())
 train_set['NumberOfChildrenVisiting'].fillna(train_set.groupby('MaritalStatus')['NumberOfChildrenVisiting'].transform('mean'), inplace=True)
 test_set['NumberOfChildrenVisiting'].fillna(test_set.groupby('MaritalStatus')['NumberOfChildrenVisiting'].transform('mean'), inplace=True)
-# print(train_set.isnull().sum()) 
-# print("================")
-# print(test_set.isnull().sum()) 
+
 train_set.loc[ train_set['Gender'] =='Fe Male' , 'Gender'] = 'Female'
 test_set.loc[ test_set['Gender'] =='Fe Male' , 'Gender'] = 'Female'
 cols = ['TypeofContact','Occupation','Gender','ProductPitched','MaritalStatus','Designation']
@@ -150,7 +147,6 @@ def outliers(data_out):
                     (data_out<lower_bound))
 
 
-
 # Age_out_index= outliers(train_set['Age'])[0]
 TypeofContact_out_index= outliers(train_set['TypeofContact'])[0]
 CityTier_out_index= outliers(train_set['CityTier'])[0]
@@ -168,6 +164,8 @@ OwnCar_out_index= outliers(train_set['OwnCar'])[0]
 NumberOfChildrenVisiting_out_index= outliers(train_set['NumberOfChildrenVisiting'])[0]
 Designation_out_index= outliers(train_set['Designation'])[0]
 MonthlyIncome_out_index= outliers(train_set['MonthlyIncome'])[0]
+
+# print(DurationOfPitch_out_index)
 
 lead_outlier_index = np.concatenate((#Age_out_index,                            # acc : 0.8650306748466258
                                     #  TypeofContact_out_index,                 # acc : 0.8920454545454546
@@ -272,7 +270,6 @@ print('Best trial : score {}, \nparams {}'.format(study.best_trial.value, study.
 
 # model = CatBoostClassifier(n_estimators= 561, depth= 8, fold_permutation_block= 134, 
 #         learning_rate= 0.5610934137500165, od_pval= 0.3492486557791592, l2_leaf_reg= 1.3928694532637893, verbose=0)
-
 
 start_time = time.time()
 model.fit(x_train,y_train)   

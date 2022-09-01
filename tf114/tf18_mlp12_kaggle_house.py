@@ -209,19 +209,19 @@ hidden = tf.compat.v1.matmul(x, w) + b
 
 w = tf.compat.v1.Variable(tf.compat.v1.zeros([10,30]), name='weight')
 b = tf.compat.v1.Variable(tf.compat.v1.zeros([30]), name='bias')
-hidden = tf.compat.v1.matmul(hidden, w) + b
+hidden = tf.nn.relu(tf.compat.v1.matmul(hidden, w) + b)
 
 w = tf.compat.v1.Variable(tf.compat.v1.zeros([30,30]), name='weight')
 b = tf.compat.v1.Variable(tf.compat.v1.zeros([30]), name='bias')
-hidden = tf.compat.v1.matmul(hidden, w) + b
+hidden = tf.nn.relu(tf.compat.v1.matmul(hidden, w) + b)
 
 w = tf.compat.v1.Variable(tf.compat.v1.zeros([30,30]), name='weight')
 b = tf.compat.v1.Variable(tf.compat.v1.zeros([30]), name='bias')
-hidden = tf.compat.v1.matmul(hidden, w) + b
+hidden = tf.nn.relu(tf.compat.v1.matmul(hidden, w) + b)
 
 w = tf.compat.v1.Variable(tf.compat.v1.zeros([30,50]), name='weight')
 b = tf.compat.v1.Variable(tf.compat.v1.zeros([50]), name='bias')
-hidden = tf.compat.v1.matmul(hidden, w) + b
+hidden = tf.nn.relu(tf.compat.v1.matmul(hidden, w) + b)
 
 w = tf.compat.v1.Variable(tf.compat.v1.zeros([50,20]), name='weight')
 b = tf.compat.v1.Variable(tf.compat.v1.zeros([20]), name='bias')
