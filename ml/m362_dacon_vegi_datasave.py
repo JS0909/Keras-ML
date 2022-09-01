@@ -49,9 +49,9 @@ def aaa(input_paths, target_paths): #, infer_mode):
     return np.array(data_list), np.array(label_list)
 
 train_data, label_data = aaa(train_input_list, train_target_list) #, False)
-vali_data, val_target = aaa(val_input_list, val_target_list) #, False)
+val_data, val_target = aaa(val_input_list, val_target_list) #, False)
 
 test_input, test_target = aaa(test_input, test_target)
 
-datalist = [train_data, label_data, vali_data, val_target, test_input, test_target]
+datalist = [train_data, label_data, val_data, val_target, test_input, test_target]
 jb.dump(datalist, path+'datasets.dat')

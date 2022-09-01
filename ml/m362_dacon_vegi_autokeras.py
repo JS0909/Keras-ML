@@ -23,11 +23,11 @@ train_data, label_data, vali_data, val_target, test_input, test_target = jb.load
 # print(train_data.shape, label_data.shape)   # (1607, 1440, 37) (1607,)
 # print(vali_data.shape) # (206, 1440, 37)
 
-train_data.reshape(1607*1440, 37)
-vali_data.reshape(206* 1440, 37)
+train_data = train_data.reshape(1607,1440*37)
+vali_data = vali_data.reshape(206, 1440*37)
 
 # 2. Model
-model = ak.StructuredDataRegressor(
+model = ak.TimeseriesForecaster(
     overwrite=True,
     max_trials=2,
     loss='mean_absolute_error'

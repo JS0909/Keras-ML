@@ -81,11 +81,11 @@ test_set['PreferredPropertyStar'].fillna(test_set.groupby('Occupation')['Preferr
 
 combine = [train_set,test_set]
 for dataset in combine:    
-    dataset.loc[ dataset['Age'] <= 29, 'Age'] = 0
-    dataset.loc[(dataset['Age'] > 29) & (dataset['Age'] <= 39), 'Age'] = 1
-    dataset.loc[(dataset['Age'] > 39) & (dataset['Age'] <= 49), 'Age'] = 2
-    dataset.loc[(dataset['Age'] > 49) & (dataset['Age'] <= 59), 'Age'] = 3
-    dataset.loc[ dataset['Age'] > 59, 'Age'] = 4
+    dataset.loc[ dataset['Age'] <= 26.6, 'Age'] = 0
+    dataset.loc[(dataset['Age'] > 26.6) & (dataset['Age'] <= 35.2), 'Age'] = 1
+    dataset.loc[(dataset['Age'] > 35.2) & (dataset['Age'] <= 43.8), 'Age'] = 2
+    dataset.loc[(dataset['Age'] > 43.8) & (dataset['Age'] <= 52.4), 'Age'] = 3
+    dataset.loc[ dataset['Age'] > 52.4, 'Age'] = 4
 # train_set = train_set.drop(['AgeBand'], axis=1)
 
 train_set['NumberOfTrips'].fillna(train_set.groupby('DurationOfPitch')['NumberOfTrips'].transform('mean'), inplace=True)
