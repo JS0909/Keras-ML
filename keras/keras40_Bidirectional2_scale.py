@@ -1,6 +1,6 @@
 import numpy as np
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, SimpleRNN, Bidirectional, LSTM
+from tensorflow.python.keras.layers import Dense, SimpleRNN, Bidirectional, LSTM
 from keras.preprocessing import sequence
 from tensorflow.python.keras.callbacks import EarlyStopping
 import tensorflow as tf

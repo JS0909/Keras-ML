@@ -2,7 +2,9 @@ import joblib as jb
 import pandas as pd
 import numpy as np
 import os
-from sklearn.metrics import r2_score
+import autokeras as ak
+import keras
+import time
 
 from tensorflow.python.keras.models import Sequential, Model, load_model
 from tensorflow.python.keras.layers import Input, Dense, GRU, Conv1D, Flatten, LSTM, Dropout
@@ -21,21 +23,22 @@ train_data, label_data, vali_data, val_target, test_input, test_target = jb.load
 # print(train_data.shape, label_data.shape)   # (1607, 1440, 37) (1607,)
 # print(vali_data.shape) # (206, 1440, 37)
 
+train_data.reshape(1607*1440, 37)
+vali_data.reshape(206* 1440, 37)
+
 # 2. Model
-model = Sequential()
-model.add(LSTM(5, input_shape=(1440,37)))
-model.add(Dense(10, activation='relu'))
-model.add(Dense(64, activation='relu'))
-model.add(Dense(32, activation='relu'))
-model.add(Dense(1))
+model = ak.StructuredDataRegressor(
+    overwrite=True,
+    max_trials=2,
+    loss='mean_absolute_error'
+)
 
 # 3. Compile, Fit
-model.compile(loss='mse', optimizer='adam', metrics=['mae'])
-Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=10, restore_best_weights=True)
-model.fit(train_data,label_data, batch_size= 500, epochs=20, callbacks=[Es], validation_split=0.1)
+start = time.time()
+model.fit(train_data, label_data, epochs=5)
+end = time.time()
 
-model.save('D:\study_data\_save\_h5/vegi02.h5')
-# model = load_model('D:\study_data\_save\_h5/vegi.h5')
+# model = load_model('D:\study_data\_save\_h5/auto_vegi01.h5')
 
 
 # 4. Evaluate, Predict
@@ -43,6 +46,10 @@ loss = model.evaluate(vali_data, val_target)
 print(loss)
 
 test_pred = model.predict(test_input)
+
+model = model.export_model()
+model.save('D:\study_data\_save\_h5/auto_vegi01.h5')
+
 
 # def RMSE(y_test, y_predict):
 #     return np.sqrt(mean_squared_error(y_test, y_predict))
@@ -70,5 +77,3 @@ with zipfile.ZipFile("submissionKeras.zip", 'w') as my_zip:
     my_zip.close()
 
 
-# vegi01
-# [0.2958856523036957, 0.2879069149494171]
