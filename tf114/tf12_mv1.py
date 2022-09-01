@@ -45,3 +45,6 @@ with tf.compat.v1.Session() as sess:
 
     mae = mean_absolute_error(y_data, hy_val)
     print('mae: ', mae)
+    
+# r2:  0.9904566760105877
+# mae:  1.73271484375
