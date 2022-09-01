@@ -6,7 +6,7 @@ import os
 
 from sklearn.ensemble import RandomForestRegressor
 from tensorflow.python.keras.models import Sequential, Model
-from tensorflow.python.keras.layers import Input, Dense, GRU, Conv1D, Flatten
+from tensorflow.python.keras.layers import Input, Dense, GRU, Conv1D, Flatten, LSTM
 from tensorflow.python.keras.callbacks import EarlyStopping
 
 
@@ -23,15 +23,18 @@ print(vali_data.shape) # (206, 1440, 37)
 
 # 2. 모델
 model = Sequential()
-model.add(Conv1D(10, 1, input_shape=(1440,37)))
-model.add(Flatten())
+model.add(LSTM(10, 1, input_shape=(1440,37)))
+model.add(Dense(10, activation='relu'))
+model.add(Dense(100, activation='relu'))
+model.add(Dense(100, activation='relu'))
+model.add(Dense(100, activation='relu'))
 model.add(Dense(10, activation='relu'))
 model.add(Dense(1))
 
 # 3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam')
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=100, restore_best_weights=True)
-model.fit(train_data,label_data, epochs=1, callbacks=[Es], validation_split=0.1)
+model.fit(train_data,label_data, epochs=100, callbacks=[Es], validation_split=0.1)
 
 
 # 4. 평가, 예측
