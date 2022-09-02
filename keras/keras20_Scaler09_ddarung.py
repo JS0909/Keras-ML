@@ -13,7 +13,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 import numpy as np
 
 # 1. 데이터
-path = './_data/ddarung/'
+path = 'd:/study_data/_data/ddarung/'
 train_set = pd.read_csv(path+'train.csv',index_col=0) # index_col = n : n번째 칼럼을 인덱스로 인식
 # print(train_set)
 # print(train_set.shape) # (1459, 10)
@@ -22,14 +22,10 @@ test_set = pd.read_csv(path+'test.csv', index_col=0)
 # print(test_set)
 # print(test_set.shape) # (715, 9)
 
-### 결측치 처리(일단 제거로 처리) ###
-print(train_set.info())
-print(train_set.isnull().sum()) # 결측치 전부 더함
-# train_set = train_set.dropna() # nan 값(결측치) 열 없앰
-train_set = train_set.fillna(0) # 결측치 0으로 채움
-print(train_set.isnull().sum()) # 없어졌는지 재확인
+train_set = train_set.fillna(0)
+test_set = test_set.fillna(0)
 
-x = train_set.drop(['count'], axis=1) # axis = 0은 열방향으로 쭉 한줄(가로로 쭉), 1은 행방향으로 쭉 한줄(세로로 쭉)
+x = train_set.drop(['count'], axis=1)
 y = train_set['count']
 
 print(x.shape, y.shape) # (1328, 9) (1328,)
@@ -37,9 +33,9 @@ print(x.shape, y.shape) # (1328, 9) (1328,)
 # trainset과 testset의 분리
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8)
 # scaler = MinMaxScaler()
-# scaler = StandardScaler()
+scaler = StandardScaler()
 # scaler = MaxAbsScaler() 
-scaler = RobustScaler()
+# scaler = RobustScaler()
 scaler.fit(x_train)
 scaler.fit(test_set)
 test_set = scaler.transform(test_set)
@@ -105,3 +101,8 @@ print('걸린 시간: ', end_time-start_time)
 # loss:  [2725.19873046875, 38.557491302490234]
 # r2:  0.6000904226776222
 # 걸린 시간:  6.501389265060425
+
+# Standard
+# loss:  [2244.907958984375, 34.09609603881836]
+# r2:  0.6919902584816643
+# 걸린 시간:  26.060454607009888

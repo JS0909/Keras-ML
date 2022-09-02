@@ -35,10 +35,10 @@ test_set["month"] = [t.month for t in pd.DatetimeIndex(test_set.datetime)]
 test_set['year'] = [t.year for t in pd.DatetimeIndex(test_set.datetime)]
 test_set['year'] = test_set['year'].map({2011:0, 2012:1})
 
-train_set.drop('datetime',axis=1,inplace=True) # train_set에서 데이트타임 드랍
-test_set.drop('datetime',axis=1,inplace=True) # test_set에서 데이트타임 드랍
-train_set.drop('casual',axis=1,inplace=True) # casul 드랍 이유 모르겠음
-train_set.drop('registered',axis=1,inplace=True) # registered 드랍 이유 모르겠음
+train_set.drop('datetime',axis=1,inplace=True)
+test_set.drop('datetime',axis=1,inplace=True)
+train_set.drop('casual',axis=1,inplace=True)
+train_set.drop('registered',axis=1,inplace=True)
 
 #print(train_set.info())
 # null값이 없으므로 결측치 삭제과정 생략

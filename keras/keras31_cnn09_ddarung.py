@@ -8,7 +8,7 @@ from tensorflow.python.keras.callbacks import EarlyStopping
 from sklearn.preprocessing import MinMaxScaler
 
 # 1. 데이터
-path = './_data/ddarung/'
+path = 'D:/study_data/_data/ddarung/'
 train_set = pd.read_csv(path+'train.csv',index_col=0) # index_col = n : n번째 칼럼을 인덱스로 인식
 # print(train_set)
 # print(train_set.shape) # (1459, 10)
@@ -67,10 +67,10 @@ r2 = r2_score(y_test, y_predict)
 print('r2: ', r2)
 
 # 5. 제출 준비
-# submission = pd.read_csv(path + 'submission.csv', index_col=0)
-# y_submit = model.predict(test_set)
-# submission['count'] = y_submit
-# submission.to_csv(path + 'submission.csv', index=True)
+submission = pd.read_csv(path + 'submission.csv', index_col=0)
+y_submit = model.predict(test_set)
+submission['count'] = y_submit
+submission.to_csv(path + 'submission.csv', index=True)
 
 # DNN
 # loss:  [4022.582275390625, 43.64305877685547]
