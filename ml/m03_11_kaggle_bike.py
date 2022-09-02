@@ -2,12 +2,8 @@
 import numpy as np
 import pandas as pd 
 from pandas import DataFrame 
-from tensorflow.python.keras.models import Sequential, Model
-from tensorflow.python.keras.layers import Dense, Input
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
-from tensorflow.python.keras.callbacks import EarlyStopping
-import time
 from sklearn.preprocessing import MaxAbsScaler, RobustScaler
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
