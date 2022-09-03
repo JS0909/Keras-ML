@@ -1,0 +1,21 @@
+getter ==> supplier
+파라미터 없이 return만 있는거
+외부에서 값을 get하기 위해
+
+setter ==> consumer
+return없이 파라미터만 있는거
+외부값을 가지고 사용 규칙을 setting
+
+def 이름(self): ==> predicate
+    return Boolean
+return과 파라미터 모두 있지만 무조건 불린값으로 떨어지는것
+ex) model.predict(파라미터)
+
+setter + getter ==> Function
+return과 파라미터가 모두 있는거
+
+
+폰은 메모리만 있는데 디스크처럼 프리징하는 기능을 가지고 있음
+
+constant : 디스크에
+variable : 메모리에
