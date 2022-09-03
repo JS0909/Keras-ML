@@ -3,33 +3,33 @@ import numpy as np
 
 
 path = 'D:\_data\dacon_travel/'
-train_set = pd.read_csv(path + 'train.csv',
+train_data = pd.read_csv(path + 'train.csv',
                         index_col=0)
-test_set = pd.read_csv(path + 'test.csv', index_col=0)
+test_data = pd.read_csv(path + 'test.csv', index_col=0)
 
-train_set['TypeofContact'].fillna('Self Enquiry', inplace=True)
-test_set['TypeofContact'].fillna('Self Enquiry', inplace=True)
-train_set['Age'].fillna(train_set.groupby('Designation')['Age'].transform('mean'), inplace=True)
-test_set['Age'].fillna(test_set.groupby('Designation')['Age'].transform('mean'), inplace=True)
-train_set['Age']=np.round(train_set['Age'],0).astype(int)
-test_set['Age']=np.round(test_set['Age'],0).astype(int)
-
-
-train_set['NumberOfChildrenVisiting'].fillna(train_set.groupby('MaritalStatus')['NumberOfChildrenVisiting'].transform('mean'), inplace=True)
-test_set['NumberOfChildrenVisiting'].fillna(test_set.groupby('MaritalStatus')['NumberOfChildrenVisiting'].transform('mean'), inplace=True)
-
-train_set['DurationOfPitch']=train_set['DurationOfPitch'].fillna(0)
-test_set['DurationOfPitch']=test_set['DurationOfPitch'].fillna(0)
+train_data['TypeofContact'].fillna('Self Enquiry', inplace=True)
+test_data['TypeofContact'].fillna('Self Enquiry', inplace=True)
+train_data['Age'].fillna(train_data.groupby('Designation')['Age'].transform('mean'), inplace=True)
+test_data['Age'].fillna(test_data.groupby('Designation')['Age'].transform('mean'), inplace=True)
+train_data['Age']=np.round(train_data['Age'],0).astype(int)
+test_data['Age']=np.round(test_data['Age'],0).astype(int)
 
 
-print(train_set[train_set['DurationOfPitch'].notnull()].groupby(['NumberOfChildrenVisiting'])['DurationOfPitch'].mean())
+train_data['NumberOfChildrenVisiting'].fillna(train_data.groupby('MaritalStatus')['NumberOfChildrenVisiting'].transform('mean'), inplace=True)
+test_data['NumberOfChildrenVisiting'].fillna(test_data.groupby('MaritalStatus')['NumberOfChildrenVisiting'].transform('mean'), inplace=True)
+
+train_data['DurationOfPitch']=train_data['DurationOfPitch'].fillna(0)
+test_data['DurationOfPitch']=test_data['DurationOfPitch'].fillna(0)
 
 
-train_set['PreferredPropertyStar'].fillna(train_set.groupby('Occupation')['PreferredPropertyStar'].transform('mean'), inplace=True)
-test_set['PreferredPropertyStar'].fillna(test_set.groupby('Occupation')['PreferredPropertyStar'].transform('mean'), inplace=True)
-# print(train_set[train_set['PreferredPropertyStar'].notnull()].groupby(['ProdTaken'])['PreferredPropertyStar'].mean())
+print(train_data[train_data['DurationOfPitch'].notnull()].groupby(['NumberOfChildrenVisiting'])['DurationOfPitch'].mean())
 
-alldata = [train_set,test_set]
+
+train_data['PreferredPropertyStar'].fillna(train_data.groupby('Occupation')['PreferredPropertyStar'].transform('mean'), inplace=True)
+test_data['PreferredPropertyStar'].fillna(test_data.groupby('Occupation')['PreferredPropertyStar'].transform('mean'), inplace=True)
+# print(train_data[train_data['PreferredPropertyStar'].notnull()].groupby(['ProdTaken'])['PreferredPropertyStar'].mean())
+
+alldata = [train_data,test_data]
 for dataset in alldata:    
     dataset.loc[ dataset['Age'] <= 20, 'Age'] = 0
     dataset.loc[(dataset['Age'] > 20) & (dataset['Age'] <= 29), 'Age'] = 1
@@ -39,25 +39,25 @@ for dataset in alldata:
     dataset.loc[ dataset['Age'] > 59, 'Age'] = 5
 
 
-train_set['NumberOfTrips'].fillna(train_set.groupby('DurationOfPitch')['NumberOfTrips'].transform('mean'), inplace=True)
-test_set['NumberOfTrips'].fillna(test_set.groupby('DurationOfPitch')['NumberOfTrips'].transform('mean'), inplace=True)
-# print(train_set[train_set['NumberOfChildrenVisiting'].notnull()].groupby(['MaritalStatus'])['NumberOfChildrenVisiting'].mean())
+train_data['NumberOfTrips'].fillna(train_data.groupby('DurationOfPitch')['NumberOfTrips'].transform('mean'), inplace=True)
+test_data['NumberOfTrips'].fillna(test_data.groupby('DurationOfPitch')['NumberOfTrips'].transform('mean'), inplace=True)
+# print(train_data[train_data['NumberOfChildrenVisiting'].notnull()].groupby(['MaritalStatus'])['NumberOfChildrenVisiting'].mean())
 
-# print(train_set['Occupation'].unique()) # ['Small Business' 'Salaried' 'Large Business' 'Free Lancer']
-train_set.loc[ train_set['Occupation'] =='Free Lancer' , 'Occupation'] = 'Salaried'
-test_set.loc[ test_set['Occupation'] =='Free Lancer' , 'Occupation'] = 'Salaried'
+# print(train_data['Occupation'].unique()) # ['Small Business' 'Salaried' 'Large Business' 'Free Lancer']
+train_data.loc[ train_data['Occupation'] =='Free Lancer' , 'Occupation'] = 'Salaried'
+test_data.loc[ test_data['Occupation'] =='Free Lancer' , 'Occupation'] = 'Salaried'
 
-train_set.loc[ train_set['Gender'] =='Fe Male' , 'Gender'] = 'Female'
-test_set.loc[ test_set['Gender'] =='Fe Male' , 'Gender'] = 'Female'
+train_data.loc[train_data['Gender'] =='Fe Male' , 'Gender'] = 'Female'
+test_data.loc[test_data['Gender'] =='Fe Male' , 'Gender'] = 'Female'
 
 from sklearn.preprocessing import LabelEncoder
 le = LabelEncoder()
-cols = np.array(train_set.columns)
+cols = np.array(train_data.columns)
 for col in cols:
-      if train_set[col].dtype == 'object':
-        train_set[col] = le.fit_transform(train_set[col])
-        test_set[col] = le.fit_transform(test_set[col])
-# print(train_set)
+      if train_data[col].dtype == 'object':
+        train_data[col] = le.fit_transform(train_data[col])
+        test_data[col] = le.fit_transform(test_data[col])
+# print(train_data)
 
 def outliers(data_out):
     quartile_1, q2 , quartile_3 = np.percentile(data_out, [25,50,75])
@@ -67,12 +67,12 @@ def outliers(data_out):
     upper_bound = quartile_3 + (iqr * 1.5)
     return np.where((data_out>upper_bound)|(data_out<lower_bound))
                      
-print(outliers(train_set['DurationOfPitch'])[0])
+print(outliers(train_data['DurationOfPitch'])[0])
   
-x = train_set.drop(['NumberOfFollowups', 'OwnCar', 'NumberOfPersonVisiting', 'NumberOfChildrenVisiting', 'MonthlyIncome', 'ProdTaken'], axis=1)
-# x = train_set.drop(['ProdTaken'], axis=1)
-test_set = test_set.drop(['NumberOfFollowups', 'OwnCar', 'NumberOfPersonVisiting', 'NumberOfChildrenVisiting', 'MonthlyIncome'], axis=1)
-y = train_set['ProdTaken']
+x = train_data.drop(['NumberOfFollowups', 'OwnCar', 'NumberOfPersonVisiting', 'NumberOfChildrenVisiting', 'MonthlyIncome', 'ProdTaken'], axis=1)
+# x = train_data.drop(['ProdTaken'], axis=1)
+test_data = test_data.drop(['NumberOfFollowups', 'OwnCar', 'NumberOfPersonVisiting', 'NumberOfChildrenVisiting', 'MonthlyIncome'], axis=1)
+y = train_data['ProdTaken']
 print(x.shape) #1911,13
 
 from sklearn.model_selection import train_test_split
@@ -98,7 +98,7 @@ accscore = accuracy_score(y_test,y_predict)
 print('acc :', accscore)
 
 model.fit(x,y) # fitting again for all data
-sub_y = model.predict(test_set)
+sub_y = model.predict(test_data)
 sub_y = np.round(sub_y,0)
 submission = pd.read_csv(path + 'sample_submission.csv')
 submission['ProdTaken'] = sub_y
