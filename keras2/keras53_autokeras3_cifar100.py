@@ -28,3 +28,6 @@ y_predict = model.predict(x_test)
 results = model.evaluate(x_test, y_test)
 print('결과: ', results)
 print('시간: ', round(end-start, 4))
+
+# 결과:  [2.5204885005950928, 0.38670000433921814]
+# 시간:  3438.8691
