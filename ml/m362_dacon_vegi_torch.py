@@ -37,7 +37,7 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 
 
 CFG = {
-    'EPOCHS':6,
+    'EPOCHS':10,
     'LEARNING_RATE':1e-3,
     'BATCH_SIZE':16,
     'SEED':106
@@ -143,8 +143,7 @@ class BaseModel(nn.Module):
         super(BaseModel, self).__init__()
         self.lstm = nn.LSTM(input_size=37, hidden_size=256, batch_first=True, bidirectional=False, dropout=0.2)
         self.classifier = nn.Sequential(
-            nn.ReLU(nn.Linear(256, 128)),
-            nn.Linear(128, 1)
+            nn.Linear(256, 1),
         )
         
     def forward(self, x):
@@ -301,10 +300,10 @@ with zipfile.ZipFile("submission.zip", 'w') as my_zip:
 
 # Train Loss : [0.28065] Valid Loss : [0.24487] / 리더보드 베스트
 # CFG = {
-    # 'EPOCHS':6,
-    # 'LEARNING_RATE':1e-3,
-    # 'BATCH_SIZE':16,
-    # 'SEED':106
+#     'EPOCHS':6,
+#     'LEARNING_RATE':1e-3,
+#     'BATCH_SIZE':16,
+#     'SEED':106
 # }
 
 # Train Loss : [0.28042] Valid Loss : [0.24099]
