@@ -25,8 +25,8 @@ print(val_target.shape) #
 # 2. Model
 model = Sequential()
 model.add(GRU(256, input_shape=(1440,37)))
-model.add(Dropout(0.2))
 model.add(Dense(256, activation='relu'))
+model.add(Dropout(0.2))
 model.add(Dense(128, activation='relu'))
 model.add(Dense(64, activation='relu'))
 model.add(Dense(32, activation='relu'))
