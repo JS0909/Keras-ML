@@ -2,11 +2,11 @@ import joblib as jb
 import pandas as pd
 import numpy as np
 import os
-from sklearn.metrics import r2_score
 
 from tensorflow.python.keras.models import Sequential, Model, load_model
 from tensorflow.python.keras.layers import Input, Dense, GRU, Conv1D, Flatten, LSTM, Dropout
 from tensorflow.python.keras.callbacks import EarlyStopping
+from sklearn.metrics import r2_score
 from sklearn.metrics import mean_squared_error
 
 # 1. Data
