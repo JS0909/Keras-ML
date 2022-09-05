@@ -26,13 +26,15 @@ optlist = [adam.Adam, adadelta.Adadelta, adagrad.Adagrad, adamax.Adamax, rmsprop
 for optimizer in optlist:
     optimizer = optimizer(learning_rate=learning_rate)
     model.compile(loss='mse', optimizer=optimizer)
-    model.fit(x, y, epochs=50, batch_size=1, verbose=0)
+    model.fit(x, y, epochs=50, batch_size=1)
 
     # 4. evaluate, predict
     loss = model.evaluate(x, y)
     y_pred = model.predict([11])
 
     print('optimizer: ', optimizer.__class__.__name__, '   /loss: ', round(loss, 4), '/lr: ', learning_rate, '/predict result: ', y_pred)
+    input('>>계속하려면 엔터<<')
+print('끝')
 
 # optimizer:  Adam    /loss:  2.3388 /lr:  0.0001 /predict result:  [[11.169116]]
 # optimizer:  Adadelta    /loss:  2.4045 /lr:  0.0001 /predict result:  [[10.517084]]
