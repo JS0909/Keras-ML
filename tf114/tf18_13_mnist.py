@@ -49,7 +49,7 @@ for step in range(epochs):
         
 print('최종: ', cost_val, hy_val)
 
-_, y_pred = sess.run([train,hypothesis], feed_dict={x:x_test, y:y_test})
+y_pred = sess.run(hypothesis, feed_dict={x:x_test, y:y_test})
 
 acc = accuracy_score(np.argmax(y_test, axis=1), np.argmax(y_pred, axis=1))
 print('acc: ', acc)
