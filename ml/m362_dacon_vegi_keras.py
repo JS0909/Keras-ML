@@ -35,9 +35,9 @@ model.add(Dense(1))
 # 3. Compile, Fit
 model.compile(loss='mse', optimizer='adam', metrics=['mae'])
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=15, restore_best_weights=True)
-model.fit(train_data,label_data, batch_size= 100, epochs=20, callbacks=[Es], validation_data=(val_data, val_target))
+model.fit(train_data,label_data, batch_size= 100, epochs=50, callbacks=[Es], validation_data=(val_data, val_target))
 
-model.save('D:\study_data\_save\_h5/vegi03.h5')
+model.save('D:\study_data\_save\_h5/vegi04.h5')
 # model = load_model('D:\study_data\_save\_h5/vegi.h5')
 
 
@@ -78,3 +78,9 @@ with zipfile.ZipFile("submissionKeras.zip", 'w') as my_zip:
 
 # vegi02
 # [0.290480375289917, 0.26576611399650574]
+
+# vegi03 현 베스트
+# [0.2860572934150696, 0.25723227858543396]
+
+# vegi04
+# [0.2761073112487793, 0.24922898411750793]
