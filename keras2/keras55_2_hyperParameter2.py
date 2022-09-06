@@ -79,3 +79,5 @@ print('걸린 시간: ', end)
 
 # acc score:  0.9598
 # 걸린 시간:  215.25915098190308
+
+# learning rate 그리드서치 넣으면 import 오류남

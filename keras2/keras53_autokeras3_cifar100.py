@@ -8,8 +8,8 @@ import time
 (x_train, y_train), (x_test, y_test) = \
     keras.datasets.cifar100.load_data()
 
-print(x_train.shape, y_train.shape) # 
-print(x_test.shape, y_test.shape) # 
+print(x_train.shape, y_train.shape)
+print(x_test.shape, y_test.shape)
 
 # 2. 모델
 model = ak.ImageClassifier(
