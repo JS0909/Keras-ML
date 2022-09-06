@@ -12,9 +12,9 @@ import keras
 x_train = x_train.reshape(60000, 28*28).astype('float32')/255.
 x_test = x_test.reshape(10000, 28*28).astype('float32')/255.
 
-from tensorflow.keras.utils import to_categorical
-y_train = to_categorical(y_train)
-y_test = to_categorical(y_test)
+# from tensorflow.keras.utils import to_categorical
+# y_train = to_categorical(y_train)
+# y_test = to_categorical(y_test)
 
 # 2. model
 def build_model(drop=0.5, optimizer='adam', activation='relu'):
@@ -29,7 +29,7 @@ def build_model(drop=0.5, optimizer='adam', activation='relu'):
     
     model = Model(inputs=inputs, outputs=outputs)
     
-    model.compile(optimizer=optimizer, metrics=['acc'], loss='categorical_crossentropy')
+    model.compile(optimizer=optimizer, metrics=['acc'], loss='sparse_categorical_crossentropy')
     
     return model
 
@@ -51,10 +51,10 @@ import time
 
 keras_model = KerasClassifier(build_fn=build_model, verbose=1)
 
-model = RandomizedSearchCV(keras_model, hyperparameters, cv=3, n_iter=5)
+model = RandomizedSearchCV(keras_model, hyperparameters, cv=3, n_iter=2)
 
 start = time.time()
-model.fit(x_train, y_train, epochs=7, validation_split=0.2)
+model.fit(x_train, y_train, epochs=1, validation_split=0.2)
 end = time.time()-start
 
 print('걸린 시간: ', end)
@@ -64,5 +64,5 @@ print('model.best_score: ', model.best_score_)
 print('model.score: ', model.score)
 
 from sklearn.metrics import accuracy_score
-y_pred = model.predict(x_test)
+y_pred = model.predict_classes(x_test)
 print('acc score: ', accuracy_score(y_test, y_pred))
