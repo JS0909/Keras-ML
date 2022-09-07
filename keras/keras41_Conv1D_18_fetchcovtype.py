@@ -1,3 +1,4 @@
+
 # keras18_gpu_test3 파일의 서머리를 확인해보시오.
 
 from sklearn.datasets import fetch_covtype

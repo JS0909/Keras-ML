@@ -1,4 +1,4 @@
-from sklearn.datasets import fetch_california_housing
+from sklearn.datasets import load_diabetes
 from sklearn.preprocessing import MinMaxScaler
 from tensorflow.python.keras.models import Sequential
 from tensorflow.python.keras.layers import Dense, Dropout
@@ -7,7 +7,7 @@ from sklearn.metrics import r2_score
 from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint
 
 # 1. 데이터
-datasets = fetch_california_housing()
+datasets = load_diabetes()
 x = datasets.data
 y = datasets.target
 
