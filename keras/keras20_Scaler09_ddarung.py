@@ -45,15 +45,9 @@ x_test = scaler.transform(x_test)
 # 2. 모델 구성
 model = Sequential()
 model.add(Dense(10, activation='relu', input_dim=9))
-model.add(Dense(30
-                , activation='relu'
-                ))
-model.add(Dense(50
-                , activation='relu'
-                ))
-model.add(Dense(20
-                , activation='relu'
-                ))
+model.add(Dense(30, activation='relu'))
+model.add(Dense(50, activation='relu'))
+model.add(Dense(20, activation='relu'))
 model.add(Dense(1))
 
 # 3. 컴파일, 훈련

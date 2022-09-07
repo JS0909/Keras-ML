@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tensorflow.python.keras.activations import elu
 
-
 def elu1(x, a):
     return np.maximum(0, x) + np.maximum(x, a*(np.exp(x)-1))
 

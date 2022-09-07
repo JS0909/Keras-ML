@@ -27,7 +27,7 @@ model.add(Dense(5, input_dim=13))
 model.add(Dense(10))
 model.add(Dense(30, activation='relu'))
 model.add(Dense(40))
-model.add(Dense(20))
+model.add(Dense(20, activation='relu'))
 model.add(Dense(10))
 model.add(Dense(1))
 
@@ -49,8 +49,6 @@ print('걸린 시간: ', end)
 print('loss: ', loss)
 print('r2: ', r2_score(y_test, y_pred))
 
-# 0.7266701456479958
-
-# 걸린 시간:  6.66641092300415
-# loss:  15.149988174438477
-# r2:  0.8187430638264707
+# 걸린 시간:  8.698838710784912
+# loss:  11.070121765136719
+# r2:  0.8675552417230248
