@@ -1,12 +1,9 @@
-# trainable = True, False 비교해가면서 만들어서 결과 비교
-
-import numpy as np
-from keras.models import Sequential
-from keras.layers import Dense, Flatten
+from keras.models import Model
+from keras.layers import Dense, Flatten, Input, GlobalAveragePooling2D
 from keras.applications import VGG16
 from keras.datasets import cifar100
+import numpy as np
 from sklearn.preprocessing import MinMaxScaler
-from keras.utils import to_categorical
 from keras.optimizers import Adam
 from tensorflow.python.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from sklearn.metrics import accuracy_score
@@ -29,15 +26,17 @@ x_test = x_test.reshape(10000, 32, 32, 3)
 # y_test = to_categorical(y_test)
 
 # 2. model
-vgg16 = VGG16(weights='imagenet', include_top=False, input_shape=(32, 32, 3))
-# vgg16.trainable=False
+input1 = Input(shape=(32, 32, 3))
+vgg16 = VGG16(include_top=False, input_shape=(32, 32, 3))(input1)
+vgg16.trainable=False
+glob = GlobalAveragePooling2D()(vgg16)
+dense = Dense(64, activation='relu')(glob)
+dense = Dense(32)(dense)
+output1 = Dense(100, activation='softmax')(dense)
 
-model = Sequential()
-model.add(vgg16)
-model.add(Flatten())
-model.add(Dense(100, activation='relu'))
-model.add(Dense(64))
-model.add(Dense(100, activation='softmax'))
+model = Model(inputs=input1, outputs=output1)
+
+model.summary()
 
 # 3. compile, fit
 optimizer = Adam(learning_rate=0.001)
@@ -45,7 +44,7 @@ model.compile(optimizer=optimizer, metrics=['acc'], loss='sparse_categorical_cro
 
 es = EarlyStopping(monitor='val_loss', patience=20, mode='min', verbose=1)
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', patience=10, mode='auto', verbose=1, factor=0.5)
-model.fit(x_train, y_train, epochs=500, validation_split=0.2, batch_size=128, callbacks=[es,reduce_lr])
+model.fit(x_train, y_train, epochs=200, validation_split=0.2, batch_size=128, callbacks=[es,reduce_lr])
 
 
 # 4. evaluate, predict
@@ -57,11 +56,5 @@ print('loss: ', loss)
 print('acc: ', acc)
 
 
-# vgg16.trainable=False
-# acc:  0.3463
-
-# vgg16.trainable=True
-# acc:  0.3654
-
-
-
+# loss:  [5.07551383972168, 0.4041999876499176]
+# acc:  0.4042

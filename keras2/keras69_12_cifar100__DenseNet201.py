@@ -1,9 +1,9 @@
-# trainable = True, False 비교해가면서 만들어서 결과 비교
+from keras.applications import VGG19, ResNet50, Xception, DenseNet201, InceptionV3, \
+    InceptionResNetV2, DenseNet121, MobileNetV2, NASNetMobile, EfficientNetB0, EfficientNetB7
 
 import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense, Flatten
-from keras.applications import VGG16
 from keras.datasets import cifar100
 from sklearn.preprocessing import MinMaxScaler
 from keras.utils import to_categorical
@@ -29,11 +29,11 @@ x_test = x_test.reshape(10000, 32, 32, 3)
 # y_test = to_categorical(y_test)
 
 # 2. model
-vgg16 = VGG16(weights='imagenet', include_top=False, input_shape=(32, 32, 3))
-# vgg16.trainable=False
+api = DenseNet201(weights='imagenet', include_top=False, input_shape=(32, 32, 3))
+# api.trainable=False
 
 model = Sequential()
-model.add(vgg16)
+model.add(api)
 model.add(Flatten())
 model.add(Dense(100, activation='relu'))
 model.add(Dense(64))
@@ -45,7 +45,7 @@ model.compile(optimizer=optimizer, metrics=['acc'], loss='sparse_categorical_cro
 
 es = EarlyStopping(monitor='val_loss', patience=20, mode='min', verbose=1)
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', patience=10, mode='auto', verbose=1, factor=0.5)
-model.fit(x_train, y_train, epochs=500, validation_split=0.2, batch_size=128, callbacks=[es,reduce_lr])
+model.fit(x_train, y_train, epochs=10, validation_split=0.2, batch_size=128, callbacks=[es,reduce_lr])
 
 
 # 4. evaluate, predict
@@ -56,12 +56,6 @@ acc = accuracy_score(y_test, np.argmax(y_pred, axis=1))
 print('loss: ', loss)
 print('acc: ', acc)
 
-
-# vgg16.trainable=False
-# acc:  0.3463
-
-# vgg16.trainable=True
-# acc:  0.3654
-
-
+# loss:  [2.1128787994384766, 0.513700008392334]
+# acc:  0.5137
 

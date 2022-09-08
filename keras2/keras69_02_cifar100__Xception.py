@@ -1,9 +1,9 @@
-# trainable = True, False 비교해가면서 만들어서 결과 비교
+from keras.applications import VGG19, ResNet50, Xception, ResNet101, InceptionV3, \
+    InceptionResNetV2, DenseNet121, MobileNetV2, NASNetMobile, EfficientNetB0
 
 import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense, Flatten
-from keras.applications import VGG16
 from keras.datasets import cifar100
 from sklearn.preprocessing import MinMaxScaler
 from keras.utils import to_categorical
@@ -29,11 +29,11 @@ x_test = x_test.reshape(10000, 32, 32, 3)
 # y_test = to_categorical(y_test)
 
 # 2. model
-vgg16 = VGG16(weights='imagenet', include_top=False, input_shape=(32, 32, 3))
-# vgg16.trainable=False
+xce = Xception(weights='imagenet', include_top=False, input_shape=(32, 32, 3))
+# xce.trainable=False
 
 model = Sequential()
-model.add(vgg16)
+model.add(xce)
 model.add(Flatten())
 model.add(Dense(100, activation='relu'))
 model.add(Dense(64))
@@ -57,11 +57,4 @@ print('loss: ', loss)
 print('acc: ', acc)
 
 
-# vgg16.trainable=False
-# acc:  0.3463
-
-# vgg16.trainable=True
-# acc:  0.3654
-
-
-
+# 안됨

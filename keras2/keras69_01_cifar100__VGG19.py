@@ -1,9 +1,10 @@
-# trainable = True, False 비교해가면서 만들어서 결과 비교
+from keras.applications import VGG19, ResNet50, Xception, ResNet101, InceptionV3, \
+    InceptionResNetV2, DenseNet121, MobileNetV2, NASNetMobile, EfficientNetB0
+# shape이 안맞아서 안도는거 개수만큼 다른 거 추가해서 넣기
 
 import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense, Flatten
-from keras.applications import VGG16
 from keras.datasets import cifar100
 from sklearn.preprocessing import MinMaxScaler
 from keras.utils import to_categorical
@@ -29,11 +30,11 @@ x_test = x_test.reshape(10000, 32, 32, 3)
 # y_test = to_categorical(y_test)
 
 # 2. model
-vgg16 = VGG16(weights='imagenet', include_top=False, input_shape=(32, 32, 3))
-# vgg16.trainable=False
+vgg19 = VGG19(weights='imagenet', include_top=False, input_shape=(32, 32, 3))
+# vgg19.trainable=False
 
 model = Sequential()
-model.add(vgg16)
+model.add(vgg19)
 model.add(Flatten())
 model.add(Dense(100, activation='relu'))
 model.add(Dense(64))
@@ -57,11 +58,7 @@ print('loss: ', loss)
 print('acc: ', acc)
 
 
-# vgg16.trainable=False
-# acc:  0.3463
-
-# vgg16.trainable=True
-# acc:  0.3654
-
-
+# vgg19
+# loss:  [5.409846782684326, 0.3395000100135803]
+# acc:  0.3395
 

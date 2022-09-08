@@ -37,7 +37,7 @@ model.compile(loss='mse', optimizer='adam', metrics=['mae'])
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=15, restore_best_weights=True)
 model.fit(train_data,label_data, batch_size= 100, epochs=50, callbacks=[Es], validation_data=(val_data, val_target))
 
-model.save('D:\study_data\_save\_h5/vegi04.h5')
+model.save('D:\study_data\_save\_h5/vegi05.h5')
 # model = load_model('D:\study_data\_save\_h5/vegi.h5')
 
 
