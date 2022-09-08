@@ -3,8 +3,8 @@
 import numpy as np
 from torch import dropout
 from tensorflow.keras.datasets import mnist
-from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.layers import Dense, Conv2D, Flatten, MaxPooling2D, Input, Dropout
+from tensorflow.python.keras.models import Sequential, Model
+from tensorflow.python.keras.layers import Dense, Conv2D, Flatten, MaxPooling2D, Input, Dropout
 from tensorflow.python.keras.optimizer_v2 import adam, adadelta, adagrad, adamax
 import keras
 
@@ -19,7 +19,7 @@ x_test = x_test.reshape(10000, 28*28).astype('float32')/255.
 # y_test = to_categorical(y_test)
 
 # 2. model
-def build_model(drop=0.5, activation='relu', node1=128, node2=64, node3=32, lr=1e-1):
+def build_model(drop=0.5, activation='relu', lr=1e-1, node1=10, node2=10, node3=10):
 
     inputs = Input(shape=(28*28), name='input')
     x = Dense(node1, activation=activation, name='hidden1')(inputs)
@@ -50,7 +50,8 @@ def create_hyperparameter():
     return {'batch_size':batchs, 'lr':lr,
             # 'optimizer':optimizers, 
             'drop':dropout, 'activation':activation,
-            'node1':node1, 'node2':node2, 'node3':node3}
+            'node1':node1, 'node2':node2, 'node3':node3
+            }
     
 hyperparameters = create_hyperparameter()
 
@@ -59,7 +60,7 @@ from tensorflow.keras.wrappers.scikit_learn import KerasClassifier
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 import time
 
-keras_model = KerasClassifier(build_fn=build_model(), verbose=1)
+keras_model = KerasClassifier(build_fn=build_model, verbose=1)
 
 model = RandomizedSearchCV(keras_model, hyperparameters, cv=3, n_iter=10)
 

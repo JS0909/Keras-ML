@@ -51,3 +51,4 @@ print(len(model.trainable_weights))     # 26
 # Total params: 14,714,688
 # Trainable params: 14,714,688
 # Non-trainable params: 0
+
