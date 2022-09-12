@@ -74,6 +74,3 @@ print('f1_micro: ', f1_score(y_pred, y_test, average='micro')) # micro f1 = acc 
 # f1_macro:  0.4556941766626644
 # f1_micro:  0.710204081632653
 
-
-
-
