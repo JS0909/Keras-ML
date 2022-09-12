@@ -90,7 +90,7 @@ for epoch in range(epochs):
         
         avg_loss += batch_loss / total_batch
     
-    prediction = tf.equal(tf.compat.v1.arg_max(hypothesis, 1), tf.argmax(y, 1))
+    prediction = tf.equal(tf.compat.v1.arg_max(hypothesis, axis=1), tf.argmax(y, 1))
     acc = tf.reduce_mean(tf.cast(prediction, tf.float32))
     print('epoch: ', '%04d'%(epoch + 1), 'loss: {:.9f}'.format(avg_loss), 'ACC: ', acc)
     
