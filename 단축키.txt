@@ -1,0 +1,28 @@
+(공통단축키)
+윈도우 : ctrl + esc
+창움직이기
+한단어블록 : ctrl + shift + 화살표
+블록 : shift + 클릭
+줄 삭제 : shift + del
+줄 주석 : ctrl + /
+줄 카피 : 블록처리 없이 ctrl + c
+
+(VScode 단축키)
+화면 크기 조절 : ctrl + 플러스, 마이너스
+실행 : ctrl + F5
+커서 여러줄 : 휠클릭 + 드래그 
+디렉토리 내 파일 찾기 : ctrl + p
+현재파일 내 찾기, 바꾸기 : ctrl + f , ctrl + h
+현재페이지 내 한꺼번에 찾아 블록 : ctrl + d
+
+(jupyter notebook 단축키)
+셀추가 : b
+마크다운 : (셀선택후) m
+마크다운 내 서식 : #, ## 등등, 1., >(들여쓰기)
+셀 삭제 : (셀선택 후) dd
+여러 셀 선택 : shift + 셀클릭
+실행 : ctrl + enter
+커서 여러줄 : alt + 드래그
+
+(colab 단축키)
+실행 : shift + enter
