@@ -12,7 +12,9 @@ from keras.models import Sequential, Model
 from keras.layers import Dense, Input
 
 input_img = Input(shape=(784,))
-encoded = Dense(64, activation='relu')(input_img) # 한번 줄임으로써 중요한 특성만 남겨놓는다
+# encoded = Dense(64, activation='relu')(input_img) # 한번 줄임으로써 중요한 특성만 남겨놓는다
+# encoded = Dense(1064, activation='relu')(input_img) # 노드를 늘릴 경우?
+encoded = Dense(16, activation='relu')(input_img) # 많이 줄일 경우? 특성이 많이 없어짐, 형태는 유지됨
 
 decoded = Dense(784, activation='sigmoid')(encoded) # 데이터 스케일링해서 255를 했기때문에 0~1 사이니까 시그모이드 쓴거
 
@@ -24,8 +26,26 @@ autoencoder.compile(optimizer='adam', loss='binary_crossentropy')
 
 autoencoder.fit(x_train, x_train, epochs=30, batch_size=128, validation_split=0.2) # 준지도학습 : x로 x를 훈련 시킴
 
+decoded_imgs = autoencoder.predict(x_test)
 
+import matplotlib.pyplot as plt
 
+n = 10
+plt.figure(figsize=(20,4))
+for i in range(n):
+    ax = plt.subplot(2, n, i+1)
+    plt.imshow(x_test[i].reshape(28,28))
+    plt.gray()
+    ax.get_xaxis().set_visible(False)
+    ax.get_yaxis().set_visible(False)
+    
+    ax = plt.subplot(2, n, i+1+n)
+    plt.imshow(decoded_imgs[i].reshape(28,28))
+    plt.gray()
+    ax.get_xaxis().set_visible(False)
+    ax.get_yaxis().set_visible(False)
+
+plt.show()
 
 
 
