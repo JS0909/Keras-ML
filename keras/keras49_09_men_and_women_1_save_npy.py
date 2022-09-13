@@ -25,8 +25,17 @@ xy_train = scale_datagen.flow_from_directory(
     shuffle=True
 )
 
+mypic = scale_datagen.flow_from_directory(
+    'd:/study_data/_data/image/mypic/',
+    target_size=(150, 150),
+    batch_size=5000,
+    class_mode='binary',
+    shuffle=True
+)
+
 x = xy_train[0][0]
 y = xy_train[0][1]
+mypic = mypic[0][0]
 
 # 트레인 테스트 스플릿
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8)
@@ -48,4 +57,6 @@ y_train = np.concatenate((y_train, y_augument))
 np.save('d:/study_data/_save/_npy/keras49_09_train_x.npy', arr =x_train)
 np.save('d:/study_data/_save/_npy/keras49_09_train_y.npy', arr =y_train)
 np.save('d:/study_data/_save/_npy/keras49_09_test_x.npy', arr =x_test)
+np.save('d:/study_data/_save/_npy/keras49_09_test_y.npy', arr =y_test)
+
 np.save('d:/study_data/_save/_npy/keras49_09_test_y.npy', arr =y_test)

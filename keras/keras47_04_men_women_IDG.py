@@ -10,15 +10,15 @@ train_datagen = ImageDataGenerator(
 
 xy_data = train_datagen.flow_from_directory(
     'd:/study_data/_data/image/men_women/',
-    target_size=(150, 150),
-    batch_size=50,
+    target_size=(100, 100),
+    batch_size=5000,
     class_mode='binary',
     shuffle=True
 )
 
 mypic = train_datagen.flow_from_directory(
     'd:/study_data/_data/image/mypic/',
-    target_size=(150, 150),
+    target_size=(100, 100),
     batch_size=5000,
     class_mode='binary',
     shuffle=True

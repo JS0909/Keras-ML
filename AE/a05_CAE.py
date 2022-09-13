@@ -17,7 +17,7 @@ def autoencoder(hidden_layer_size):
     model.add(Conv2D(filters=hidden_layer_size, kernel_size=(2,2), strides=2, input_shape=(28,28,1), activation='relu'))
     model.add(Dense(units=10, activation='relu'))
     model.add(Dense(units=5, activation='relu'))
-    model.add(Dense(units=10, activation='relu'))
+    model.add(Dense(units=1, activation='sigmoid'))
     model.add(UpSampling2D(size=(2, 2), interpolation='nearest'))
     
     model.summary()
@@ -33,27 +33,27 @@ model_154 = autoencoder(hidden_layer_size=154)
 
 print('----------------- node 1개 시작 --------------------')
 model_01.compile(optimizer='adam', loss='binary_crossentropy')
-model_01.fit(x_train, x_train, epochs=10)
+model_01.fit(x_train, x_train, epochs=1)
 
 print('----------------- node 4개 시작 --------------------')
 model_04.compile(optimizer='adam', loss='binary_crossentropy')
-model_04.fit(x_train, x_train, epochs=10)
+model_04.fit(x_train, x_train, epochs=1)
 
 print('----------------- node 16개 시작 --------------------')
 model_16.compile(optimizer='adam', loss='binary_crossentropy')
-model_16.fit(x_train, x_train, epochs=10)
+model_16.fit(x_train, x_train, epochs=1)
 
 print('----------------- node 32개 시작 --------------------')
 model_32.compile(optimizer='adam', loss='binary_crossentropy')
-model_32.fit(x_train, x_train, epochs=10)
+model_32.fit(x_train, x_train, epochs=1)
 
 print('----------------- node 64개 시작 --------------------')
 model_64.compile(optimizer='adam', loss='binary_crossentropy')
-model_64.fit(x_train, x_train, epochs=10)
+model_64.fit(x_train, x_train, epochs=1)
 
 print('----------------- node 154개 시작 --------------------')
 model_154.compile(optimizer='adam', loss='binary_crossentropy')
-model_154.fit(x_train, x_train, epochs=10)
+model_154.fit(x_train, x_train, epochs=1)
 
 output_01 = model_01.predict(x_test)
 output_04 = model_04.predict(x_test)

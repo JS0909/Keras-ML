@@ -7,7 +7,7 @@ y_train = np.load('d:/study_data/_save/_npy/keras49_09_train_y.npy')
 x_test = np.load('d:/study_data/_save/_npy/keras49_09_test_x.npy')
 y_test = np.load('d:/study_data/_save/_npy/keras49_09_test_y.npy')
 
-# mypic = np.load('d:/study_data/_save/_npy/keras47_04_mypic.npy')
+mypic = np.load('d:/study_data/_save/_npy/keras47_04_mypic.npy')
 
 print(x_train.shape) # (2016, 150, 150, 3)
 print(y_train.shape) # (2016,)
