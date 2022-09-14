@@ -35,7 +35,7 @@ print('loss:', loss)
 result = model.predict([[10, 1.4,0]])
 print('10, 1.4, 0의 예측값은 : ', result)
 
-# 예측 [[10,1.4,0]]
+# 예측 [[10,1.4,0]]->20
 
 # model.add(Dense(5, input_dim=3)) 
 # model.add(Dense(4))

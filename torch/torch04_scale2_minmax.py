@@ -17,8 +17,8 @@ x = torch.FloatTensor(x).unsqueeze(1).to(DEVICE) # (3, 1)
 y = torch.FloatTensor(y).unsqueeze(-1).to(DEVICE)
 
 ###### 스케일링 ######
-pred_data = (torch.Tensor([[4]]).to(DEVICE) - torch.mean(x)) / torch.std(x) # 예측 데이터도 같은 스케일로 스케일링
-x = (x - torch.mean(x)) / torch.std(x) # Standard Scaler
+pred_data = (torch.Tensor([[4]]).to(DEVICE) - torch.min(x)) / torch.max(x) # 예측 데이터도 같은 스케일로 스케일링
+x = (x - torch.min(x)) / torch.max(x) # Minmax Scaler
 
 print(x, y)
 print(pred_data)
@@ -41,7 +41,7 @@ def train(model, optimizer, x, y):
 
     return loss.item()
     
-epochs = 2000
+epochs = 20000
 for epoch in range(1, epochs+1):
     loss = train(model, optimizer, x, y)
     print('epoch: {}, loss: {}'.format(epoch, loss))
@@ -61,3 +61,6 @@ print(f'최종 loss: {result_loss}')
 
 results = model(pred_data)
 print(f'4의 예측값: {results.item()}')
+
+# 최종 loss: 0.001306623569689691
+# 4의 예측값: 3.91491675376892

@@ -1,0 +1,16 @@
+텐서데이터.to(디바이스)
+모델.to(디바이스)
+
+토치텐서.unsqueeze(0) : 0번째자리 쉐이프 늘려주기, 0이면 0번째, -1 마지막 번째
+
+optimizer.zero_grad() : 두번째이상 역전파부터 이전의 가중치가 남아져 더해지는 문제를 해결하기 위해 계속 가중치 초기화
+loss.backward() : 역전파 하겠다
+optimizer.step() : 역전파 한거 가지고 가중치 갱신하겠다
+.item() : 텐서 내의 한개의 숫자를 스칼라형태로 반환. 숫자만 뽑아서 딱 주는 것.
+
+with torch.no_grad(): : 평가할때 가중치값 갱신 없이 순전파만 사용하기 위해 씀
+
+.tolist() : 그냥 리스트화
+.cpu() : cpu로 보내기. 이 상태에서만 numpy화 가능
+.detach() : 뒤에 grad_fn=<AddmmBackward0> 부분 빠짐. 자동미분(autograd) 부분 빠짐
+.numpy() : 텐서 넘파이로 바꿈

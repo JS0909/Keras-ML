@@ -37,7 +37,7 @@ model.fit(x, y, epochs=100, batch_size=1)
 loss = model.evaluate(x,y)
 print('loss:', loss)
 result = model.predict([[9, 30, 210]])
-print('9, 30, 210의 예측값은 : ', result) # 10, 1.9, 0
+print('9, 30, 210의 예측값은 : ', result) # 1.0, 1.9, 0
 
 # model.add(Dense(5, input_dim=3)) 
 # model.add(Dense(4))

@@ -37,7 +37,7 @@ def train(model, criterion, optimizer, x, y):
     loss.backward()  # 역전파하겠다
     optimizer.step() # 역전파한거 가지고 가중치를 갱신시키겠다
 
-    return loss.item() # item() : 텐서형태가 아닌 알아들을 수 있는 형태로 반환한다는 뜻. sess.run() 느낌
+    return loss.item() # item() : 텐서 내의 한개의 숫자를 스칼라형태로 반환. 숫자만 뽑아서 딱 주는 것.
     
 epochs = 2000
 for epoch in range(1, epochs+1): # 1 ~ 100 까지 돌리기

@@ -10,9 +10,11 @@ DEVICE = torch.device('cuda:0' if USE_CUDA else 'cpu')
 print(torch.__version__, '사용DVICE:', DEVICE)
 
 # 1. data
-x = np.array([[1,2,3,4,5,6,7,8,9,10], [1,1.1,1.2,1.3,1.4,1.5,1.6,1.5,1.4,1.3]]) 
+x = np.array([[1,2,3,4,5,6,7,8,9,10],
+              [1,1,1,1,2,1.3,1.4,1.5,1.6,1.4],
+              [9,8,7,6,5,4,3,2,1,0]])
 y = np.array([11,12,13,14,15,16,17,18,19,20])
-x_test = np.array([10, 1.3])
+x_test = np.array([10, 1.4,0])
 
 x = torch.FloatTensor(np.transpose(x)).to(DEVICE)
 y = torch.FloatTensor(y).unsqueeze(-1).to(DEVICE)
@@ -22,11 +24,11 @@ x_test = torch.FloatTensor(np.transpose(x_test)).to(DEVICE)
 x_test = (x_test - torch.mean(x)) / torch.std(x) 
 x = (x - torch.mean(x)) / torch.std(x) 
 
-print(x.shape, y.shape, x_test.shape)
+print(x.shape, x_test.shape)
 
 # 2. model
 model = nn.Sequential(
-    nn.Linear(2,4),
+    nn.Linear(3,4),
     nn.Linear(4,5),
     nn.Linear(5,3),
     nn.ReLU(),          # 위에 적용됨
@@ -35,7 +37,7 @@ model = nn.Sequential(
 ).to(DEVICE)
 
 # 3. compile, fit
-optimizer = optim.SGD(model.parameters(), lr=0.001)
+optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 def train(model, optimizer, x, y):
     optimizer.zero_grad()
@@ -69,5 +71,7 @@ print(f'최종 loss: {result_loss}')
 results = model(x_test)
 print(f'예측값: {results.item()}')
 
-# 최종 loss: 0.0003869640058837831
-# 예측값: 19.963666915893555
+# 예측 [[10,1.4,0]]->20
+
+# 최종 loss: 8.185452641217006e-13
+# 예측값: 20.0

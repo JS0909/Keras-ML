@@ -10,31 +10,24 @@ DEVICE = torch.device('cuda:0' if USE_CUDA else 'cpu')
 print(torch.__version__, '사용DVICE:', DEVICE)
 
 # 1. data
-x = np.array([[1,2,3,4,5,6,7,8,9,10], [1,1.1,1.2,1.3,1.4,1.5,1.6,1.5,1.4,1.3]]) 
-y = np.array([11,12,13,14,15,16,17,18,19,20])
-x_test = np.array([10, 1.3])
+x = np.array([1,2,3]) # (3, )
+y = np.array([1,2,3])
 
-x = torch.FloatTensor(np.transpose(x)).to(DEVICE)
+x = torch.FloatTensor(x).unsqueeze(1).to(DEVICE) # (3, 1)
 y = torch.FloatTensor(y).unsqueeze(-1).to(DEVICE)
-x_test = torch.FloatTensor(np.transpose(x_test)).to(DEVICE)
 
 ###### 스케일링 ######
-x_test = (x_test - torch.mean(x)) / torch.std(x) 
-x = (x - torch.mean(x)) / torch.std(x) 
+pred_data = (torch.Tensor([[4]]).to(DEVICE) - torch.mean(x)) / torch.std(x) # 예측 데이터도 같은 스케일로 스케일링
+x = (x - torch.mean(x)) / torch.std(x) # Standard Scaler
 
-print(x.shape, y.shape, x_test.shape)
+print(x, y)
+print(pred_data)
 
 # 2. model
-model = nn.Sequential(
-    nn.Linear(2,4),
-    nn.Linear(4,5),
-    nn.Linear(5,3),
-    nn.ReLU(),          # 위에 적용됨
-    nn.Linear(3,2),
-    nn.Linear(2,1)
-).to(DEVICE)
+model = nn.Linear(1, 1).to(DEVICE)
 
 # 3. compile, fit
+criterion = nn.MSELoss() # = loss
 optimizer = optim.SGD(model.parameters(), lr=0.001)
 
 def train(model, optimizer, x, y):
@@ -48,26 +41,26 @@ def train(model, optimizer, x, y):
 
     return loss.item()
     
-epochs = 10000
+epochs = 2000
 for epoch in range(1, epochs+1):
     loss = train(model, optimizer, x, y)
     print('epoch: {}, loss: {}'.format(epoch, loss))
     
 # 4. eval
-def evaluate(model, x, y): 
+def evaluate(model, criterion, x, y): 
     model.eval() 
     
     with torch.no_grad(): 
         x_predict = model(x)
-        results = nn.MSELoss()(x_predict, y)
+        results = criterion(x_predict, y)
     
     return results.item()
 
-result_loss = evaluate(model, x, y)
+result_loss = evaluate(model, criterion, x, y)
 print(f'최종 loss: {result_loss}')
 
-results = model(x_test)
-print(f'예측값: {results.item()}')
+results = model(pred_data)
+print(f'4의 예측값: {results.item()}')
 
-# 최종 loss: 0.0003869640058837831
-# 예측값: 19.963666915893555
+# 최종 loss: 0.0005928670871071517
+# 4의 예측값: 3.97436547279357
