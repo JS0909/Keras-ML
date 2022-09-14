@@ -60,3 +60,6 @@ activate 가상환경이름
 
 !텐서플로 1은 pip 설치지원이 안되서 콘다 인스톨로 설치해야됨!
 conda install -c anaconda tensorflow==1.14
+
+파이토치설치
+pytorch.org 접속 -> 페이지 중간쯤에 설치 옵션 선택 -> 원하는 가상환경 활성화 후 명령어 cmd 에 복붙
