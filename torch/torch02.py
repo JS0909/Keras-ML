@@ -6,6 +6,9 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 
+USE_CUDA = torch.cuda.is_available()                   # 쿠다 사용할 수 있는지 여부
+DEVICE = torch.device('cuda:0' if USE_CUDA else 'cpu') # 쿠다 사용 가능하면 'cuda' 모드, 안되면 'cpu' 모드 / device id 생략 가능
+print(torch.__version__, '사용DVICE:', DEVICE)
 
 # 1. data
 x = np.array([1,2,3]) # (3, )
