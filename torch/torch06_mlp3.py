@@ -50,7 +50,7 @@ def train(model, optimizer, x, y):
 
     return loss.item()
     
-epochs = 1200
+epochs = 12000
 for epoch in range(1, epochs+1):
     loss = train(model, optimizer, x, y)
     print('epoch: {}, loss: {}'.format(epoch, loss))
@@ -69,10 +69,10 @@ result_loss = evaluate(model, x, y)
 print(f'최종 loss: {result_loss}')
 
 results = model(x_test)
-# results = results.cpu().detach()
+results = results.cpu().detach().numpy()
 print(f'예측값: {results}')
 
 # 예측: [[9, 30, 210]] -> 예상 y값 [[10, 1.9]]
 
-# 최종 loss: 0.0011502228444442153
-# 예측값: [9.9509, 1.9047]
+# 최종 loss: 4.7168261517072096e-05
+# 예측값: [[10.004651   1.9085085]]
