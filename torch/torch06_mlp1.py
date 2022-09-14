@@ -10,22 +10,23 @@ DEVICE = torch.device('cuda:0' if USE_CUDA else 'cpu')
 print(torch.__version__, '사용DVICE:', DEVICE)
 
 # 1. data
-x = np.array([1,2,3]) # (3, )
-y = np.array([1,2,3])
+x = np.array([[1,2,3,4,5,6,7,8,9,10], [1,1.1,1.2,1.3,1.4,1.5,1.6,1.5,1.4,1.3]]) 
+y = np.array([11,12,13,14,15,16,17,18,19,20])
+x_test = np.array([10, 1.3])
 
-x = torch.FloatTensor(x).unsqueeze(1).to(DEVICE) # (3, 1)
+x = torch.FloatTensor(np.transpose(x)).to(DEVICE)
 y = torch.FloatTensor(y).unsqueeze(-1).to(DEVICE)
+x_test = torch.FloatTensor(np.transpose(x_test)).to(DEVICE)
 
 ###### 스케일링 ######
-pred_data = (torch.Tensor([[4]]).to(DEVICE) - torch.mean(x)) / torch.std(x) 
+x_test = (x_test - torch.mean(x)) / torch.std(x) 
 x = (x - torch.mean(x)) / torch.std(x) 
 
 print(x, y)
-print(pred_data)
 
 # 2. model
 model = nn.Sequential(
-    nn.Linear(1,4),
+    nn.Linear(2,4),
     nn.Linear(4,5),
     nn.Linear(5,3),
     nn.Linear(3,2),
@@ -65,5 +66,5 @@ def evaluate(model, criterion, x, y):
 result_loss = evaluate(model, criterion, x, y)
 print(f'최종 loss: {result_loss}')
 
-results = model(pred_data)
-print(f'4의 예측값: {results.item()}')
+results = model(x_test)
+print(f'예측값: {results.item()}')
