@@ -37,8 +37,8 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 
 
 CFG = {
-    'EPOCHS':20,
-    'LEARNING_RATE':5e-4,
+    'EPOCHS':6,
+    'LEARNING_RATE':1e-3,
     'BATCH_SIZE':16,
     'SEED':106
 }
@@ -141,7 +141,7 @@ val_loader = DataLoader(val_dataset, batch_size=CFG['BATCH_SIZE'], shuffle=False
 class BaseModel(nn.Module):
     def __init__(self):
         super(BaseModel, self).__init__()
-        self.lstm = nn.LSTM(input_size=37, hidden_size=256, batch_first=True, bidirectional=False, dropout=0.1)
+        self.lstm = nn.LSTM(input_size=37, hidden_size=256, batch_first=True, bidirectional=False, dropout=0.2)
         self.classifier = nn.Sequential(
             nn.Linear(256, 128),
             nn.ReLU(),
@@ -189,7 +189,7 @@ def train(model, optimizer, train_loader, val_loader, scheduler, device):
                     
         val_loss = validation(model, val_loader, criterion, device)
         
-        print(f'{epoch} Train Loss : [{np.mean(train_loss):.5f}] Valid Loss : [{val_loss:.5f}]')
+        print(f'Train Loss : [{np.mean(train_loss):.5f}] Valid Loss : [{val_loss:.5f}]')
         
         if scheduler is not None:
             scheduler.step()

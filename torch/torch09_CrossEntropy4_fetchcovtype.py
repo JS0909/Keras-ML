@@ -1,11 +1,9 @@
-# 회귀에 0과 1의 논리를 붙인 이진분류 모델 (회귀에 sigmoid 붙인 것)
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 
-from sklearn.datasets import load_breast_cancer
+from sklearn.datasets import fetch_covtype
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
@@ -16,44 +14,44 @@ DEVICE = torch.device('cuda:0' if USE_CUDA else 'cpu')
 print(torch.__version__, DEVICE) # 1.12.1 cuda:0
 
 # 1. data
-datasets = load_breast_cancer()
+datasets = fetch_covtype()
 x = datasets.data
 y = datasets.target
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, shuffle=True, random_state=123, stratify=y)
 
 x_train = torch.FloatTensor(x_train)
-y_train = torch.FloatTensor(y_train).unsqueeze(1).to(DEVICE)
-x_test = torch.FloatTensor(x_test)
-y_test = torch.FloatTensor(y_test).unsqueeze(-1).to(DEVICE)
+y_train = torch.LongTensor(y_train).to(DEVICE)
 
+x_test = torch.FloatTensor(x_test)
+y_test = torch.LongTensor(y_test).to(DEVICE)
+
+###### scale ######
 scaler = StandardScaler()
 x_train = scaler.fit_transform(x_train)
 x_test = scaler.transform(x_test)
-# 넘파이 형태로 스케일링하기 때문에 스케일링 데이터는 스케일링 이후 to(DEVICE)
 
 x_train = torch.FloatTensor(x_train).to(DEVICE)
 x_test = torch.FloatTensor(x_test).to(DEVICE)
 
-print(x_train.size())
-print(x_train.shape)
-# torch.Size([455, 30])
+print(x_train.size(), len(y_train.unique()))
+# torch.Size([464809, 54]) 7
 
 # 2. model
 model = nn.Sequential(
-    nn.Linear(30, 64),
+    nn.Linear(54, 74),
     nn.ReLU(),
-    nn.Linear(64, 32),
+    nn.Linear(74, 32),
     nn.ReLU(),
     nn.Linear(32, 16),
+    nn.Linear(16, 128),
     nn.ReLU(),
-    nn.Linear(16, 1),
-    nn.Sigmoid()
+    nn.Linear(128, 7),
 ).to(DEVICE)
 
 
 # 3. compile, fit
-criterion = nn.BCELoss() # binary_crossentropy
+criterion = nn.CrossEntropyLoss() # softmax + sparse_categorical_crossentropy
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 def train(model, criterion, optimizer, x_train, y_train):
@@ -82,13 +80,14 @@ def evaluate(model, criterion, x_test, y_test):
     return loss.item()
 
 loss = evaluate(model, criterion, x_test, y_test)
-pred_result = (model(x_test) >= 0.5).float()
+pred_result = torch.argmax(model(x_test), 1)
 
 score = (pred_result == y_test).float().mean()
 acc_score = accuracy_score(y_test.cpu(), pred_result.cpu())
-# sklean의 accuracy_score 사용하기 위해서는 cpu로 가져와서 연산해야함
 
 print(f'loss:{loss}')
 print(f'pred_result:{pred_result}')
 print(f'score:{score:.4f}')
 print(f'acc_score:{acc_score:.4f}')
+
+# 터짐

@@ -3,8 +3,8 @@ import pandas as pd
 import numpy as np
 import os
 
-from tensorflow.python.keras.models import Sequential, Model, load_model
-from tensorflow.python.keras.layers import Input, Dense, GRU, Conv1D, Flatten, LSTM, Dropout
+from tensorflow.keras.models import Sequential, Model, load_model
+from tensorflow.keras.layers import Input, Dense, GRU, Conv1D, Flatten, LSTM, Dropout, Bidirectional
 from tensorflow.python.keras.callbacks import EarlyStopping
 from sklearn.metrics import r2_score
 from sklearn.metrics import mean_squared_error
@@ -20,26 +20,27 @@ train_data, label_data, val_data, val_target, test_input, test_target = jb.load(
 # print(label_data)   # 1440
 # print(train_data.shape, label_data.shape)   # (1607, 1440, 37) (1607,)
 # print(val_data.shape) # (206, 1440, 37)
-print(val_target.shape) # 
+# print(val_target.shape) # (206,)
 
 # 2. Model
 model = Sequential()
-model.add(GRU(256, input_shape=(1440,37)))
-model.add(Dense(256, activation='relu'))
+model.add(Bidirectional(GRU(100, input_shape=(1440,37))))
+model.add(Dense(100, activation='relu'))
 model.add(Dropout(0.2))
 model.add(Dense(128, activation='relu'))
-model.add(Dense(64, activation='relu'))
+model.add(Dense(64))
 model.add(Dense(32, activation='relu'))
 model.add(Dense(1))
+
+# return_sequence=True // RNN 겹치기
 
 # 3. Compile, Fit
 model.compile(loss='mse', optimizer='adam', metrics=['mae'])
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=15, restore_best_weights=True)
-model.fit(train_data,label_data, batch_size= 100, epochs=50, callbacks=[Es], validation_data=(val_data, val_target))
+model.fit(train_data,label_data, batch_size=200, epochs=50, callbacks=[Es], validation_data=(val_data, val_target))
 
-model.save('D:\study_data\_save\_h5/vegi05.h5')
+model.save('D:\study_data\_save\_h5/vegi06.h5')
 # model = load_model('D:\study_data\_save\_h5/vegi.h5')
-
 
 # 4. Evaluate, Predict
 loss = model.evaluate(val_data, val_target)
@@ -84,3 +85,6 @@ with zipfile.ZipFile("submissionKeras.zip", 'w') as my_zip:
 
 # vegi04
 # [0.2761073112487793, 0.24922898411750793]
+
+# vegi05
+# [0.29625755548477173, 0.2660003900527954]
