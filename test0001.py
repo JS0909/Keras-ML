@@ -1,6 +1,4 @@
-a = 1
-b = 2
-c = a + b
-print(c)
-c = a * b
-print(c)
+import numpy
+
+a = numpy.array([1.00221541, 1.1234854, 12.1567489])
+print('{a:.2f}')

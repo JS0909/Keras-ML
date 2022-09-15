@@ -77,3 +77,5 @@ print(f'예측값: {results.tolist()}')
 
 # 최종 loss: 4.319656177892428e-12
 # 예측값: [ 1.0000e+01,  1.9000e+00, -1.8179e-06]
+# 예측값: tensor([[-0.7393,  0.5671, -0.8583]], device='cuda:0',
+#        grad_fn=<AddmmBackward0>)

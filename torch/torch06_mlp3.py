@@ -25,6 +25,7 @@ x_test = (x_test - torch.mean(x)) / torch.std(x)
 x = (x - torch.mean(x)) / torch.std(x)
 
 print(x.shape, y.shape, x_test.shape)
+# torch.Size([10, 3]) torch.Size([10, 2]) torch.Size([1, 3])
                                     
 # 2. model
 model = nn.Sequential(
