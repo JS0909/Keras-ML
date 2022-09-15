@@ -6,8 +6,11 @@ import os
 from tensorflow.keras.models import Sequential, Model, load_model
 from tensorflow.keras.layers import Input, Dense, GRU, Conv1D, Flatten, LSTM, Dropout, Bidirectional
 from tensorflow.python.keras.callbacks import EarlyStopping
-from sklearn.metrics import r2_score
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import r2_score, mean_squared_error
+from sklearn.model_selection import train_test_split
+from keras.optimizers import Adam
+
+
 
 # 1. Data
 path = 'D:\study_data\_data\dacon_vegi/'
@@ -22,9 +25,11 @@ train_data, label_data, val_data, val_target, test_input, test_target = jb.load(
 # print(val_data.shape) # (206, 1440, 37)
 # print(val_target.shape) # (206,)
 
+x_train, x_test, y_train, y_test = train_test_split(train_data, label_data, train_size=0.85, shuffle=False, random_state=1234)
+
 # 2. Model
 model = Sequential()
-model.add(Bidirectional(GRU(100, input_shape=(1440,37))))
+model.add(Bidirectional(GRU(50, input_shape=(1440,37))))
 model.add(Dense(100, activation='relu'))
 model.add(Dropout(0.2))
 model.add(Dense(128, activation='relu'))
@@ -35,24 +40,26 @@ model.add(Dense(1))
 # return_sequence=True // RNN 겹치기
 
 # 3. Compile, Fit
-model.compile(loss='mse', optimizer='adam', metrics=['mae'])
+model.compile(loss='mse', optimizer=Adam(lr=0.0005), metrics=['mae'])
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=15, restore_best_weights=True)
-model.fit(train_data,label_data, batch_size=200, epochs=50, callbacks=[Es], validation_data=(val_data, val_target))
+model.fit(x_train, y_train, batch_size=200, epochs=50, callbacks=[Es], validation_data=(val_data, val_target))
 
 model.save('D:\study_data\_save\_h5/vegi06.h5')
 # model = load_model('D:\study_data\_save\_h5/vegi.h5')
 
 # 4. Evaluate, Predict
-loss = model.evaluate(val_data, val_target)
+loss = model.evaluate(x_test, y_test)
 print(loss)
 
+y_pred = model.predict(x_test)
+
+rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+r2score = r2_score(y_pred, y_test)
+
+print('rmse: ', rmse)
+print('r2:', r2score)
+
 test_pred = model.predict(test_input)
-
-# def RMSE(y_test, y_predict):
-#     return np.sqrt(mean_squared_error(y_test, y_predict))
-# rmse = RMSE(val_target, test_pred)
-# print('rmse: ', rmse)
-
 
 # test_pred -> TEST_ files
 for i in range(6):
