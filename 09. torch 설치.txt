@@ -1,0 +1,10 @@
+pytorch.org install 페이지로 접속
+CUDA 11.3cmd 창에서 가상환경 설정
+conda create -n torch1121 python=3.9.0 anaconda설치 중에  뜨는 물음에 y 입력
+설치가 완료되면 가상환경 torch1121으로 들어간다.
+activate torch1121
+설치 중에  뜨는 물음에 y 입력
+
+GPU 작동 안할 경우
+pip uninstall torch, torchvision, torchaudio
+하고 다시 홈페이지 긁어서 설치
