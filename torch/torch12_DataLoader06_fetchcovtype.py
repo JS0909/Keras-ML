@@ -39,9 +39,9 @@ print(x_train.size(), len(y_train.unique()))
 # torch.Size([464809, 54]) 7
 
 train_set = TensorDataset(x_train, y_train)
-train_loader = DataLoader(train_set, batch_size=100, shuffle=True)
+train_loader = DataLoader(train_set, batch_size=1000, shuffle=True)
 test_set = TensorDataset(x_test, y_test)
-test_loader = DataLoader(test_set, batch_size=100, shuffle=True)
+test_loader = DataLoader(test_set, batch_size=1000, shuffle=True)
 
 # 2. model
 class Model(nn.Module): # 상속은 상위 클래스만 넣을 수 있음
@@ -66,7 +66,7 @@ class Model(nn.Module): # 상속은 상위 클래스만 넣을 수 있음
         x = self.linear4(x)
         return x
     
-model = Model(54, 7).to(DEVICE)
+model = Model(54, 8).to(DEVICE)
 
 
 # 3. compile, fit
@@ -117,3 +117,6 @@ print(f'loss:{loss}')
 print(f'score:{score:.4f}')
 print(f'acc_score:{acc_score:.4f}')
 
+# loss:0.2606202478592212
+# score:0.8969
+# acc_score:0.8969
