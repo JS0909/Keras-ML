@@ -86,7 +86,7 @@ score = (pred_result == y_test).float().mean()
 acc_score = accuracy_score(y_test.cpu(), pred_result.cpu())
 
 print(f'loss:{loss}')
-print(f'pred_result:{pred_result}')
+# print(f'pred_result:{pred_result}')
 print(f'score:{score:.4f}')
 print(f'acc_score:{acc_score:.4f}')
 

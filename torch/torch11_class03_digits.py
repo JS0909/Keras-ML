@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 
-from sklearn.datasets import load_wine
+from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
@@ -14,7 +14,7 @@ DEVICE = torch.device('cuda:0' if USE_CUDA else 'cpu')
 print(torch.__version__, DEVICE) # 1.12.1 cuda:0
 
 # 1. data
-datasets = load_wine()
+datasets = load_digits()
 x = datasets.data
 y = datasets.target
 
@@ -35,20 +35,32 @@ x_train = torch.FloatTensor(x_train).to(DEVICE)
 x_test = torch.FloatTensor(x_test).to(DEVICE)
 
 print(x_train.size(), len(y_train.unique()))
-# torch.Size([142, 13]) 3
+# torch.Size([1437, 64]) 10
 
 # 2. model
-model = nn.Sequential(
-    nn.Linear(13, 64),
-    nn.ReLU(),
-    nn.Linear(64, 32),
-    nn.ReLU(),
-    nn.Linear(32, 16),
-    nn.Linear(16, 128),
-    nn.ReLU(),
-    nn.Linear(128, 3),
-).to(DEVICE)
-
+class Model(nn.Module): # 상속은 상위 클래스만 넣을 수 있음
+    def __init__(self, input_dim, output_dim): # 사용할 레이어들 정의
+        # super().__init__()
+        super(Model, self).__init__()
+        self.linear1 = nn.Linear(input_dim, 64)
+        self.linear2 = nn.Linear(64, 32)
+        self.linear3 = nn.Linear(32, 16)
+        self.linear4 = nn.Linear(16, output_dim)
+        self.relu = nn.ReLU()
+        self.sigmoid = nn.Sigmoid()
+        
+        
+    def forward(self, input_size): # 실제 모델 구성
+        x = self.linear1(input_size)
+        x = self.relu(x)
+        x = self.linear2(x)
+        x = self.relu(x)
+        x = self.linear3(x)
+        x = self.relu(x)
+        x = self.linear4(x)
+        return x
+    
+model = Model(64, 10).to(DEVICE)
 
 # 3. compile, fit
 criterion = nn.CrossEntropyLoss() # softmax + sparse_categorical_crossentropy
@@ -90,7 +102,6 @@ print(f'loss:{loss}')
 print(f'score:{score:.4f}')
 print(f'acc_score:{acc_score:.4f}')
 
-# loss:0.01840273290872574
-# pred_result:[1 0 1 2 2 0 1 1 1 0 1 1 0 0 2 1 2 1 1 2 0 2 1 2 1 0 2 1 0 0 0 2 0 1 0 2]
-# score:1.0000
-# acc_score:1.0000
+# score:0.9833
+# acc_score:0.9833
+# loss:1.4859732389450073

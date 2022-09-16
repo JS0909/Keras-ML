@@ -5,12 +5,10 @@ import os
 
 from tensorflow.keras.models import Sequential, Model, load_model
 from tensorflow.keras.layers import Input, Dense, GRU, Conv1D, Flatten, LSTM, Dropout, Bidirectional
-from tensorflow.python.keras.callbacks import EarlyStopping
+from tensorflow.python.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from sklearn.metrics import r2_score, mean_squared_error
 from sklearn.model_selection import train_test_split
 from keras.optimizers import Adam
-
-
 
 # 1. Data
 path = 'D:\study_data\_data\dacon_vegi/'
@@ -25,11 +23,12 @@ train_data, label_data, val_data, val_target, test_input, test_target = jb.load(
 # print(val_data.shape) # (206, 1440, 37)
 # print(val_target.shape) # (206,)
 
-x_train, x_test, y_train, y_test = train_test_split(train_data, label_data, train_size=0.85, shuffle=False, random_state=1234)
+x_train, x_test, y_train, y_test = train_test_split(train_data, label_data, train_size=0.87, shuffle=True, random_state=123)
 
 # 2. Model
 model = Sequential()
-model.add(Bidirectional(GRU(50, input_shape=(1440,37))))
+# model.add(Bidirectional(GRU(100, input_shape=(1440,37))))
+model.add(GRU(100, input_shape=(1440,37)))
 model.add(Dense(100, activation='relu'))
 model.add(Dropout(0.2))
 model.add(Dense(128, activation='relu'))
@@ -40,11 +39,12 @@ model.add(Dense(1))
 # return_sequence=True // RNN 겹치기
 
 # 3. Compile, Fit
-model.compile(loss='mse', optimizer=Adam(lr=0.0005), metrics=['mae'])
-Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=15, restore_best_weights=True)
-model.fit(x_train, y_train, batch_size=200, epochs=50, callbacks=[Es], validation_data=(val_data, val_target))
+model.compile(loss='mse', optimizer=Adam(lr=6.2500e-05), metrics=['mae'])
+reduce_lr = ReduceLROnPlateau(monitor='val_loss', patience=20, mode='auto', verbose=1, factor=0.5)
+Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=100, restore_best_weights=True)
+model.fit(x_train, y_train, batch_size=200, epochs=5000, callbacks=[Es,reduce_lr], validation_data=(val_data, val_target))
 
-model.save('D:\study_data\_save\_h5/vegi06.h5')
+model.save('D:\study_data\_save\_h5/vegi07.h5')
 # model = load_model('D:\study_data\_save\_h5/vegi.h5')
 
 # 4. Evaluate, Predict

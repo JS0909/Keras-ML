@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
+from torch.utils.data import TensorDataset, DataLoader
 
 from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
@@ -37,39 +38,60 @@ x_test = torch.FloatTensor(x_test).to(DEVICE)
 print(x_train.size(), len(y_train.unique()))
 # torch.Size([142, 13]) 3
 
-# 2. model
-model = nn.Sequential(
-    nn.Linear(13, 64),
-    nn.ReLU(),
-    nn.Linear(64, 32),
-    nn.ReLU(),
-    nn.Linear(32, 16),
-    nn.Linear(16, 128),
-    nn.ReLU(),
-    nn.Linear(128, 3),
-).to(DEVICE)
+# DataLoader
+train_set = TensorDataset(x_train, y_train)
+train_loader = DataLoader(train_set, batch_size=32, shuffle=True)
 
+# 2. model
+class Model(nn.Module): # 상속은 상위 클래스만 넣을 수 있음
+    def __init__(self, input_dim, output_dim): # 사용할 레이어들 정의
+        # super().__init__()
+        super(Model, self).__init__()
+        self.linear1 = nn.Linear(input_dim, 64)
+        self.linear2 = nn.Linear(64, 32)
+        self.linear3 = nn.Linear(32, 16)
+        self.linear4 = nn.Linear(16, output_dim)
+        self.relu = nn.ReLU()
+        self.sigmoid = nn.Sigmoid()
+        
+        
+    def forward(self, input_size): # 실제 모델 구성
+        x = self.linear1(input_size)
+        x = self.relu(x)
+        x = self.linear2(x)
+        x = self.relu(x)
+        x = self.linear3(x)
+        x = self.relu(x)
+        x = self.linear4(x)
+        return x
+    
+model = Model(13, 3).to(DEVICE)
 
 # 3. compile, fit
 criterion = nn.CrossEntropyLoss() # softmax + sparse_categorical_crossentropy
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-def train(model, criterion, optimizer, x_train, y_train):
+def train(model, criterion, optimizer, loader):
     model.train()
-    optimizer.zero_grad()
     
-    hypothesis = model(x_train)
-    loss = criterion(hypothesis, y_train)
-    
-    loss.backward()
-    optimizer.step()
-    
-    return loss.item()
+    total_loss = 0
+    for x_batch, y_batch in loader:
+        optimizer.zero_grad()
+
+        hypothesis = model(x_batch)
+        loss = criterion(hypothesis, y_batch)
+
+        loss.backward()
+        optimizer.step()
+        total_loss += loss.item()
+        
+    return total_loss / len(loader)
 
 EPOCHS = 1000
 for epoch in range(1, EPOCHS+1):
-    loss = train(model, criterion, optimizer, x_train, y_train)
-    print(epoch, '\t', loss)
+    loss = train(model, criterion, optimizer, train_loader)
+    if epoch%20 == 0:
+        print(epoch, '\t', loss)
 
 # eval, pred
 def evaluate(model, criterion, x_test, y_test):
@@ -90,7 +112,6 @@ print(f'loss:{loss}')
 print(f'score:{score:.4f}')
 print(f'acc_score:{acc_score:.4f}')
 
-# loss:0.01840273290872574
-# pred_result:[1 0 1 2 2 0 1 1 1 0 1 1 0 0 2 1 2 1 1 2 0 2 1 2 1 0 2 1 0 0 0 2 0 1 0 2]
-# score:1.0000
-# acc_score:1.0000
+# loss:0.04348238185048103
+# score:0.9722
+# acc_score:0.9722
