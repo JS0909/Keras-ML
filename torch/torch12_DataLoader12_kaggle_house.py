@@ -272,7 +272,8 @@ def train(model, criterion, optimizer, loader):
 EPOCHS = 1000
 for epoch in range(1, EPOCHS+1):
     loss = train(model, criterion, optimizer, train_loader)
-    print(epoch, '\t', loss)
+    if epoch%20==0:
+        print(epoch, '\t', loss)
 
 # eval, pred
 def evaluate(model, criterion, loader):
@@ -294,3 +295,5 @@ score = r2_score(pred_result, y_test.cpu().detach().numpy())
 print(f'loss:{loss}')
 print(f'score:{score:.4f}')
 
+# loss:691215360.0
+# score:0.8334
