@@ -173,4 +173,3 @@ plt.plot(x, dgx_epoch, 'b', label='D(G(z))')
 plt.legend()
 plt.show()
 
-
