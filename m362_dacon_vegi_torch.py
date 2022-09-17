@@ -141,7 +141,7 @@ val_loader = DataLoader(val_dataset, batch_size=CFG['BATCH_SIZE'], shuffle=False
 class BaseModel(nn.Module):
     def __init__(self):
         super(BaseModel, self).__init__()
-        self.lstm = nn.LSTM(input_size=37, hidden_size=256, batch_first=True, bidirectional=False, dropout=0.1)
+        self.lstm = nn.LSTM(input_size=37, hidden_size=256, batch_first=True, bidirectional=False, dropout=0.3)
         self.classifier = nn.Sequential(
             nn.Linear(256, 128),
             nn.ReLU(),
