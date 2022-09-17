@@ -42,7 +42,7 @@ model.add(Dense(1))
 model.compile(loss='mse', optimizer=Adam(lr=6.2500e-05), metrics=['mae'])
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', patience=20, mode='auto', verbose=1, factor=0.5)
 Es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=100, restore_best_weights=True)
-model.fit(x_train, y_train, batch_size=200, epochs=5000, callbacks=[Es,reduce_lr], validation_data=(val_data, val_target))
+model.fit(x_train, y_train, batch_size=32, epochs=3, callbacks=[Es,reduce_lr], validation_data=(val_data, val_target))
 
 model.save('D:\study_data\_save\_h5/vegi07.h5')
 # model = load_model('D:\study_data\_save\_h5/vegi.h5')
