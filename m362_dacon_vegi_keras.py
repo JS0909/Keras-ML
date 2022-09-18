@@ -95,4 +95,3 @@ with zipfile.ZipFile("submissionKeras.zip", 'w') as my_zip:
 
 # vegi05
 # [0.29625755548477173, 0.2660003900527954]
-
