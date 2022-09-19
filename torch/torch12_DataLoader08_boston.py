@@ -40,8 +40,8 @@ from torch.utils.data import TensorDataset, DataLoader
 train_set = TensorDataset(x_train, y_train)
 test_set = TensorDataset(x_test, y_test)
 
-train_loader = DataLoader(train_set, batch_size=32)
-test_loader = DataLoader(test_set, batch_size=32)
+train_loader = DataLoader(train_set, batch_size=32, shuffle=True)
+test_loader = DataLoader(test_set, batch_size=32, shuffle=False)
 
 
 # 2. model
