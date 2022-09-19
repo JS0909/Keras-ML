@@ -1,7 +1,9 @@
 *.hdf5
 *.mp4
 *.jpg
+*.png
 *.avi
 *.dat
 *.npy
 *.h5
+YOLOv5

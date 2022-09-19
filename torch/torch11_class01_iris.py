@@ -45,7 +45,7 @@ print(x_train.size())
 # 2. model
 class Model(nn.Module): # 상속은 상위 클래스만 넣을 수 있음
     def __init__(self, input_dim, output_dim): # 사용할 레이어들 정의
-        # super().__init__()
+        # super().__init__() # Model의 부모 클래스도 init 해줌
         super(Model, self).__init__()
         self.linear1 = nn.Linear(input_dim, 64)
         self.linear2 = nn.Linear(64, 32)
