@@ -16,7 +16,7 @@ path = 'D:\study_data/_data\dacon_vegi/'
 
 train_data, label_data, val_data, val_target, test_input, test_target = jb.load(path+'datasets.dat')
 
-x_train,x_test,y_train,y_test = train_test_split(train_data,label_data,train_size=0.91,shuffle=True,random_state=123)
+x_train,x_test,y_train,y_test = train_test_split(train_data,label_data,train_size=0.91,shuffle=True,random_state=1234)
 # print(x_train.shape)
 
 #2. 모델 구성      
@@ -26,9 +26,8 @@ model.add(GRU(100,input_shape=(1440,37)))
 # model.add(GRU(50))
 model.add(Dense(100, activation='relu'))
 model.add(Dropout(0.1))
-model.add(Dense(50, activation='relu'))
+model.add(Dense(50))
 model.add(Dropout(0.1))
-model.add(Dense(80, activation='relu'))
 model.add(Dense(32, activation='relu'))
 model.add(Dense(1))
 # model.summary()
