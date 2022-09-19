@@ -52,7 +52,7 @@ print('================= len(train_set) ===================')
 print(len(train_set)) # 455
 
 train_loader = DataLoader(train_set, batch_size=40, shuffle=True)
-test_loader = DataLoader(test_set, batch_size=40, shuffle=True)
+test_loader = DataLoader(test_set, batch_size=40, shuffle=False)
 # test 데이터는 배치작업 안해도 되긴 함
 
 # 2. model
