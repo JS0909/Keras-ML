@@ -37,10 +37,10 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 
 
 CFG = {
-    'EPOCHS':20,
+    'EPOCHS':7,
     'LEARNING_RATE':5e-4,
     'BATCH_SIZE':16,
-    'SEED':106
+    'SEED':123
 }
 
 
@@ -143,14 +143,8 @@ class BaseModel(nn.Module):
         super(BaseModel, self).__init__()
         self.lstm = nn.LSTM(input_size=37, hidden_size=256, batch_first=True, bidirectional=False, dropout=0.3)
         self.classifier = nn.Sequential(
-            nn.Linear(256, 128),
-            nn.ReLU(),
-            nn.Linear(128, 64),
-            nn.ReLU(),
-            nn.Linear(64, 32),
-            nn.ReLU(),
-            nn.Linear(32, 16),
-            nn.Linear(16, 1),
+            nn.Linear(256, 64),
+            nn.Linear(64, 1),
         )
         
     def forward(self, x):
