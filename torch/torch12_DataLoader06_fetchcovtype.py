@@ -41,7 +41,7 @@ print(x_train.size(), len(y_train.unique()))
 train_set = TensorDataset(x_train, y_train)
 train_loader = DataLoader(train_set, batch_size=1000, shuffle=True)
 test_set = TensorDataset(x_test, y_test)
-test_loader = DataLoader(test_set, batch_size=1000, shuffle=True)
+test_loader = DataLoader(test_set, batch_size=1000, shuffle=False)
 
 # 2. model
 class Model(nn.Module): # 상속은 상위 클래스만 넣을 수 있음
