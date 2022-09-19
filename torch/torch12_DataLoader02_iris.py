@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 
-from sklearn.datasets import load_breast_cancer
+from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
@@ -13,7 +13,7 @@ DEVICE = torch.device('cuda:0' if USE_CUDA else 'cpu')
 print(torch.__version__, DEVICE) # 1.12.1 cuda:0
 
 # 1. data
-datasets = load_breast_cancer()
+datasets = load_iris()
 x = datasets.data
 y = datasets.target
 
@@ -41,7 +41,7 @@ train_set = TensorDataset(x_train, y_train)
 test_set = TensorDataset(x_test, y_test)
 
 train_loader = DataLoader(train_set, batch_size=100, shuffle=True)
-test_loader = DataLoader(test_set, batch_size=100, shuffle=True)
+test_loader = DataLoader(test_set, batch_size=100, shuffle=False)
 
 # 2. model
 class Model(nn.Module): # 상속은 상위 클래스만 넣을 수 있음
