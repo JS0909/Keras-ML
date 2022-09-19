@@ -1,5 +1,4 @@
 import numpy as np
-from torch import dropout
 from tensorflow.keras.datasets import mnist
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Dense, Conv2D, Flatten, MaxPooling2D, Input, Dropout, GlobalAveragePooling2D
