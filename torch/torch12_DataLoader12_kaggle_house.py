@@ -222,7 +222,7 @@ train_set = TensorDataset(x_train, y_train)
 test_set = TensorDataset(x_test, y_test)
 
 train_loader = DataLoader(train_set, batch_size=100, shuffle=True)
-test_loader = DataLoader(test_set, batch_size=100, shuffle=True)
+test_loader = DataLoader(test_set, batch_size=100, shuffle=False)
 
 # 2. model
 class Model(nn.Module): # 상속은 상위 클래스만 넣을 수 있음
