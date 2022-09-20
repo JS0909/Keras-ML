@@ -8,3 +8,6 @@
 *.h5
 YOLOv5
 team
+YOLOv7
+*.pt
+ocr
