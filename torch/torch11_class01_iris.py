@@ -1,5 +1,3 @@
-# 회귀에 0과 1의 논리를 붙인 이진분류 모델 (회귀에 sigmoid 붙인 것)
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
