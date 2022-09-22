@@ -20,10 +20,16 @@ y = datasets.target
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, shuffle=True, random_state=123, stratify=y)
 
 x_train = torch.FloatTensor(x_train)
-y_train = torch.FloatTensor(y_train).unsqueeze(1).to(DEVICE)
-x_test = torch.FloatTensor(x_test)
-y_test = torch.FloatTensor(y_test).unsqueeze(-1).to(DEVICE)
+# y_train = torch.FloatTensor(y_train).unsqueeze(1).to(DEVICE)
+# y_train = torch.FloatTensor(y_train).to(DEVICE)
+y_train = torch.LongTensor(y_train).to(DEVICE)
 
+x_test = torch.FloatTensor(x_test)
+# y_test = torch.FloatTensor(y_test).unsqueeze(-1).to(DEVICE)
+# y_test = torch.FloatTensor(y_test).to(DEVICE)
+y_test = torch.LongTensor(y_test).to(DEVICE)
+
+###### scale ######
 scaler = StandardScaler()
 x_train = scaler.fit_transform(x_train)
 x_test = scaler.transform(x_test)
@@ -32,21 +38,20 @@ x_train = torch.FloatTensor(x_train).to(DEVICE)
 x_test = torch.FloatTensor(x_test).to(DEVICE)
 
 print(x_train.size())
-# torch.Size([455, 30])
+# torch.Size([150, 4])
 
 ############################# DataLoader #############################
 from torch.utils.data import TensorDataset, DataLoader
                             # L x, y 합친거     # L x,y + batch 합친거
 train_set = TensorDataset(x_train, y_train)
 test_set = TensorDataset(x_test, y_test)
-
-train_loader = DataLoader(train_set, batch_size=100, shuffle=True)
-test_loader = DataLoader(test_set, batch_size=100, shuffle=False)
+train_loader = DataLoader(train_set, batch_size=40, shuffle=True)
+test_loader = DataLoader(test_set, batch_size=40, shuffle=False)
 
 # 2. model
 class Model(nn.Module): # 상속은 상위 클래스만 넣을 수 있음
     def __init__(self, input_dim, output_dim): # 사용할 레이어들 정의
-        # super().__init__()
+        # super().__init__() # Model의 부모 클래스도 init 해줌
         super(Model, self).__init__()
         self.linear1 = nn.Linear(input_dim, 64)
         self.linear2 = nn.Linear(64, 32)
@@ -64,13 +69,12 @@ class Model(nn.Module): # 상속은 상위 클래스만 넣을 수 있음
         x = self.linear3(x)
         x = self.relu(x)
         x = self.linear4(x)
-        x = self.sigmoid(x)
         return x
     
-model = Model(30, 1).to(DEVICE)
+model = Model(4, 3).to(DEVICE)
 
 # 3. compile, fit
-criterion = nn.BCELoss() # binary_crossentropy
+criterion = nn.CrossEntropyLoss() # softmax + sparse_categorical_crossentropy
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 def train(model, criterion, optimizer, loader):
@@ -81,19 +85,19 @@ def train(model, criterion, optimizer, loader):
         optimizer.zero_grad()
         hypothesis = model(x_batch)
         loss = criterion(hypothesis, y_batch)
-
+    
         loss.backward()
         optimizer.step()
         total_loss += loss.item()
     
     return total_loss / len(loader)
 
-EPOCHS = 100
+EPOCHS = 1000
 for epoch in range(1, EPOCHS+1):
-    loss = train(model, criterion, optimizer, train_set)
+    loss = train(model, criterion, optimizer, train_loader)
     print(epoch, '\t', loss)
 
-# 4. eval, pred
+# eval, pred
 def evaluate(model, criterion, loader):
     model.eval()
     
@@ -104,19 +108,21 @@ def evaluate(model, criterion, loader):
             loss = criterion(pred, y_batch)
             total_loss += loss.item()
             
-    return total_loss / len(loader)
+    return total_loss
 
 loss = evaluate(model, criterion, test_loader)
-pred_result = (model(x_test) >= 0.5).float()
+pred_result = torch.argmax(model(x_test), 1)
 
 score = (pred_result == y_test).float().mean()
 acc_score = accuracy_score(y_test.cpu(), pred_result.cpu())
 
 print(f'loss:{loss}')
-# print(f'pred_result:{pred_result}')
+print(f'pred_result:{pred_result}')
 print(f'score:{score:.4f}')
 print(f'acc_score:{acc_score:.4f}')
 
-# loss:0.5295606896524987
-# score:0.9825
-# acc_score:0.9825
+# loss:0.25718310475349426
+# pred_result:tensor([1, 0, 2, 2, 0, 0, 2, 1, 2, 0, 0, 2, 2, 1, 2, 1, 0, 0, 0, 0, 0, 2, 2, 1,
+#         2, 2, 1, 1, 1, 1], device='cuda:0')
+# score:0.9667
+# acc_score:0.9667
