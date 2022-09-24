@@ -19,3 +19,4 @@ return과 파라미터가 모두 있는거
 
 constant : 디스크에
 variable : 메모리에
+
