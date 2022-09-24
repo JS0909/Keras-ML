@@ -50,6 +50,7 @@ TRG.build_vocab(train_dataset, min_freq=2)
 print(f"len(SRC): {len(SRC.vocab)}")
 print(f"len(TRG): {len(TRG.vocab)}")
 
+# 무슨 숫자로 임베딩되는지 볼 수 있음
 print(TRG.vocab.stoi["abcabc"]) # 없는 단어: 0
 print(TRG.vocab.stoi[TRG.pad_token]) # 패딩(padding): 1
 print(TRG.vocab.stoi["<sos>"]) # <sos>: 2
