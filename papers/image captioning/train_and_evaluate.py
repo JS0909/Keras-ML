@@ -209,8 +209,8 @@ def main(_):
     loss_plot.append(total_loss / num_steps)
 
     # 5회 반복마다 파라미터값을 저장합니다.
-    if epoch % 5 == 0:
-      ckpt_manager.save(checkpoint_number=epoch)
+    # if epoch % 5 == 0:
+      # ckpt_manager.save(checkpoint_number=epoch)
 
     print ('Epoch {} Loss {:.6f}'.format(epoch, total_loss/num_steps))
     print ('Time taken for 1 epoch {} sec\n'.format(time.time() - start))
