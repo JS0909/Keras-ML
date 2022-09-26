@@ -730,10 +730,13 @@ def translate_sentence(sentence, src_field, trg_field, model, device, max_len=50
     # 첫 번째 <sos>는 제외하고 출력 문장 반환
     return trg_tokens[1:], attention
 
+# 번역할 문장 뽑기
 example_idx = 10
 
 src = vars(test_dataset.examples[example_idx])['src']
 trg = vars(test_dataset.examples[example_idx])['trg']
+
+# src = tokenize_de('Ich liebe dich.') # 이런식으로 원하는 문장 넣어볼 수 있음
 
 print(f'소스 문장: {src}')
 print(f'타겟 문장: {trg}')
