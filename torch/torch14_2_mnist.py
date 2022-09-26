@@ -18,8 +18,8 @@ path = 'D:\study_data\_data/torch_data/'
 # test_dataset = MNIST(path, train=False, download=True, transform=transf)
 # print(train_dataset[0][0].shape) # torch.Size([1, 15, 15])
 
-train_dataset = MNIST(path, train=True, download=True, transform=transf)
-test_dataset = MNIST(path, train=False, download=True, transform=transf)
+train_dataset = MNIST(path, train=True, download=True)
+test_dataset = MNIST(path, train=False, download=True)
 
 x_train, y_train = train_dataset.data/255. , train_dataset.targets
 x_test, y_test = test_dataset.data/255. , test_dataset.targets
