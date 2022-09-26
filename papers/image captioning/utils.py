@@ -34,6 +34,6 @@ def plot_attention(image, result, attention_plot):
     img = ax.imshow(temp_image)
     ax.imshow(temp_att, cmap='gray', alpha=0.6, extent=img.get_extent())
 
-  plt.tight_layout()
-  plt.savefig(image.split(os.path.sep)[-1].split('.')[-2] + ' attention' + '.png')
-  plt.show()
+  # plt.tight_layout()
+  # plt.savefig(image.split(os.path.sep)[-1].split('.')[-2] + ' attention' + '.png')
+  # plt.show()
