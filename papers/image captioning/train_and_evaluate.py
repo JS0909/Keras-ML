@@ -34,7 +34,7 @@ units = 512
 top_k = 5000
 vocab_size = top_k + 1
 attention_features_shape = 64
-EPOCHS = 20
+EPOCHS = 10
 
 # 빠른 학습을 위해서 shuffle된 set에서 처음 30000개만을 선택해서 데이터를 불러옵니다.
 train_captions, img_name_vector = prepare_image_and_caption_data(num_examples)
@@ -216,32 +216,36 @@ def main(_):
     print ('Time taken for 1 epoch {} sec\n'.format(time.time() - start))
 
   print('Training Finished !')
-  plt.plot(loss_plot)
-  plt.xlabel('Epochs')
-  plt.ylabel('Loss')
-  plt.title('Loss Plot')
-  plt.savefig('Loss plot.png')
-  plt.show()
+  # plt.plot(loss_plot)
+  # plt.xlabel('Epochs')
+  # plt.ylabel('Loss')
+  # plt.title('Loss Plot')
+  # plt.savefig('Loss plot.png')
+  # plt.show()
 
-  # validation set에서 random하게 1장의 이미지를 뽑아 해당 이미지에 대한 captioning을 진행합니다.
+  # validation set에서 random하게 1장의 이미지를 뽑아 해당 이미지에 대한 captioning을 진행합니다.잔차 연결
   rid = np.random.randint(0, len(img_name_val))
   image = img_name_val[rid]
   real_caption = ' '.join([tokenizer.index_word[i] for i in cap_val[rid] if i not in [0]])
-  result, attention_plot = evaluate(image, max_length, attention_features_shape, encoder, decoder, image_features_extract_model, tokenizer)
+  result, _ = evaluate(image, max_length, attention_features_shape, encoder, decoder, image_features_extract_model, tokenizer)
 
   print ('Real Caption:', real_caption)
   print ('Prediction Caption:', ' '.join(result))
-  plot_attention(image, result, attention_plot)
 
   # test를 위해서 surfer 이미지 한장을 다운받은뒤, 해당 이미지에 대한 captioning을 진행해봅니다.
-  image_url = 'https://tensorflow.org/images/surf.jpg'
-  image_extension = image_url[-4:]
-  image_path = tf.keras.utils.get_file('image' + image_extension, origin=image_url)
+  # image_url = 'https://tensorflow.org/images/surf.jpg'
+  # image_extension = image_url[-4:]
+  # image_path = tf.keras.utils.get_file('image' + image_extension, origin=image_url)
 
-  result, attention_plot = evaluate(image_path, max_length, attention_features_shape, encoder, decoder, image_features_extract_model, tokenizer)
+  image_path = 'WERWE.JPG'
+  result, _ = evaluate(image_path, max_length, attention_features_shape, encoder, decoder, image_features_extract_model, tokenizer)
   print('Prediction Caption:', ' '.join(result))
-  plot_attention(image_path, result, attention_plot)
 
 if __name__ == '__main__':
   # main 함수를 호출합니다.
   app.run(main)
+  
+  
+  
+# Downloading data from https://tensorflow.org/images/surf.jpg
+# Prediction Caption: a man riding on a clear ocean <end>
