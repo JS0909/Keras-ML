@@ -11,3 +11,10 @@ team
 YOLOv7
 *.pt
 ocr
+*.zip
+*.pyc
+*.json
+*.index
+ckpt*
+checkpoints
+image_classifier
