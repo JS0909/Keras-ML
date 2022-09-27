@@ -12,6 +12,7 @@ from models_ import *
 from caption_train_test_val_split import *
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(device)
 
 model_path = "D:\study_data\_data\Flickr8k\models_save/" # 학습된 모델이 저장될 경로
 crop_size = 224 # 랜덤하게 잘라낼 이미지 크기
@@ -143,12 +144,6 @@ for epoch in range(num_epochs):
                 print('Epoch [{}/{}], Step [{}/{}], Average Loss: {:.4f}, Perplexity: {:5.4f}, Elapsed time: {:.4f}s'
                       .format(epoch, num_epochs, i, total_step, total_loss / total_count, np.exp(loss.item()), time.time() - start_time))
             
-def run():
-    torch.multiprocessing.freeze_support()
-    print('loop')
-
-if __name__ == '__main__':
-    run()
            
 def load_image(image_path, transform=None):
     image = Image.open(image_path).convert('RGB')
