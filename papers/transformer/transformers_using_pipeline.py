@@ -1,8 +1,8 @@
 from transformers import pipeline
 
-classifier = pipeline('sentiment-analysis')
-res = classifier('I like reading a book.')
-print(res)
+# classifier = pipeline('sentiment-analysis')
+# res = classifier('I like reading a book.')
+# print(res)
 
 generator = pipeline('text-generation', model='distilgpt2')
 res = generator(
@@ -12,8 +12,8 @@ res = generator(
     )
 print(res)
 
-generator = pipeline('translation_en_to_de')
-res = generator(
-    'Do you like pineapple?'
-)
-print(res)
+# generator = pipeline('translation_en_to_de')
+# res = generator(
+#     'Do you like pineapple?'
+# )
+# print(res)
