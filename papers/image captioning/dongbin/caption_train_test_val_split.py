@@ -71,3 +71,5 @@ for word in words:
 # Vocabulary 파일 저장
 with open(vocab_path, 'wb') as f:
     pickle.dump(vocab, f)
+    
+print('done.')
