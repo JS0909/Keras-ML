@@ -17,7 +17,7 @@ class EncoderCNN(nn.Module):
         # 입력 이미지에서 특징 벡터(feature vectors)
         with torch.no_grad(): # 네트워크의 앞 부분은 변경되지 않도록 하기
             features = self.resnet(images)
-        features = features.reshape(features.size(0), -1)
+        features = features.reshape(features.size(0), -1) # flatten()
         features = self.bn(self.linear(features))
         return features
 

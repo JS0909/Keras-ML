@@ -2,7 +2,7 @@ import pickle
 import nltk
 from collections import Counter
 
-# nltk.download('punkt')
+# nltk.download('punkt') 토크나이저 다운로드
 
 caption_path = "D:\study_data\_data\Flickr8k/captions.txt" # 원본 캡션(caption) 파일
 vocab_path = "D:\study_data\_data\Flickr8k/vocab/vocab.pkl" # 단어 사전 결과 파일
@@ -56,6 +56,11 @@ with open(caption_path, "r") as f:
 
 # 단어의 빈도수가 특정 임계치(threshold) 이상인 경우에만 사용
 words = [word for word, cnt in counter.items() if cnt >= word_threshold]
+
+words=[]
+for word, cnt in counter.items():
+    if cnt >= word_threshold:
+        words.append(word)
 
 # Vocabulary 객체 생성
 vocab = Vocabulary()
