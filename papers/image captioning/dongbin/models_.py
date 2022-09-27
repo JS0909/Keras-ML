@@ -3,7 +3,6 @@ import torch.nn as nn
 import torchvision.models as models
 from torch.nn.utils.rnn import pack_padded_sequence
 
-
 class EncoderCNN(nn.Module):
     def __init__(self, embed_size):
         # 사전 학습된(pre-trained) ResNet-101을 불러와 FC 레이어를 교체
