@@ -65,3 +65,13 @@ conda install -c anaconda tensorflow==1.14
 
 파이토치설치
 pytorch.org 접속 -> 페이지 중간쯤에 설치 옵션 선택 -> 원하는 가상환경 활성화 후 명령어 cmd 에 복붙
+
+-gpu 안돌아가면-
+conda create -n torch1121 python=3.9.0 anaconda설치
+activate torch1121
+pytorch.org install 페이지로 접속
+버전 골라서 명령어 긁어서 설치
+
+GPU 작동 안할 경우
+pip uninstall torch, torchvision, torchaudio
+하고 다시 홈페이지 긁어서 설치
