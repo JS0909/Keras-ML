@@ -315,4 +315,3 @@ print(y_pred)
 # generate_caption("1002674143_1b742ab4b8.jpg")
 # generate_caption("101669240_b2d3e7f17b.jpg")
 
-
