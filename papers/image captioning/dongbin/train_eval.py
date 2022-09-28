@@ -69,7 +69,7 @@ num_layers = 1 # LSTM의 레이어 개수
 encoder = EncoderCNN(embed_size).to(device)
 decoder = DecoderRNN(embed_size, hidden_size, len(vocab), num_layers).to(device)
 
-num_epochs = 5
+num_epochs = 1
 learning_rate = 0.001
 
 log_step = 20 # 로그를 출력할 스텝(step)
