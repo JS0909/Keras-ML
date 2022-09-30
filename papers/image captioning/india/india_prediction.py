@@ -4,17 +4,17 @@ import numpy as np
 from tqdm.notebook import tqdm
 
 from keras.applications.vgg16 import VGG16, preprocess_input
-from tensorflow.keras.preprocessing.image import load_img, img_to_array
+from keras.preprocessing.image import load_img, img_to_array
 from keras.preprocessing.text import Tokenizer
-from tensorflow.keras.preprocessing.sequence import pad_sequences
+from keras.preprocessing.sequence import pad_sequences
 from keras.models import Model, load_model
-from keras.utils import to_categorical, plot_model
+from tensorflow.keras.utils import to_categorical
 from keras.layers import Input, Dense, LSTM, Embedding, Dropout, add
 
-BASE_DIR = 'D:\study_data\_data\Flickr8k/'
+BASE_DIR = 'D:\study_data\_data/team_project\Flickr8k/'
 WORKING_DIR = 'D:\study_data\_data\Flickr8k/working'
 
-'''
+
 # load vgg16 model
 model = VGG16()
 # restructure the model
@@ -52,7 +52,7 @@ for img_name in tqdm(os.listdir(directory)):
 # store features in pickle
 pickle.dump(features, open(os.path.join(WORKING_DIR, 'features.pkl'), 'wb'))
 print('img processing done.')
-'''
+
 # load features from pickle
 with open(os.path.join(WORKING_DIR, 'features.pkl'), 'rb') as f:
     features = pickle.load(f)
@@ -70,8 +70,8 @@ for line in tqdm(captions_doc.split('\n')):
     # split the line by comma(,)
     tokens = line.split(',')
     
-    # if len(line) < 2: # 1단어짜리 스킵용도
-    #     continue
+    if len(line) < 1: # 0 단어짜리 스킵용도. caption.txt 파일 맨마지막에 빈문장자리가 있어서 그거 걸러내는 용도
+        continue
     
     image_id, caption = tokens[0], tokens[1:]
     # remove extension from image ID
@@ -109,8 +109,8 @@ def clean(mapping): # 맵핑 딕셔너리 안의 caption을 전처리
             caption = 'start ' + " ".join([word for word in caption.split()]) + ' end'
             # 스페이스 기준 잘라서 넣기
             '''a child is standing on her head .
-            start a child is standing on her head end'''
-            captions[i] = caption.replace(' .', '')
+            start a child is standing on her head end .'''
+            captions[i] = caption.replace(' .', '') # 마침표 제거
             
 
 # before preprocess of text
@@ -182,10 +182,12 @@ def data_generator(data_keys, mapping, features, tokenizer, max_length, vocab_si
                     # pad input sequence
                     in_seq = pad_sequences([in_seq], maxlen=max_length)[0] # 최대 문장 길이만큼 패딩(0을 앞쪽에 채움)
                     # encode output sequence
-                    out_seq = to_categorical([out_seq], num_classes=vocab_size)[0] # 이해 안감... 아오
+                    out_seq = to_categorical([out_seq], num_classes=vocab_size)[0] 
+                    # 마지막에 소프트맥스값으로 뽑긴 함. 근데 여기서 원핫을 때린다고 원핫밸류가 다르게 찍히는게 이해가 안가는게
+                    # 여기선 지금 한문장따리만 투카테고리컬에 들어가거든? 그러면 투카테고리컬이 이전 밸류들을 다 기억을 하고 있다는 소린거 같은데 그런가봄
                     
                     # store the sequences
-                    X1.append(features[key][0])
+                    X1.append(features[key][0]) # features 에 하나의 key에 해당하는 이미지 피쳐가 리스트로 묶여있기 때문에 인덱스로 부름
                     X2.append(in_seq)
                     y.append(out_seq)
             if n == batch_size: # 배치 사이즈만큼 차면 yield로 한묶음 채워서 뱉음
@@ -193,8 +195,20 @@ def data_generator(data_keys, mapping, features, tokenizer, max_length, vocab_si
                 yield [X1, X2], y
                 X1, X2, y = list(), list(), list()
                 n = 0
-                
-                
+
+# yield 는 해당 함수가 반복문을 통해 실행 될때마다 차례대로 값을 뱉도록 해준다
+# 즉 현재 함수 내에서 while문으로 생성된 yield는 제너레이터형식 주소 안에 차곡차곡 쌓이게 되고
+# 함수를 반복해서 부를 때마다 쌓인 yield 가 리턴되는 형태이다
+# 그러니까 지금 배치 크기일때 마다 해당 함수의 주소에
+# yield1 [X1, X2], y
+# yield2 [X1, X2], y
+# yield3 [X1, X2], y
+# ...
+# 이런 형태로 리턴되길 대기하는 중인 것
+# while 이 없어도 작동 함
+
+# mapping 에는 이미지 아이디별로 캡션 5개씩 딕셔너리로 되어있고
+# features 에는 이미지 아이디별로 VGG16을 통과한 값이 딕셔너리로 되어있음  
   
 # encoder model
 # image feature layers
@@ -215,15 +229,15 @@ outputs = Dense(vocab_size, activation='softmax')(decoder2)
 model = Model(inputs=[inputs1, inputs2], outputs=outputs)
 model.compile(loss='categorical_crossentropy', optimizer='adam')
 
-# plot the model
-plot_model(model, show_shapes=True)
-
 
 # train the model
 print('start training...')
-epochs = 40
+epochs = 2
 batch_size = 32
 steps = len(train) // batch_size # 1 batch 당 훈련하는 데이터 수
+# len(train): 8091 / steps: 252
+# 제너레이터 함수에서 yield로 252개의 [X1, X2], y 묶음이 차곡차곡 쌓여 있고  steps_per_epoch=steps 이 옵션으로
+# epoch 1번짜리 fit을 돌때 252번(정해준steps번) generator 를 호출함. iterating 을 steps번 함
 
 for i in range(epochs):
     print(f'epoch: {i+1}')
@@ -231,8 +245,8 @@ for i in range(epochs):
     generator = data_generator(train, mapping, features, tokenizer, max_length, vocab_size, batch_size)
     # fit for one epoch
     model.fit(generator, epochs=1, steps_per_epoch=steps, verbose=1) # generator -> [X1, X2], y
-print('done training.')      
-                
+print('done training.')
+
 # save the model
 model.save(WORKING_DIR+'/best_model.h5')
 
@@ -244,17 +258,17 @@ def idx_to_word(integer, tokenizer):
 
 
 # generate caption for an image
-def predict_caption(model, image, tokenizer, max_length):
+def predict_caption(model, image, tokenizer, max_length): # 여기서 image 자리는 vgg 통과해 나온 feature의 자리임
     # add start tag for generation process
-    in_text = 'start'
+    in_text = 'start' # 빈 문장 생성
     # iterate over the max length of sequence
     for i in range(max_length):
         # encode input sequence
-        sequence = tokenizer.texts_to_sequences([in_text])[0]
+        sequence = tokenizer.texts_to_sequences([in_text])[0] # 이거 인덱스 없으면 대괄호 하나 더 있어서 4차원이라 LSTM 이 안먹겠다고 오류남
         # pad the sequence
         sequence = pad_sequences([sequence], max_length)
         # predict next word
-        yhat = model.predict([image, sequence], verbose=0)
+        yhat = model.predict([image, sequence], verbose=0) # X1 (feature) / X2 (문장)
         # get index with high probability
         yhat = np.argmax(yhat)
         # convert index to word
@@ -288,8 +302,8 @@ for key in tqdm(test):
     predicted.append(y_pred)
     
 # calcuate BLEU score
-print("BLEU-1: %f" % corpus_bleu(actual, predicted, weights=(1.0, 0, 0, 0)))
-print("BLEU-2: %f" % corpus_bleu(actual, predicted, weights=(0.5, 0.5, 0, 0)))
+print("BLEU-1: %f" % corpus_bleu(actual, predicted, weights=(1.0, 0, 0, 0)))        # 1-gram 만 뽑음
+print("BLEU-2: %f" % corpus_bleu(actual, predicted, weights=(0.5, 0.5, 0, 0)))      # 1-gram 과 2-gram 만 뽑되 각각 같은 가중치를 두고 뽑음
 
 
 from PIL import Image
@@ -312,7 +326,7 @@ def generate_caption(image_name):
     plt.show()
 '''
 
-image = load_img('C:\AIA_Team_Project\Project\img_captioning\india/siberian-husky-g84d30ce80_1280.jpg', target_size=(224, 224))
+image = load_img('D:\study_data\_data/team_project\predict_img/siberian-husky-g84d30ce80_1280.jpg', target_size=(224, 224))
 # convert image pixels to numpy array
 image = img_to_array(image)
 # reshape data for model
@@ -321,11 +335,11 @@ image = image.reshape((1, image.shape[0], image.shape[1], image.shape[2]))
 print('extracting features..')
 model = VGG16()
 model = Model(inputs=model.inputs, outputs=model.layers[-2].output)
-predic_feature = model.predict(image, verbose=1)
+predic_features = model.predict(image, verbose=1)
 
 print('prediction..')
 model = load_model(WORKING_DIR+'/best_model.h5')
-y_pred = predict_caption(model, predic_feature, tokenizer, max_length)
+y_pred = predict_caption(model, predic_features, tokenizer, max_length)
 y_pred = y_pred.replace('start', '')
 y_pred = y_pred.replace('end', '')
 print(y_pred)
@@ -333,3 +347,29 @@ print(y_pred)
 # generate_caption("1001773457_577c3a7d70.jpg")
 # generate_caption("1002674143_1b742ab4b8.jpg")
 # generate_caption("101669240_b2d3e7f17b.jpg")
+
+
+''' input 시퀀스와 output 시퀀스 쌍
+in: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3
+ 1]
+out: [0. 0. 0. ... 0. 0. 0.]    # 원핫 상태
+
+in: [ 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+  0  0  0  0  0  0  0  0  0  0  0  3  1 11]
+out: [0. 0. 0. ... 0. 0. 0.]
+
+in: [  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   3   1
+  11 620]
+out: [0. 0. 0. ... 0. 0. 0.]
+
+in: [  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   3   1  11
+ 620   6]
+out: [0. 1. 0. ... 0. 0. 0.]
+
+in: [  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0   0   0   0   0   3   1  11 620
+   6   1]
+out: [0. 0. 0. ... 0. 0. 0.]
+'''

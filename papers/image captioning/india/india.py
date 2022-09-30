@@ -4,17 +4,17 @@ import numpy as np
 from tqdm.notebook import tqdm
 
 from keras.applications.vgg16 import VGG16, preprocess_input
-from keras.applications import ResNet101
+# from keras.applications import ResNet101
 from keras.preprocessing.image import load_img, img_to_array
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 from keras.models import Model, load_model
-from keras.utils import to_categorical, plot_model
+from tensorflow.keras.utils import to_categorical
 from keras.layers import Input, Dense, LSTM, Embedding, Dropout, add
 
 BASE_DIR = 'D:\study_data\_data\Flickr8k/'
 WORKING_DIR = 'D:\study_data\_data\Flickr8k/working'
-
+'''
 # load vgg16 model
 model = VGG16()
 # model = ResNet101()
@@ -53,7 +53,7 @@ for img_name in tqdm(os.listdir(directory)):
 # store features in pickle
 pickle.dump(features, open(os.path.join(WORKING_DIR, 'features.pkl'), 'wb'))
 print('img processing done.')
-
+'''
 # load features from pickle
 with open(os.path.join(WORKING_DIR, 'features.pkl'), 'rb') as f:
     features = pickle.load(f)
@@ -61,12 +61,12 @@ with open(os.path.join(WORKING_DIR, 'features.pkl'), 'rb') as f:
 
 with open(os.path.join(BASE_DIR, 'captions.txt'), 'r') as f:
     next(f)
-    captions_doc = f.readlines()[1:]
+    captions_doc = f.read()
 
 # create mapping of image to captions
 mapping = {}
 # process lines
-for line in tqdm(captions_doc):
+for line in tqdm(captions_doc.split('\n')):
     # split the line by comma(,)
     tokens = line.split(',')
     if len(line) < 2:
@@ -95,11 +95,11 @@ def clean(mapping):
             # convert to lowercase
             caption = caption.lower()
             # delete digits, special chars, etc., 
-            caption = caption.replace('[^B-Zb-z]', '')
+            caption = caption.replace('[^A-Za-z]', '')
             # delete additional spaces
             caption = caption.replace('\s+', ' ')
             # add start and end tags to the caption
-            caption = '<start> ' + " ".join([word for word in caption.split() if len(word)>1]) + ' <end>'
+            caption = 'start ' + " ".join([word for word in caption.split() if len(word)>1]) + ' end'
             captions[i] = caption
             
 
@@ -140,13 +140,13 @@ split = int(len(image_ids) * 0.90)
 train = image_ids[:split]
 test = image_ids[split:]
 
-# <start> girl going into wooden building <end>
+# start girl going into wooden building end
 #        X                   y
-# <start>                   girl
-# <start> girl              going
-# <start> girl going        into
+# start                   girl
+# start girl              going
+# start girl going        into
 # ...........
-# <start> girl going into wooden building      <end>
+# start girl going into wooden building      end
 
 
 # create data generator to get data in batch (avoids session crash)
@@ -202,10 +202,6 @@ outputs = Dense(vocab_size, activation='softmax')(decoder2)
 model = Model(inputs=[inputs1, inputs2], outputs=outputs)
 model.compile(loss='categorical_crossentropy', optimizer='adam')
 
-# plot the model
-plot_model(model, show_shapes=True)
-
-
 # train the model
 print('start training...')
 epochs = 20
@@ -232,7 +228,7 @@ def idx_to_word(integer, tokenizer):
 # generate caption for an image
 def predict_caption(model, image, tokenizer, max_length):
     # add start tag for generation process
-    in_text = '<start>'
+    in_text = 'start'
     # iterate over the max length of sequence
     for i in range(max_length):
         # encode input sequence
@@ -251,7 +247,7 @@ def predict_caption(model, image, tokenizer, max_length):
         # append word as input for generating next word
         in_text += " " + word
         # stop if we reach end tag
-        if word == '<end>':
+        if word == 'end':
             break
       
     return in_text
