@@ -12,9 +12,9 @@ from tensorflow.keras.utils import to_categorical
 from keras.layers import Input, Dense, LSTM, Embedding, Dropout, add
 
 BASE_DIR = 'D:\study_data\_data/team_project\Flickr8k/'
-WORKING_DIR = 'D:\study_data\_data\Flickr8k/working'
+WORKING_DIR = 'D:\study_data\_data/team_project\Flickr8k/working'
 
-
+'''
 # load vgg16 model
 model = VGG16()
 # restructure the model
@@ -52,6 +52,7 @@ for img_name in tqdm(os.listdir(directory)):
 # store features in pickle
 pickle.dump(features, open(os.path.join(WORKING_DIR, 'features.pkl'), 'wb'))
 print('img processing done.')
+'''
 
 # load features from pickle
 with open(os.path.join(WORKING_DIR, 'features.pkl'), 'rb') as f:
@@ -106,7 +107,7 @@ def clean(mapping): # 맵핑 딕셔너리 안의 caption을 전처리
             # delete additional spaces
             caption = caption.replace('\s+', ' ') # [ \t\n\r\f\v] 가 1번 이상 나오면 공백으로 변경
             # add start and end tags to the caption
-            caption = 'start ' + " ".join([word for word in caption.split()]) + ' end'
+            caption = 'start ' + caption + ' end'
             # 스페이스 기준 잘라서 넣기
             '''a child is standing on her head .
             start a child is standing on her head end .'''

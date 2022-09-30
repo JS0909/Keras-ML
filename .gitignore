@@ -6,9 +6,6 @@
 *.dat
 *.npy
 *.h5
-YOLOv5
-team
-YOLOv7
 *.pt
 ocr
 *.zip
@@ -16,5 +13,10 @@ ocr
 *.json
 *.index
 ckpt*
+
 checkpoints
 image_classifier
+catboost_info
+__pycache__
+YOLOv5
+YOLOv7
