@@ -11,7 +11,7 @@ from keras.preprocessing.sequence import pad_sequences
 from keras.models import Model, load_model
 from tensorflow.keras.utils import to_categorical
 from keras.layers import Input, Dense, LSTM, Embedding, Dropout, add
-
+'''
 #================ json 파일 처리 ==================
 num_examples= 50000     # 훈련에 사용할 이미지 개수
 
@@ -89,7 +89,7 @@ print('img processing done.')
 
 # features = {'0':[이미지숫자화된거], '1':[이미지숫자화된거], '2':[이미지숫자화된거], ...}
 #===================================================================================================================================
-
+'''
 
 # features 파일 불러오기
 with open(os.path.join('D:\study_data\_data/team_project\coco_dataset\img_features/', 'features.pkl'), 'rb') as f:
@@ -108,8 +108,8 @@ for i, line in enumerate(train_captions):
   # store the caption
   mapping[image_id] = caption
 
-print('mapping:',mapping)
-print('mapping_len:', len(mapping))
+# print('mapping:', mapping)
+# print('mapping_len:', len(mapping))
 # mapping = {'0':[캡션문장], '1':[캡션문장], '2':[캡션문장], ...}
 
 
@@ -211,8 +211,8 @@ model.compile(loss='categorical_crossentropy', optimizer='adam')
 
 # train the model
 print('start training...')
-epochs = 50
-batch_size = 100
+epochs = 30
+batch_size = 64
 steps = len(train) // batch_size # 1 batch 당 훈련하는 데이터 수
 
 # 제너레이터 함수에서 yield로 252개의 [X1, X2], y 묶음이 차곡차곡 쌓여 있고  steps_per_epoch=steps 이 옵션으로
@@ -289,3 +289,5 @@ print(y_pred)
 
 # 5만장에 50에포..
 # a black polar bear is looking out the back of a car 
+
+# a penguin is holding a tire on a rock
