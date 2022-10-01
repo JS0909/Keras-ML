@@ -211,8 +211,8 @@ model.compile(loss='categorical_crossentropy', optimizer='adam')
 
 # train the model
 print('start training...')
-epochs = 30
-batch_size = 64
+epochs = 50
+batch_size = 128
 steps = len(train) // batch_size # 1 batch 당 훈련하는 데이터 수
 
 # 제너레이터 함수에서 yield로 252개의 [X1, X2], y 묶음이 차곡차곡 쌓여 있고  steps_per_epoch=steps 이 옵션으로
@@ -264,7 +264,7 @@ def predict_caption(model, image, tokenizer, max_length): # 여기서 image 자�
       
   return in_text
 
-image = load_img('D:\study_data\_data/team_project\predict_img/siberian-husky-g84d30ce80_1280.jpg', target_size=(224, 224))
+image = load_img('D:\study_data\_data/team_project\predict_img/street-g27099b4c0_1280.jpg', target_size=(224, 224))
 # convert image pixels to numpy array
 image = img_to_array(image)
 # reshape data for model
@@ -287,7 +287,9 @@ print(y_pred)
 
 # a white polar bear offering a picture of a polar bear
 
-# 5만장에 50에포..
+# 5만장에 50에포.. 강아지두마리 사진
 # a black polar bear is looking out the back of a car 
-
 # a penguin is holding a tire on a rock
+
+# 5만장에 50에포 128배치.. 오토바이 사진
+# a motorcycle parked on a street next to a street
