@@ -211,7 +211,7 @@ model.compile(loss='categorical_crossentropy', optimizer='adam')
 
 # train the model
 print('start training...')
-epochs = 50
+epochs = 70
 batch_size = 64
 steps = len(train) // batch_size # 1 batch 당 훈련하는 데이터 수
 
