@@ -294,3 +294,6 @@ print(y_pred)
 # 5만장에 50에포 128배치.. 오토바이 사진
 # a motorcycle parked on a street next to a street
 # a person on a motorcycle with a helmet on the side
+
+# 70에포 64배치
+#  a man is sitting on a motorcycle with a usa flag

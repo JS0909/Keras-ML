@@ -52,7 +52,7 @@ for img_name in tqdm(os.listdir(directory)):
 # store features in pickle
 pickle.dump(features, open(os.path.join(WORKING_DIR, 'features.pkl'), 'wb'))
 print('img processing done.')
-'''
+''' 
 
 # load features from pickle
 with open(os.path.join(WORKING_DIR, 'features.pkl'), 'rb') as f:
@@ -108,7 +108,6 @@ def clean(mapping): # 맵핑 딕셔너리 안의 caption을 전처리
             caption = caption.replace('\s+', ' ') # [ \t\n\r\f\v] 가 1번 이상 나오면 공백으로 변경
             # add start and end tags to the caption
             caption = 'start ' + caption + ' end'
-            # 스페이스 기준 잘라서 넣기
             '''a child is standing on her head .
             start a child is standing on her head end .'''
             captions[i] = caption.replace(' .', '') # 마침표 제거
@@ -133,7 +132,7 @@ for key in mapping:
         
 print('all_captions_len:', len(all_captions))
 
-print(all_captions[:3]) # 캡션 아무거나 한개 보기
+print(all_captions[:3]) # 캡션 아무거나 몇개 보기
 
 
 # tokenize the text
@@ -153,13 +152,13 @@ split = int(len(image_ids) * 0.90) # train_test_split
 train = image_ids[:] # 안함
 # test = image_ids[split:]
 
-# <start> girl going into wooden building end
+# start girl going into wooden building end
 #        X                   y
-# <start>                   girl
-# <start> girl              going
-# <start> girl going        into
+# start                   girl
+# start girl              going
+# start girl going        into
 # ...........
-# <start> girl going into wooden building      end
+# start girl going into wooden building      end
 
 
 # create data generator to get data in batch (avoids session crash)
@@ -233,7 +232,7 @@ model.compile(loss='categorical_crossentropy', optimizer='adam')
 
 # train the model
 print('start training...')
-epochs = 2
+epochs = 50
 batch_size = 32
 steps = len(train) // batch_size # 1 batch 당 훈련하는 데이터 수
 # len(train): 8091 / steps: 252
@@ -344,6 +343,10 @@ y_pred = predict_caption(model, predic_features, tokenizer, max_length)
 y_pred = y_pred.replace('start', '')
 y_pred = y_pred.replace('end', '')
 print(y_pred)
+
+
+# epoch 50 / batch 32
+# two dogs play in the snow 
 
 # generate_caption("1001773457_577c3a7d70.jpg")
 # generate_caption("1002674143_1b742ab4b8.jpg")
