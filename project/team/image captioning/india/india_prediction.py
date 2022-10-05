@@ -78,7 +78,7 @@ for line in tqdm(captions_doc.split('\n')):
     # remove extension from image ID
     image_id = image_id.split('.')[0] # . 이후 지움
     # convert caption list to string
-    caption = "".join(caption)
+    caption = " ".join(caption)
     '''['A small child is jumping on a bed .\n']
             A small child is jumping on a bed .'''
     
@@ -107,9 +107,9 @@ def clean(mapping): # 맵핑 딕셔너리 안의 caption을 전처리
             # delete additional spaces
             caption = caption.replace('\s+', ' ') # [ \t\n\r\f\v] 가 1번 이상 나오면 공백으로 변경
             # add start and end tags to the caption
-            caption = 'start ' + caption + ' end'
+            caption = 'startseq ' + caption + ' endseq'
             '''a child is standing on her head .
-            start a child is standing on her head end .'''
+            startseq a child is standing on her head endseq .'''
             captions[i] = caption.replace(' .', '') # 마침표 제거
             
 
@@ -149,16 +149,17 @@ print('max_len:', max_length)
 
 image_ids = list(mapping.keys())
 split = int(len(image_ids) * 0.90) # train_test_split
-train = image_ids[:] # 안함
-# test = image_ids[split:]
+# train = image_ids[:] # 안함
+train = image_ids[:split]
+test = image_ids[split:]
 
-# start girl going into wooden building end
+# startseq girl going into wooden building endseq
 #        X                   y
-# start                   girl
-# start girl              going
-# start girl going        into
+# startseq                   girl
+# startseq girl              going
+# startseq girl going        into
 # ...........
-# start girl going into wooden building      end
+# startseq girl going into wooden building      endseq
 
 
 # create data generator to get data in batch (avoids session crash)
@@ -166,35 +167,35 @@ def data_generator(data_keys, mapping, features, tokenizer, max_length, vocab_si
     # loop over images
     X1, X2, y = list(), list(), list()
     n = 0
-    while 1:
-        for key in data_keys:
-            n += 1
-            captions = mapping[key]
-            # process each caption
-            for caption in captions:
-                # encode the sequence
-                seq = tokenizer.texts_to_sequences([caption])[0] # 리스트 안에 넣고 (한문장씩 들어가 있으니까)
-                                                                 # 첫문장을 토크나이징하는 것으로 해야함
-                # split the sequence into X, y pairs
-                for i in range(1, len(seq)):
-                    # split into input and output pairs
-                    in_seq, out_seq = seq[:i], seq[i] # 현재 문장을 인풋으로, 다음에 올 단어를 아웃풋으로
-                    # pad input sequence
-                    in_seq = pad_sequences([in_seq], maxlen=max_length)[0] # 최대 문장 길이만큼 패딩(0을 앞쪽에 채움)
-                    # encode output sequence
-                    out_seq = to_categorical([out_seq], num_classes=vocab_size)[0] 
-                    # 마지막에 소프트맥스값으로 뽑긴 함. 근데 여기서 원핫을 때린다고 원핫밸류가 다르게 찍히는게 이해가 안가는게
-                    # 여기선 지금 한문장따리만 투카테고리컬에 들어가거든? 그러면 투카테고리컬이 이전 밸류들을 다 기억을 하고 있다는 소린거 같은데 그런가봄
-                    
-                    # store the sequences
-                    X1.append(features[key][0]) # features 에 하나의 key에 해당하는 이미지 피쳐가 리스트로 묶여있기 때문에 인덱스로 부름
-                    X2.append(in_seq)
-                    y.append(out_seq)
-            if n == batch_size: # 배치 사이즈만큼 차면 yield로 한묶음 채워서 뱉음
-                X1, X2, y = np.array(X1), np.array(X2), np.array(y)
-                yield [X1, X2], y
-                X1, X2, y = list(), list(), list()
-                n = 0
+
+    for key in data_keys:
+        n += 1
+        captions = mapping[key]
+        # process each caption
+        for caption in captions:
+            # encode the sequence
+            seq = tokenizer.texts_to_sequences([caption])[0] # 리스트 안에 넣고 (한문장씩 들어가 있으니까)
+                                                                # 첫문장을 토크나이징하는 것으로 해야함
+            # split the sequence into X, y pairs
+            for i in range(1, len(seq)):
+                # split into input and output pairs
+                in_seq, out_seq = seq[:i], seq[i] # 현재 문장을 인풋으로, 다음에 올 단어를 아웃풋으로
+                # pad input sequence
+                in_seq = pad_sequences([in_seq], maxlen=max_length)[0] # 최대 문장 길이만큼 패딩(0을 앞쪽에 채움)
+                # encode output sequence
+                out_seq = to_categorical([out_seq], num_classes=vocab_size)[0] 
+                # 마지막에 소프트맥스값으로 뽑긴 함. 근데 여기서 원핫을 때린다고 원핫밸류가 다르게 찍히는게 이해가 안가는게
+                # 여기선 지금 한문장따리만 투카테고리컬에 들어가거든? 그러면 투카테고리컬이 이전 밸류들을 다 기억을 하고 있다는 소린거 같은데 그런가봄
+                
+                # store the sequences
+                X1.append(features[key][0]) # features 에 하나의 key에 해당하는 이미지 피쳐가 리스트로 묶여있기 때문에 인덱스로 부름
+                X2.append(in_seq)
+                y.append(out_seq)
+        if n == batch_size: # 배치 사이즈만큼 차면 yield로 한묶음 채워서 뱉음
+            X1, X2, y = np.array(X1), np.array(X2), np.array(y)
+            yield [X1, X2], y
+            X1, X2, y = list(), list(), list()
+            n = 0
 
 # yield 는 해당 함수가 반복문을 통해 실행 될때마다 차례대로 값을 뱉도록 해준다
 # 즉 현재 함수 내에서 while문으로 생성된 yield는 제너레이터형식 주소 안에 차곡차곡 쌓이게 되고
@@ -232,7 +233,7 @@ model.compile(loss='categorical_crossentropy', optimizer='adam')
 
 # train the model
 print('start training...')
-epochs = 50
+epochs = 5
 batch_size = 32
 steps = len(train) // batch_size # 1 batch 당 훈련하는 데이터 수
 # len(train): 8091 / steps: 252
@@ -260,7 +261,7 @@ def idx_to_word(integer, tokenizer):
 # generate caption for an image
 def predict_caption(model, image, tokenizer, max_length): # 여기서 image 자리는 vgg 통과해 나온 feature의 자리임
     # add start tag for generation process
-    in_text = 'start' # 빈 문장 생성
+    in_text = 'startseq' # 빈 문장 생성
     # iterate over the max length of sequence
     for i in range(max_length):
         # encode input sequence
@@ -340,8 +341,8 @@ predic_features = model.predict(image, verbose=1)
 print('prediction..')
 model = load_model(WORKING_DIR+'/best_model.h5')
 y_pred = predict_caption(model, predic_features, tokenizer, max_length)
-y_pred = y_pred.replace('start', '')
-y_pred = y_pred.replace('end', '')
+y_pred = y_pred.replace('startseq', '')
+y_pred = y_pred.replace('endseq', '')
 print(y_pred)
 
 
