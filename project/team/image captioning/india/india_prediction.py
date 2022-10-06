@@ -4,6 +4,7 @@ import numpy as np
 from tqdm.notebook import tqdm
 
 from keras.applications.vgg16 import VGG16, preprocess_input
+from keras.applications.resnet import ResNet101
 from keras.preprocessing.image import load_img, img_to_array
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
@@ -16,9 +17,10 @@ WORKING_DIR = 'D:\study_data\_data/team_project\Flickr8k/working'
 
 '''
 # load vgg16 model
-model = VGG16()
+# model = VGG16()
+model = ResNet101()
 # restructure the model
-model = Model(inputs=model.inputs, outputs=model.layers[-2].output)
+model = Model(inputs=model.inputs, outputs=model.layers[-1].output)
 # summarize
 # model.summary()
 
@@ -50,12 +52,12 @@ for img_name in tqdm(os.listdir(directory)):
 # print(features)
 
 # store features in pickle
-pickle.dump(features, open(os.path.join(WORKING_DIR, 'features.pkl'), 'wb'))
+pickle.dump(features, open(os.path.join(WORKING_DIR, 'features_Res.pkl'), 'wb'))
 print('img processing done.')
-''' 
+'''
 
 # load features from pickle
-with open(os.path.join(WORKING_DIR, 'features.pkl'), 'rb') as f:
+with open(os.path.join(WORKING_DIR, 'features_Res.pkl'), 'rb') as f:
     features = pickle.load(f)
     
     
@@ -213,7 +215,7 @@ def data_generator(data_keys, mapping, features, tokenizer, max_length, vocab_si
   
 # encoder model
 # image feature layers
-inputs1 = Input(shape=(4096,))
+inputs1 = Input(shape=(1000,))
 fe1 = Dropout(0.4)(inputs1)
 fe2 = Dense(256, activation='relu')(fe1)
 # sequence feature layers
@@ -230,7 +232,7 @@ outputs = Dense(vocab_size, activation='softmax')(decoder2)
 model = Model(inputs=[inputs1, inputs2], outputs=outputs)
 model.compile(loss='categorical_crossentropy', optimizer='adam')
 
-
+'''
 # train the model
 print('start training...')
 epochs = 5
@@ -250,7 +252,7 @@ print('done training.')
 
 # save the model
 model.save(WORKING_DIR+'/best_model.h5')
-
+'''
 def idx_to_word(integer, tokenizer):
     for word, index in tokenizer.word_index.items():
         if index == integer:
@@ -334,8 +336,9 @@ image = img_to_array(image)
 image = image.reshape((1, image.shape[0], image.shape[1], image.shape[2]))
 
 print('extracting features..')
-model = VGG16()
-model = Model(inputs=model.inputs, outputs=model.layers[-2].output)
+# model = VGG16()
+model = ResNet101()
+model = Model(inputs=model.inputs, outputs=model.layers[-1].output)
 predic_features = model.predict(image, verbose=1)
 
 print('prediction..')
