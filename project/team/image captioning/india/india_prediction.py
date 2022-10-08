@@ -222,17 +222,18 @@ fe2 = Dense(256, activation='relu')(fe1)
 inputs2 = Input(shape=(max_length,))
 se1 = Embedding(vocab_size, 256, mask_zero=True)(inputs2)
 se2 = Dropout(0.4)(se1)
-se3 = LSTM(256)(se2)
+se3 = Dense(256)(se2)
 
 # decoder model
 decoder1 = add([fe2, se3])
-decoder2 = Dense(256, activation='relu')(decoder1)
-outputs = Dense(vocab_size, activation='softmax')(decoder2)
+decoder2 = LSTM(256)(decoder1)
+decoder3 = Dense(256, activation='relu')(decoder2)
+outputs = Dense(vocab_size, activation='softmax')(decoder3)
 
 model = Model(inputs=[inputs1, inputs2], outputs=outputs)
 model.compile(loss='categorical_crossentropy', optimizer='adam')
 
-'''
+
 # train the model
 print('start training...')
 epochs = 5
@@ -252,7 +253,7 @@ print('done training.')
 
 # save the model
 model.save(WORKING_DIR+'/best_model.h5')
-'''
+
 def idx_to_word(integer, tokenizer):
     for word, index in tokenizer.word_index.items():
         if index == integer:
