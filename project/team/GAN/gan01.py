@@ -108,7 +108,7 @@ dgx_epoch = []      # epoch 별 D(G(z)) 스코어 -> 만들어낸 이미지로 �
 total_step = len(data_loader)
 
 for epoch in range(num_epochs):
-    for i, (images, _) in enumerate(data_loader):   # data_loader 에 image, label 로 있나봄      
+    for i, (images, _) in enumerate(data_loader):   # data_loader 에 image, label 로 있나봄       
         # 이미지는 지금 4차원일 것. (배치개수, 채널, 가로, 세로) : (100, 1, 28, 28)  
         images = images.reshape(batch_size, -1).to(device)  # 여기서 (100, 1*28*28) 로 차원 변경
         # Create the labels which are later used as input for the BCE loss
