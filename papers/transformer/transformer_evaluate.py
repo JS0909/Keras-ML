@@ -4,7 +4,7 @@ import torch
 import spacy
 import en_core_web_sm
 
-from transformer_train import Transformer
+from transformer_train import *
 
 spacy_en = en_core_web_sm.load() # 영어 토큰화(tokenization)
 spacy_de = spacy.load('de_core_news_sm') # 독일어 토큰화(tokenization)
