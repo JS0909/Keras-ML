@@ -140,7 +140,7 @@ torch.manual_seed(manualSeed)
 #
 
 # 데이터셋의 경로
-dataroot = "D:\study_data\_data/team_project\Flickr8k\Images/"
+dataroot = "D:\study_data\_data/team_project\celeba/"
 
 # dataloader에서 사용할 쓰레드 수
 workers = 2
