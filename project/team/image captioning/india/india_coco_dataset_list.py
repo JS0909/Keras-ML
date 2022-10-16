@@ -13,14 +13,14 @@ from keras.preprocessing.sequence import pad_sequences
 from keras.models import Model, load_model
 from tensorflow.keras.utils import to_categorical
 from keras.layers import Input, Dense, LSTM, Embedding, Dropout, add
-'''
+
 #================ json 파일 처리 ==================
 num_examples= 80000     # 훈련에 사용할 이미지 개수
 
 # annotation json 파일 읽기
 with open('D:\study_data\_data/team_project\coco_dataset\json_files/captions_train2014.json', 'r') as f:
   annotations = json.load(f)
-
+print(len(annotations['annotations']))
 # caption과 image name을 vector로 저장
 all_captions = []
 all_img_name_vector = []
@@ -88,7 +88,7 @@ print('img processing done.')
 
 # features = [[첫번째이미지피처], [두번째이미지피처], ..., [마지막이미지피처]]
 #===================================================================================================================================
-'''
+
 
 # features 파일 불러오기
 with open(os.path.join('D:\study_data\_data/team_project\coco_dataset\img_features/', 'res101_features10000.pkl'), 'rb') as f:
@@ -180,14 +180,16 @@ se3 = Dense(256)(se2)
 
 # decoder model
 decoder1 = add([fe2, se3])
-decoder2 = LSTM(256)(decoder1)
-decoder3 = Dense(256, activation='relu')(decoder2)
-outputs = Dense(vocab_size, activation='softmax')(decoder3)
+decoder2 = LSTM(256, return_sequences=True)(decoder1)
+decoder3 = LSTM(256, return_sequences=True)(decoder2)
+decoder4 = LSTM(256)(decoder3)
+decoder5 = Dense(256, activation='relu')(decoder4)
+outputs = Dense(vocab_size, activation='softmax')(decoder5)
 
 model = Model(inputs=[inputs1, inputs2], outputs=outputs)
 model.compile(loss='categorical_crossentropy', optimizer='adam')
 
-'''
+
 # train the model
 print('start training...')
 epochs = 40
@@ -208,7 +210,7 @@ print('done training.')
 # save the model
 model.save('D:\study_data\_data/team_project\coco_dataset\model_save/res101_model3_10000.h5')
 print('model saved.')
-'''
+
 
 def idx_to_word(integer, tokenizer):
   for word, index in tokenizer.word_index.items():
