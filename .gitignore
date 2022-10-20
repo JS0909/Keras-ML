@@ -20,3 +20,5 @@ catboost_info
 __pycache__
 YOLOv5
 YOLOv7
+.data
+*.log
