@@ -8,48 +8,64 @@ import random
 
 import spacy
 import en_core_web_sm
+from nltk.tokenize import word_tokenize
 
-spacy_en = en_core_web_sm.load() # 영어 토큰화(tokenization)
-spacy_de = spacy.load('de_core_news_sm') # 독일어 토큰화(tokenization)
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+spacy_en = en_core_web_sm.load() # 영어 toknizer
+spacy_de = spacy.load('de_core_news_sm') # 독일어 toknizer
+
+
+'''
 # 간단히 토큰화(tokenization) 기능 써보기
 tokenized = spacy_en.tokenizer("I am a graduate student.")
 
 for i, token in enumerate(tokenized):
     print(f"인덱스 {i}: {token.text}")
-    
+'''
+
 # 독일어(Deutsch) 문장을 토큰화 하는 함수 (순서를 뒤집지 않음)
-def tokenize_de(text):
-    return [token.text for token in spacy_de.tokenizer(text)]
+# def tokenize_de(text):
+#     return [token.text for token in spacy_de.tokenizer(text)]
+
+def tokenize_de(text): # 단어단위 일반 토크나이저 사용 해보기
+    return [token for token in word_tokenize(text)]
 
 # 영어(English) 문장을 토큰화 하는 함수
-def tokenize_en(text):
-    return [token.text for token in spacy_en.tokenizer(text)]
+# def tokenize_en(text):
+#     return [token.text for token in spacy_en.tokenizer(text)]
+
+def tokenize_en(text): # 단어단위 일반 토크나이저 사용 해보기
+    return [token for token in word_tokenize(text)]
 
 from torchtext.data import Field, BucketIterator
 
 SRC = Field(tokenize=tokenize_de, init_token="<sos>", eos_token="<eos>", lower=True, batch_first=True)
 TRG = Field(tokenize=tokenize_en, init_token="<sos>", eos_token="<eos>", lower=True, batch_first=True)
-# 트랜스포머에서는 보통 시퀀스보다 batch를 첫차원에 넣음
+# batch가 첫번째 차원
 
 from torchtext.datasets import Multi30k # 단어풀 쉽게 다운받아 사용 가능
 
 train_dataset, valid_dataset, test_dataset = Multi30k.splits(exts=(".de", ".en"), fields=(SRC, TRG))
-
+    
 print(f"학습 데이터셋(training dataset) 크기: {len(train_dataset.examples)}개")
 print(f"평가 데이터셋(validation dataset) 크기: {len(valid_dataset.examples)}개")
 print(f"테스트 데이터셋(testing dataset) 크기: {len(test_dataset.examples)}개")
 
+'''
 # 학습 데이터 중 하나를 선택해 출력
 print(vars(train_dataset.examples[30])['src'])
 print(vars(train_dataset.examples[30])['trg'])
+'''
 
+# 최소 두번 이상 등장한 단어에 대해서만 vcab 에 추가함
 SRC.build_vocab(train_dataset, min_freq=2)
 TRG.build_vocab(train_dataset, min_freq=2)
 
 print(f"len(SRC): {len(SRC.vocab)}")
 print(f"len(TRG): {len(TRG.vocab)}")
 
+'''
 # 무슨 숫자로 임베딩되는지 볼 수 있음
 print(TRG.vocab.stoi["abcabc"]) # 없는 단어: 0
 print(TRG.vocab.stoi[TRG.pad_token]) # 패딩(padding): 1
@@ -57,19 +73,18 @@ print(TRG.vocab.stoi["<sos>"]) # <sos>: 2
 print(TRG.vocab.stoi["<eos>"]) # <eos>: 3
 print(TRG.vocab.stoi["hello"])
 print(TRG.vocab.stoi["world"])
-
-
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+'''
 
 BATCH_SIZE = 128
 
-# 일반적인 데이터 로더(data loader)의 iterator와 유사하게 사용 가능
+# BucketIterator : 일반적인 dataloader 기능이 있는데 이 dataloader를 만들 때 batch별로 비슷한 길이의 문장끼리 묶도록 함으로써 패딩을 최소화
+# 토큰화 + 각 배치별 최대길이에 맞춰 패딩작업
 train_iterator, valid_iterator, test_iterator = BucketIterator.splits(
     (train_dataset, valid_dataset, test_dataset),
-    batch_size=BATCH_SIZE,
+    batch_size=BATCH_SIZE, shuffle=False,
     device=device)
 
-for i, batch in enumerate(train_iterator):
+for idx, batch in enumerate(train_iterator):
     src = batch.src
     trg = batch.trg
 
@@ -77,10 +92,9 @@ for i, batch in enumerate(train_iterator):
 
     # 현재 배치에 있는 하나의 문장에 포함된 정보 출력
     for i in range(src.shape[1]):
-        print(f"인덱스 {i}: {src[0][i].item()}") # 여기에서는 [Seq_num, Seq_len]
+        print(f"인덱스 {i}: {src[idx][i].item()}")
 
-    # 첫 번째 배치만 확인
-    break
+    break  # 첫번째 배치만 확인
 
 
 class MultiHeadAttentionLayer(nn.Module):
@@ -88,7 +102,10 @@ class MultiHeadAttentionLayer(nn.Module):
         super().__init__()
 
         assert hidden_dim % n_heads == 0
-        # 짝수만 디멘션으로 사용 가능하도록 함
+        # hidden_dim 이 n_heads로 나누어 떨어져야만 함. 그래야 n_head x head_dim = hidden_dim
+        # n_head : 어텐션 헤드 개수
+        # head_dim : 각 헤드의 임베딩 디멘션
+        # hidden_dim : 모든 어텐션의 디멘션, 임베딩 차원
 
         self.hidden_dim = hidden_dim # 임베딩 차원
         self.n_heads = n_heads # 헤드(head)의 개수: 서로 다른 어텐션(attention) 컨셉의 수
@@ -98,7 +115,7 @@ class MultiHeadAttentionLayer(nn.Module):
         self.fc_k = nn.Linear(hidden_dim, hidden_dim) # Key 값에 적용될 FC 레이어
         self.fc_v = nn.Linear(hidden_dim, hidden_dim) # Value 값에 적용될 FC 레이어
 
-        self.fc_o = nn.Linear(hidden_dim, hidden_dim)
+        self.fc_o = nn.Linear(hidden_dim, hidden_dim) # 임베딩 디멘션, 원래 모양, 피드포워드
 
         self.dropout = nn.Dropout(dropout_ratio)
 
@@ -125,6 +142,7 @@ class MultiHeadAttentionLayer(nn.Module):
         Q = Q.view(batch_size, -1, self.n_heads, self.head_dim).permute(0, 2, 1, 3)
         K = K.view(batch_size, -1, self.n_heads, self.head_dim).permute(0, 2, 1, 3)
         V = V.view(batch_size, -1, self.n_heads, self.head_dim).permute(0, 2, 1, 3)
+        # permute(): 다차원 행렬전치에 사용. transpose()는 permute()의 두개만 쓰는 버전임
 
         # Q: [batch_size, n_heads, query_len, head_dim]
         # K: [batch_size, n_heads, key_len, head_dim]
@@ -132,21 +150,28 @@ class MultiHeadAttentionLayer(nn.Module):
 
         # Attention Energy 계산
         energy = torch.matmul(Q, K.permute(0, 1, 3, 2)) / self.scale
-        # permute(): 다차원 행렬전치에 사용. transpose()는 permute()의 두개만 쓰는 버전임
 
         # energy: [batch_size, n_heads, query_len, key_len]
 
-        # 마스크(mask)를 사용하는 경우
+        # 마스크(mask)를 사용하는 경우, encoder에서도 사용하는 이유는 여기서는 0이 없는 단어, 1이 패딩이라 패딩부분을 0으로 처리하기 위함임
         if mask is not None:
-            # 마스크(mask) 값이 0인 부분을 -1e10으로 채우기 - softmax 이후 0%가 되도록
             energy = energy.masked_fill(mask==0, -1e10)
-
+        # 마스크(mask) 값이 0인 부분을 -1e10으로 채우기 - softmax 이후 0%가 되도록
+        # 마스크 벡터는 trg_pad_mask 에 저장시켜 사용하는데
+        """ (마스크 예시)
+        1 0 0 0 0
+        1 1 0 0 0
+        1 1 1 0 0
+        1 1 1 1 0
+        1 1 1 1 1
+        """
+        # 이 모양으로 되어있음
+        
         # 어텐션(attention) 스코어 계산: 각 단어에 대한 확률 값
         attention = torch.softmax(energy, dim=-1)
+        # attention: [batch_size, n_heads, query_len, key_len]   query_len = key_len
 
-        # attention: [batch_size, n_heads, query_len, key_len]
-
-        # 여기에서 Scaled Dot-Product Attention을 계산 - attention value 값
+        # 여기에서 Scaled Dot-Product Attention을 계산 = attention value 값
         x = torch.matmul(self.dropout(attention), V)
 
         # x: [batch_size, n_heads, query_len, head_dim]
@@ -157,14 +182,14 @@ class MultiHeadAttentionLayer(nn.Module):
 
         # x: [batch_size, query_len, n_heads, head_dim] <<
 
-        x = x.view(batch_size, -1, self.hidden_dim)
+        x = x.view(batch_size, -1, self.hidden_dim) # 콘캣
         # view(): 토치에서 이 함수는 다차원 행렬을 저차원 행렬로 변환해줌
 
-        # x: [batch_size, query_len, hidden_dim] << 변경되는 부분 참고
+        # x: [batch_size, query_len, hidden_dim] << 변경되는 부분 참고     n_heads x head_dim = hidden_dim
         # 이 모양은 처음에 넣었던 각 키, 쿼리, 밸류 모양과 동일함
 
         x = self.fc_o(x)
-        # 원래 모양만든거 가지고 리니어 한번 통과해서 weight값 곱해준 것
+        # 원래 모양만든거 가지고 리니어 한번 통과해서 weight값 곱해준 것 - feedforward network 부분
 
         # x: [batch_size, query_len, hidden_dim]
 
@@ -192,7 +217,8 @@ class PositionwiseFeedforwardLayer(nn.Module):
 
         # x: [batch_size, seq_len, hidden_dim]
         
-        # 걍 렐루한번, 리니어한번 때려 나감
+        # 걍 렐루한번, 리니어한번 때려 나감. 포지션 벡터 차원을 하나 정해주고 그 벡터에 맞춰서 각 값의 자리별로 서로 다른 값을 갖도록 한 후
+        # 다시 원래 모양으로 되돌려 나감. 그러면 각 자리의 값들에는 위치벡터값을 간직하고 있는 채로 모양만 원래 모양으로 변경됨
 
         return x
 
@@ -215,7 +241,7 @@ class EncoderLayer(nn.Module):
         # self attention
         # 필요한 경우 마스크(mask) 행렬을 이용하여 어텐션(attention)할 단어를 조절 가능
         _src, _ = self.self_attention(src, src, src, src_mask)
-        # self-attention 이므로 src 에는 복제된 키, 쿼리, 밸류
+        # self-attention 이므로 _src 에는 src키, src쿼리, src밸류
 
         # dropout, residual connection and layer norm
         src = self.self_attn_layer_norm(src + self.dropout(_src))
@@ -243,7 +269,7 @@ class Encoder(nn.Module): # 앞의 EncoderLayer를 총 n개의 레이어만큼 �
 
         self.device = device
 
-        self.tok_embedding = nn.Embedding(input_dim, hidden_dim) # 들어온 것에 대한 임베딩 (토큰화)
+        self.tok_embedding = nn.Embedding(input_dim, hidden_dim) # 들어온 것에 대한 임베딩 (밀집벡터화)
         self.pos_embedding = nn.Embedding(max_length, hidden_dim) # 전체에 대한 임베딩 (위치값 기억테이블 생성)
     
 
@@ -264,22 +290,28 @@ class Encoder(nn.Module): # 앞의 EncoderLayer를 총 n개의 레이어만큼 �
         src_len = src.shape[1] # 각 문장 중 단어가 제일 많은 문장의 단어 개수 (최대길이)
 
         pos = torch.arange(0, src_len).unsqueeze(0).repeat(batch_size, 1).to(self.device)
-        # arange(0, src_len): 0 부터 src_len 까지 실수범위
-        # unsqueeze(0): 한차원 늘리고 (벡터형태니까) -> (1, src_len)
-        # repeat(batch_size, 1): dim=0으로 batch_size만큼 반복, dim=1로 1만큼 반복 -> (batch_size, src_len)
+        '''>>> torch.arange(5)
+        tensor([ 0,  1,  2,  3,  4])
+        >>> torch.arange(1, 4)
+        tensor([ 1,  2,  3])
+        >>> torch.arange(1, 2.5, 0.5)
+        tensor([ 1.0000,  1.5000,  2.0000])'''
+        # 1. arange(0, src_len): 0 부터 src_len 까지 실수범위
+        # 2. unsqueeze(0): 0번째에 한차원 늘림 (벡터형태니까) -> (1, src_len)
+        # 3. repeat(batch_size, 1): dim=0으로 batch_size만큼 반복, dim=1로 1만큼 반복 -> (batch_size, src_len)
         
         # pos: [batch_size, src_len]
 
         # 소스 문장의 임베딩과 위치 임베딩을 더한 것을 사용
         src = self.dropout((self.tok_embedding(src) * self.scale) + self.pos_embedding(pos))
-
-        # src: [batch_size, src_len, hidden_dim]
+        # src: [batch_size, src_len, hidden_dim]  각 문장들이 밀집벡터형태로 배치개수만큼 묶여 있음
 
         # 모든 인코더 레이어를 차례대로 거치면서 순전파(forward) 수행
         for layer in self.layers:
             src = layer(src, src_mask)
         # 실질적으로 레이어 통과 진행시키는 부분
-
+        # 모듈 리스트로 n개만큼 쌓은 인코더 레이어에 src를 하나씩 통과시키도록 선언해둠
+        
         # src: [batch_size, src_len, hidden_dim]
 
         return src # 마지막 레이어의 출력을 반환
@@ -312,13 +344,13 @@ class DecoderLayer(nn.Module):
 
         # dropout, residual connection and layer norm
         trg = self.self_attn_layer_norm(trg + self.dropout(_trg))
-
+        
         # trg: [batch_size, trg_len, hidden_dim]
 
         # encoder attention
         # 디코더의 쿼리(Query)를 이용해 인코더를 어텐션(attention)
         _trg, attention = self.encoder_attention(trg, enc_src, enc_src, src_mask)
-        #  자신의 쿼리, 인코더의 키, 인코더의 밸류
+        #  자신(디코더)의 쿼리, 인코더의 키, 인코더의 밸류
         
         # dropout, residual connection and layer norm
         trg = self.enc_attn_layer_norm(trg + self.dropout(_trg))
@@ -389,7 +421,6 @@ class Decoder(nn.Module):
 class Transformer(nn.Module):
     def __init__(self, encoder, decoder, src_pad_idx, trg_pad_idx, device):
         super().__init__()
-
         self.encoder = encoder
         self.decoder = decoder
         self.src_pad_idx = src_pad_idx
@@ -484,7 +515,7 @@ class Transformer(nn.Module):
         enc_src = self.encoder(src, src_mask)
 
         # enc_src: [batch_size, src_len, hidden_dim]
-
+        
         output, attention = self.decoder(trg, enc_src, trg_mask, src_mask)
 
         # output: [batch_size, trg_len, output_dim]
@@ -496,18 +527,19 @@ class Transformer(nn.Module):
 ######## Training ########
 INPUT_DIM = len(SRC.vocab)
 OUTPUT_DIM = len(TRG.vocab)
-HIDDEN_DIM = 256
-ENC_LAYERS = 3
-DEC_LAYERS = 3
-ENC_HEADS = 8
+HIDDEN_DIM = 256    # 전체 디멘션
+ENC_LAYERS = 3      # 인코더 레이어 개수
+DEC_LAYERS = 3      # 디코더 레이어 개수
+ENC_HEADS = 8       # 헤드 개수
 DEC_HEADS = 8
-ENC_PF_DIM = 512
+ENC_PF_DIM = 512    # 포지션 임베딩 차원
 DEC_PF_DIM = 512
 ENC_DROPOUT = 0.1
 DEC_DROPOUT = 0.1
 
 SRC_PAD_IDX = SRC.vocab.stoi[SRC.pad_token]
 TRG_PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
+# 패딩 토큰 무엇인지 저장 (1 임)
 
 # 인코더(encoder)와 디코더(decoder) 객체 선언
 enc = Encoder(INPUT_DIM, HIDDEN_DIM, ENC_LAYERS, ENC_HEADS, ENC_PF_DIM, ENC_DROPOUT, device)
@@ -523,10 +555,11 @@ print(f'The model has {count_parameters(model):,} trainable parameters')
 
 def initialize_weights(m):
     if hasattr(m, 'weight') and m.weight.dim() > 1:
-        # m(여기서는 다음 줄에서 모델을 넘겼다)에서 'weight'에 해당하는 속성이 존재하면 True반환 & 가중치 차원이 1보다 크면 가중치 초기화 진행
+        # hastter : 속성이름을 파라미터로 주었을 때, 객체에 속성이 존재할 경우 True, 아닐 경우 False를 반환한다.
+        # m(모델)에서 'weight'에 해당하는 속성이 존재하면 True반환 & 가중치 차원이 1보다 크면 가중치 초기화 진행
         nn.init.xavier_uniform_(m.weight.data)
 # xavier uniform 초기화는 인풋과 아웃풋 개수를 반영해서 처음 가중치를 초기화 시킨다
-# 공식은 루트(6/인풋크기+아웃풋크기)
+# 노드개수가 너무 많으면 exploding, 적으면 gradient vanishing 문제가 생기기 때문에 앞뒤 노드 개수를 반영해 가중치를 초기화한다
 
 model.apply(initialize_weights)
 
@@ -535,7 +568,7 @@ model.apply(initialize_weights)
 LEARNING_RATE = 0.0005
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
-# 뒷 부분의 패딩(padding)에 대해서는 값 무시
+# 패딩(padding)에 대해서는 값 무시
 criterion = nn.CrossEntropyLoss(ignore_index = TRG_PAD_IDX)
 
 
@@ -548,7 +581,7 @@ def train(model, iterator, optimizer, criterion, clip):
     for i, batch in enumerate(iterator):
         src = batch.src
         trg = batch.trg
-
+        
         optimizer.zero_grad()
 
         # 출력 단어의 마지막 인덱스(<eos>)는 제외
@@ -557,6 +590,8 @@ def train(model, iterator, optimizer, criterion, clip):
 
         # output: [배치 크기, trg_len - 1, output_dim]
         # trg: [배치 크기, trg_len]
+        # torch.Size([128, 27, 5920])
+        # torch.Size([128, 28])
 
         output_dim = output.shape[-1]
 
@@ -599,7 +634,7 @@ def evaluate(model, iterator, criterion):
             # 입력을 할 때는 <sos>부터 시작하도록 처리
             output, _ = model(src, trg[:,:-1])
 
-            # output: [배치 크기, trg_len - 1, output_dim]
+            # output: [배치 크기, trg_len - 1, output_dim=vocab_size]
             # trg: [배치 크기, trg_len]
 
             output_dim = output.shape[-1]
@@ -627,9 +662,9 @@ def epoch_time(start_time, end_time):
     return elapsed_mins, elapsed_secs
 
 
-N_EPOCHS = 10
+N_EPOCHS = 2
 CLIP = 1
-best_valid_loss = float('inf')
+best_valid_loss = float('inf') # 양의 무한대부터 시작
 
 for epoch in range(N_EPOCHS):
     start_time = time.time() # 시작 시간 기록
@@ -657,6 +692,12 @@ model.load_state_dict(torch.load('transformer_german_to_english.pt'))
 test_loss = evaluate(model, test_iterator, criterion)
 
 print(f'Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):.3f}')
+# PPL : 언어모델의 평가 방법. Perplexity. 직역 시 당혹스러운 정도. 낮을 수록 좋다
+# 이전 단어로 다음 단어를 예측할 때 몇 개의 단어 후보를 고려하는지
+# 단, 테스트 데이터가 충분히 많고, 언어 모델을 활용할 도메인에 적합한 테스트 데이터셋으로 구성된 경우에 한함
+# 이전 단어들을 기반으로 다음 단어를 예측할 때마다 평균적으로 몇개의 단어 후보 중 정답을 찾는지, 그 수가 적을 수록 좋은 것
+# 따라서 같은 테스트 데이터셋에서 언어 모델 간의 PPL 값을 비교하면 어떤 언어 모델이 우수한 성능을 보이는지 알 수 있음
+# 크로스엔트로피를 지수화하면 perplexity가 됨
 #=============================================================================================================================
 
 
@@ -670,6 +711,7 @@ print(f'Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):.3f}')
 #==================================================== 평가 및 예측 ===========================================================
 
 # 학습된 모델 불러오기
+model = Transformer(enc, dec, SRC_PAD_IDX, TRG_PAD_IDX, device).to(device)
 model.load_state_dict(torch.load('transformer_german_to_english.pt'))
 
 test_loss = evaluate(model, test_iterator, criterion)
@@ -680,39 +722,39 @@ print(f'Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):.3f}')
 def translate_sentence(sentence, src_field, trg_field, model, device, max_len=50, logging=True):
     model.eval() # 평가 모드
 
-    if isinstance(sentence, str):
+    if isinstance(sentence, str): # isinstance : sentence 의 자료형이 str 인지 확인. bool 반환
         nlp = spacy.load('de')
         tokens = [token.text.lower() for token in nlp(sentence)]
     else:
         tokens = [token.lower() for token in sentence]
 
     # 처음에 <sos> 토큰, 마지막에 <eos> 토큰 붙이기
-    tokens = [src_field.init_token] + tokens + [src_field.eos_token]
+    tokens = [src_field.init_token] + tokens + [src_field.eos_token]    # 처음에 Filed 객체로 선언해둠
     if logging:
         print(f"전체 소스 토큰: {tokens}")
 
-    src_indexes = [src_field.vocab.stoi[token] for token in tokens]
+    src_indexes = [src_field.vocab.stoi[token] for token in tokens]     # 소스문장을 번호로 바꿈
     if logging:
         print(f"소스 문장 인덱스: {src_indexes}")
 
-    src_tensor = torch.LongTensor(src_indexes).unsqueeze(0).to(device)
+    src_tensor = torch.LongTensor(src_indexes).unsqueeze(0).to(device)  # 토치텐서에 실어주기
 
     # 소스 문장에 따른 마스크 생성
-    src_mask = model.make_src_mask(src_tensor)
+    src_mask = model.make_src_mask(src_tensor)      # 패딩부분 가리는 용도 마스크 생성
 
     # 인코더(endocer)에 소스 문장을 넣어 출력 값 구하기
     with torch.no_grad():
         enc_src = model.encoder(src_tensor, src_mask)
-
+    
     # 처음에는 <sos> 토큰 하나만 가지고 있도록 하기
     trg_indexes = [trg_field.vocab.stoi[trg_field.init_token]]
 
     for i in range(max_len): # max_len 만큼 반복해서 단어 뽑기
-        trg_tensor = torch.LongTensor(trg_indexes).unsqueeze(0).to(device)
+        trg_tensor = torch.LongTensor(trg_indexes).unsqueeze(0).to(device)  # 1배치니까
 
         # 출력 문장에 따른 마스크 생성
         trg_mask = model.make_trg_mask(trg_tensor)
-
+        
         with torch.no_grad():
             output, attention = model.decoder(trg_tensor, enc_src, trg_mask, src_mask)
 
@@ -721,7 +763,7 @@ def translate_sentence(sentence, src_field, trg_field, model, device, max_len=50
         trg_indexes.append(pred_token) # 출력 문장에 더하기
 
         # <eos>를 만나는 순간 끝
-        if pred_token == trg_field.vocab.stoi[trg_field.eos_token]:
+        if pred_token == trg_field.vocab.stoi[trg_field.eos_token]:     # 현재 predict한 것이 <eos> 라면 끝냄
             break
 
     # 각 출력 단어 인덱스를 실제 단어로 변환
@@ -729,21 +771,6 @@ def translate_sentence(sentence, src_field, trg_field, model, device, max_len=50
 
     # 첫 번째 <sos>는 제외하고 출력 문장 반환
     return trg_tokens[1:], attention
-
-# 번역할 문장 뽑기
-example_idx = 10
-
-src = vars(test_dataset.examples[example_idx])['src']
-trg = vars(test_dataset.examples[example_idx])['trg']
-
-# src = tokenize_de('Ich liebe dich.') # 이런식으로 원하는 문장 넣어볼 수 있음
-
-print(f'소스 문장: {src}')
-print(f'타겟 문장: {trg}')
-
-translation, attention = translate_sentence(src, SRC, TRG, model, device, logging=True)
-
-print("모델 출력 결과:", " ".join(translation))
 
 
 import matplotlib.pyplot as plt
@@ -772,22 +799,25 @@ def display_attention(sentence, translation, attention, n_heads=8, n_rows=4, n_c
         ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
 
     plt.show()
-    plt.close()
     
     
 example_idx = 10
+# src = vars(test_dataset.examples[example_idx])['src']
+# src = tokenize_de('Ich liebe dich.') # 원하는 문장
+# src = tokenize_de('eine mutter und ihr kleiner sohn genießen einen schönen tag im freien.')
+src = tokenize_de('eine Mutter ist freundlich.')
 
-src = vars(test_dataset.examples[example_idx])['src']
-trg = vars(test_dataset.examples[example_idx])['trg']
+# trg = vars(test_dataset.examples[example_idx])['trg']
+# trg = tokenize_en('I love you.')
 
 print(f'소스 문장: {src}')
-print(f'타겟 문장: {trg}')
+# print(f'타겟 문장: {trg}')
 
 translation, attention = translate_sentence(src, SRC, TRG, model, device, logging=True)
 
 print("모델 출력 결과:", " ".join(translation))
 
-
+# '''
 # inference 및 bleu 스코어
 from torchtext.data.metrics import bleu_score
 
@@ -796,7 +826,7 @@ def show_bleu(data, src_field, trg_field, model, device, max_len=50):
     pred_trgs = []
     index = 0
 
-    for datum in data:
+    for datum in data:  # 버킷이터레이터로 만든 test_dataset
         src = vars(datum)['src']
         trg = vars(datum)['trg']
 
@@ -838,3 +868,4 @@ def show_bleu(data, src_field, trg_field, model, device, max_len=50):
     print(f'Cumulative BLEU4 score = {cumulative_bleu4_score*100:.2f}') 
     
 show_bleu(test_dataset, SRC, TRG, model, device)
+# '''
