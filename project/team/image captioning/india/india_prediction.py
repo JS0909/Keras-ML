@@ -2,9 +2,9 @@ import os
 import pickle
 import numpy as np
 from tqdm.notebook import tqdm
+import time
 
 from keras.applications.vgg16 import VGG16, preprocess_input
-from keras.applications.resnet import ResNet101
 from keras.preprocessing.image import load_img, img_to_array
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
@@ -13,14 +13,13 @@ from tensorflow.keras.utils import to_categorical
 from keras.layers import Input, Dense, LSTM, Embedding, Dropout, add
 
 BASE_DIR = 'D:\study_data\_data/team_project\Flickr8k/'
-WORKING_DIR = 'D:\study_data\_data/team_project\Flickr8k/working'
+WORKING_DIR = 'D:\study_data\_data/team_project\Flickr8k\working/'
 
 '''
 # load vgg16 model
-# model = VGG16()
-model = ResNet101()
+model = VGG16()
 # restructure the model
-model = Model(inputs=model.inputs, outputs=model.layers[-1].output)
+model = Model(inputs=model.inputs, outputs=model.layers[-2].output)
 # summarize
 # model.summary()
 
@@ -28,6 +27,7 @@ model = Model(inputs=model.inputs, outputs=model.layers[-1].output)
 features = {}
 directory = os.path.join(BASE_DIR, 'Images')
 
+start_time = time.time()
 for img_name in tqdm(os.listdir(directory)):
     # load the image from file
     img_path = directory + '/' + img_name
@@ -48,16 +48,19 @@ for img_name in tqdm(os.listdir(directory)):
     image_id = img_name.split('.')[0]
     # store feature
     features[image_id] = feature
-    
+
+end_time = time.time() 
+print('feature extraction took', end_time-start_time, 'sec.')  
 # print(features)
 
+
 # store features in pickle
-pickle.dump(features, open(os.path.join(WORKING_DIR, 'features_Res.pkl'), 'wb'))
+pickle.dump(features, open(os.path.join(WORKING_DIR, 'features.pkl'), 'wb'))
 print('img processing done.')
 '''
 
 # load features from pickle
-with open(os.path.join(WORKING_DIR, 'features_Res.pkl'), 'rb') as f:
+with open(os.path.join(WORKING_DIR, 'features.pkl'), 'rb') as f:
     features = pickle.load(f)
     
     
@@ -80,7 +83,7 @@ for line in tqdm(captions_doc.split('\n')):
     # remove extension from image ID
     image_id = image_id.split('.')[0] # . 이후 지움
     # convert caption list to string
-    caption = " ".join(caption)
+    caption = "".join(caption)
     '''['A small child is jumping on a bed .\n']
             A small child is jumping on a bed .'''
     
@@ -109,20 +112,21 @@ def clean(mapping): # 맵핑 딕셔너리 안의 caption을 전처리
             # delete additional spaces
             caption = caption.replace('\s+', ' ') # [ \t\n\r\f\v] 가 1번 이상 나오면 공백으로 변경
             # add start and end tags to the caption
-            caption = 'startseq ' + caption + ' endseq'
+            caption = 'startseq ' + " ".join([word for word in caption.split() if len(word)>1]) + ' endseq'
+            # 스페이스 기준 잘라서 넣기
             '''a child is standing on her head .
             startseq a child is standing on her head endseq .'''
             captions[i] = caption.replace(' .', '') # 마침표 제거
             
 
 # before preprocess of text
-print('bf_text:', mapping['1000268201_693b08cb0e'])
+# print('bf_text:', mapping['1000268201_693b08cb0e'])
 
 # preprocess the text
 clean(mapping)
 
 # after preprocess of text
-print('af_text:', mapping['1000268201_693b08cb0e'])
+# print('af_text:', mapping['1000268201_693b08cb0e'])
 
 
 # 딕셔너리에서 캡션만 뽑아오기
@@ -134,14 +138,13 @@ for key in mapping:
         
 print('all_captions_len:', len(all_captions))
 
-print(all_captions[:3]) # 캡션 아무거나 몇개 보기
+print(all_captions[:3]) # 캡션 아무거나 한개 보기
 
 
 # tokenize the text
 tokenizer = Tokenizer()
 tokenizer.fit_on_texts(all_captions)
 vocab_size = len(tokenizer.word_index) + 1 # 패딩토큰 포함
-
 print('vacab_size:', vocab_size)
 
 # get maximum length of the caption available
@@ -151,8 +154,7 @@ print('max_len:', max_length)
 
 image_ids = list(mapping.keys())
 split = int(len(image_ids) * 0.90) # train_test_split
-# train = image_ids[:] # 안함
-train = image_ids[:split]
+train = image_ids[:split] # 안함
 test = image_ids[split:]
 
 # startseq girl going into wooden building endseq
@@ -177,7 +179,7 @@ def data_generator(data_keys, mapping, features, tokenizer, max_length, vocab_si
         for caption in captions:
             # encode the sequence
             seq = tokenizer.texts_to_sequences([caption])[0] # 리스트 안에 넣고 (한문장씩 들어가 있으니까)
-                                                                # 첫문장을 토크나이징하는 것으로 해야함
+                                                             # 첫문장을 토크나이징하는 것으로 해야함
             # split the sequence into X, y pairs
             for i in range(1, len(seq)):
                 # split into input and output pairs
@@ -215,20 +217,19 @@ def data_generator(data_keys, mapping, features, tokenizer, max_length, vocab_si
   
 # encoder model
 # image feature layers
-inputs1 = Input(shape=(1000,))
+inputs1 = Input(shape=(4096,))
 fe1 = Dropout(0.4)(inputs1)
 fe2 = Dense(256, activation='relu')(fe1)
 # sequence feature layers
 inputs2 = Input(shape=(max_length,))
 se1 = Embedding(vocab_size, 256, mask_zero=True)(inputs2)
 se2 = Dropout(0.4)(se1)
-se3 = Dense(256)(se2)
+se3 = LSTM(256)(se2)
 
 # decoder model
 decoder1 = add([fe2, se3])
-decoder2 = LSTM(256)(decoder1)
-decoder3 = Dense(256, activation='relu')(decoder2)
-outputs = Dense(vocab_size, activation='softmax')(decoder3)
+decoder2 = Dense(256, activation='relu')(decoder1)
+outputs = Dense(vocab_size, activation='softmax')(decoder2)
 
 model = Model(inputs=[inputs1, inputs2], outputs=outputs)
 model.compile(loss='categorical_crossentropy', optimizer='adam')
@@ -236,23 +237,28 @@ model.compile(loss='categorical_crossentropy', optimizer='adam')
 
 # train the model
 print('start training...')
-epochs = 5
+epochs = 40
 batch_size = 32
 steps = len(train) // batch_size # 1 batch 당 훈련하는 데이터 수
 # len(train): 8091 / steps: 252
 # 제너레이터 함수에서 yield로 252개의 [X1, X2], y 묶음이 차곡차곡 쌓여 있고  steps_per_epoch=steps 이 옵션으로
 # epoch 1번짜리 fit을 돌때 252번(정해준steps번) generator 를 호출함. iterating 을 steps번 함
 
+start_time = time.time()
 for i in range(epochs):
     print(f'epoch: {i+1}')
     # create data generator
     generator = data_generator(train, mapping, features, tokenizer, max_length, vocab_size, batch_size)
     # fit for one epoch
     model.fit(generator, epochs=1, steps_per_epoch=steps, verbose=1) # generator -> [X1, X2], y
+end_time = time.time()
 print('done training.')
+print('training took', round(end_time-start_time), 'sec.')
+print(f'epochs: {epochs}    batch size: {batch_size}')
 
 # save the model
 model.save(WORKING_DIR+'/best_model.h5')
+
 
 def idx_to_word(integer, tokenizer):
     for word, index in tokenizer.word_index.items():
@@ -264,7 +270,7 @@ def idx_to_word(integer, tokenizer):
 # generate caption for an image
 def predict_caption(model, image, tokenizer, max_length): # 여기서 image 자리는 vgg 통과해 나온 feature의 자리임
     # add start tag for generation process
-    in_text = 'startseq' # 빈 문장 생성
+    in_text = 'start' # 빈 문장 생성
     # iterate over the max length of sequence
     for i in range(max_length):
         # encode input sequence
@@ -283,12 +289,33 @@ def predict_caption(model, image, tokenizer, max_length): # 여기서 image 자�
         # append word as input for generating next word
         in_text += " " + word
         # stop if we reach end tag
-        if word == 'end':
+        if word == 'endseq':
             break
       
     return in_text
 
-''' bleu score
+
+
+
+image = load_img('D:\study_data\_data/team_project\predict_img/03.jpg', target_size=(224, 224))
+# convert image pixels to numpy array
+image = img_to_array(image)
+# reshape data for model
+image = image.reshape((1, image.shape[0], image.shape[1], image.shape[2]))
+
+print('extracting features..')
+model = VGG16()
+model = Model(inputs=model.inputs, outputs=model.layers[-2].output)
+predic_features = model.predict(image, verbose=1)
+
+print('prediction..')
+model = load_model(WORKING_DIR+'/best_model.h5')
+y_pred = predict_caption(model, predic_features, tokenizer, max_length)
+y_pred = y_pred.replace('start', '')
+y_pred = y_pred.replace('endseq', '')
+print(y_pred)
+
+# ''' bleu score
 from nltk.translate.bleu_score import corpus_bleu
 # validate with test data
 actual, predicted = list(), list()
@@ -308,50 +335,7 @@ for key in tqdm(test):
 # calcuate BLEU score
 print("BLEU-1: %f" % corpus_bleu(actual, predicted, weights=(1.0, 0, 0, 0)))        # 1-gram 만 뽑음
 print("BLEU-2: %f" % corpus_bleu(actual, predicted, weights=(0.5, 0.5, 0, 0)))      # 1-gram 과 2-gram 만 뽑되 각각 같은 가중치를 두고 뽑음
-
-
-from PIL import Image
-import matplotlib.pyplot as plt
-def generate_caption(image_name):
-    # load the image
-    # image_name = "1001773457_577c3a7d70.jpg"
-    image_id = image_name.split('.')[0]
-    img_path = os.path.join(BASE_DIR, "Images", image_name)
-    image = Image.open(img_path)
-    captions = mapping[image_id]
-    print('---------------------Actual---------------------')
-    for caption in captions:
-        print(caption)
-    # predict the caption
-    y_pred = predict_caption(model, features[image_id], tokenizer, max_length)
-    print('--------------------Predicted--------------------')
-    print(y_pred)
-    plt.imshow(image)
-    plt.show()
-'''
-
-image = load_img('D:\study_data\_data/team_project\predict_img/siberian-husky-g84d30ce80_1280.jpg', target_size=(224, 224))
-# convert image pixels to numpy array
-image = img_to_array(image)
-# reshape data for model
-image = image.reshape((1, image.shape[0], image.shape[1], image.shape[2]))
-
-print('extracting features..')
-# model = VGG16()
-model = ResNet101()
-model = Model(inputs=model.inputs, outputs=model.layers[-1].output)
-predic_features = model.predict(image, verbose=1)
-
-print('prediction..')
-model = load_model(WORKING_DIR+'/best_model.h5')
-y_pred = predict_caption(model, predic_features, tokenizer, max_length)
-y_pred = y_pred.replace('startseq', '')
-y_pred = y_pred.replace('endseq', '')
-print(y_pred)
-
-
-# epoch 50 / batch 32
-# two dogs play in the snow 
+# '''
 
 # generate_caption("1001773457_577c3a7d70.jpg")
 # generate_caption("1002674143_1b742ab4b8.jpg")
@@ -382,3 +366,7 @@ in: [  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
    6   1]
 out: [0. 0. 0. ... 0. 0. 0.]
 '''
+
+
+# training took 1568 sec. 26분
+# epochs: 40    batch size: 32
