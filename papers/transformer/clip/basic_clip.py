@@ -404,7 +404,7 @@ def find_matches(model, image_embeddings, query, image_filenames, n=9):
     dot_similarity = text_embeddings_n @ image_embeddings_n.T
     
     values, indices = torch.topk(dot_similarity.squeeze(0), n * 5) # argmax 인데 제일 큰거부터 (n=)9*5개 인덱스 반환함
-    matches = [image_filenames[idx] for idx in indices[::5]]
+    matches = [image_filenames[idx] for idx in indices[::5]]       # 45개 중 5개씩 건너뛰어가며 뽑아 냄 (결국 9개 이미지 반환하는 것)
     '''indices tensor([5330, 5334, 5331, 5333, 5332, 1403, 1404, 1401, 1402, 1400,  362,  361,
          364,  360,  363, 6044, 6040, 6042, 6043, 6041, 7915, 7916, 7918, 7917,
         7919, 2616, 2617, 2619, 2618, 2615, 1543, 1544, 1540, 1541, 1542, 2184,

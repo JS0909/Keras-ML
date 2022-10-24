@@ -171,7 +171,7 @@ def data_generator(features, captions, tokenizer, max_length, vocab_size, batch_
 # image feature layers
 inputs1 = Input(shape=(1000,))
 fe1 = Dropout(0.4)(inputs1)
-fe2 = Dense(256, activation='relu')(fe1)
+fe2 = Dense(128, activation='relu')(fe1)
 # sequence feature layers
 inputs2 = Input(shape=(max_length,))
 se1 = Embedding(vocab_size, 256, mask_zero=True)(inputs2)
@@ -180,10 +180,10 @@ se3 = Dense(256)(se2)
 
 # decoder model
 decoder1 = add([fe2, se3])
-decoder2 = LSTM(256, return_sequences=True)(decoder1)
-decoder3 = LSTM(256, return_sequences=True)(decoder2)
-decoder4 = LSTM(256)(decoder3)
-decoder5 = Dense(256, activation='relu')(decoder4)
+decoder2 = LSTM(64, return_sequences=True)(decoder1)
+decoder3 = LSTM(64, return_sequences=True)(decoder2)
+decoder4 = LSTM(64)(decoder3)
+decoder5 = Dense(128, activation='relu')(decoder4)
 outputs = Dense(vocab_size, activation='softmax')(decoder5)
 
 model = Model(inputs=[inputs1, inputs2], outputs=outputs)

@@ -14,9 +14,9 @@ from caption_train_test_val_split import *
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(device)
 
-model_path = "D:\study_data\_data\Flickr8k\models_save/" # 학습된 모델이 저장될 경로
+model_path = "D:\study_data\_data/team_project\Flickr8k\models_save/" # 학습된 모델이 저장될 경로
 crop_size = 224 # 랜덤하게 잘라낼 이미지 크기
-vocab_path = "D:\study_data\_data\Flickr8k/vocab/vocab.pkl"
+vocab_path = "D:\study_data\_data/team_project\Flickr8k/vocab/vocab.pkl"
 
 # 모델 디렉토리 만들기
 if not os.path.exists(model_path):
@@ -47,14 +47,14 @@ batch_size = 128
 num_workers = 0
 
 # 데이터 로더(data loader) 선언
-image_dir = "D:\study_data\_data\Flickr8k\Images" 
-train_image_dir = "D:\study_data\_data\Flickr8k/train" 
-val_image_dir = "D:\study_data\_data\Flickr8k/val" 
-test_image_dir = "D:\study_data\_data\Flickr8k/test"
+image_dir = "D:\study_data\_data/team_project\Flickr8k\Images" 
+train_image_dir = "D:\study_data\_data/team_project\Flickr8k/train" 
+val_image_dir = "D:\study_data\_data/team_project\Flickr8k/val" 
+test_image_dir = "D:\study_data\_data/team_project\Flickr8k/test"
 
-train_caption_path = "D:\study_data\_data\Flickr8k/train/captions.txt"
-val_caption_path = "D:\study_data\_data\Flickr8k/val/captions.txt"
-test_caption_path = "D:\study_data\_data\Flickr8k/test/captions.txt"
+train_caption_path = "D:\study_data\_data/team_project\Flickr8k/captions.txt"
+val_caption_path = "D:\study_data\_data/team_project\Flickr8k/val/captions.txt"
+test_caption_path = "D:\study_data\_data/team_project\Flickr8k/test/captions.txt"
 
 train_data_loader = get_loader(train_image_dir, train_caption_path, vocab, train_transform, batch_size, shuffle=True, num_workers=num_workers, testing=False) 
 val_data_loader = get_loader(val_image_dir, val_caption_path, vocab, val_transform, batch_size, shuffle=False, num_workers=num_workers, testing=False)
