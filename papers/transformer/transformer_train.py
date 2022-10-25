@@ -15,28 +15,26 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 spacy_en = en_core_web_sm.load() # 영어 toknizer
 spacy_de = spacy.load('de_core_news_sm') # 독일어 toknizer
 
-
-'''
 # 간단히 토큰화(tokenization) 기능 써보기
 tokenized = spacy_en.tokenizer("I am a graduate student.")
 
 for i, token in enumerate(tokenized):
     print(f"인덱스 {i}: {token.text}")
-'''
+
 
 # 독일어(Deutsch) 문장을 토큰화 하는 함수 (순서를 뒤집지 않음)
-# def tokenize_de(text):
-#     return [token.text for token in spacy_de.tokenizer(text)]
+def tokenize_de(text):
+    return [token.text for token in spacy_de.tokenizer(text)]
 
-def tokenize_de(text): # 단어단위 일반 토크나이저 사용 해보기
-    return [token for token in word_tokenize(text)]
+# def tokenize_de(text): # 단어단위 일반 토크나이저 사용 해보기
+#     return [token for token in word_tokenize(text)]
 
 # 영어(English) 문장을 토큰화 하는 함수
-# def tokenize_en(text):
-#     return [token.text for token in spacy_en.tokenizer(text)]
+def tokenize_en(text):
+    return [token.text for token in spacy_en.tokenizer(text)]
 
-def tokenize_en(text): # 단어단위 일반 토크나이저 사용 해보기
-    return [token for token in word_tokenize(text)]
+# def tokenize_en(text): # 단어단위 일반 토크나이저 사용 해보기
+#     return [token for token in word_tokenize(text)]
 
 from torchtext.data import Field, BucketIterator
 
@@ -52,11 +50,11 @@ print(f"학습 데이터셋(training dataset) 크기: {len(train_dataset.example
 print(f"평가 데이터셋(validation dataset) 크기: {len(valid_dataset.examples)}개")
 print(f"테스트 데이터셋(testing dataset) 크기: {len(test_dataset.examples)}개")
 
-'''
+
 # 학습 데이터 중 하나를 선택해 출력
 print(vars(train_dataset.examples[30])['src'])
 print(vars(train_dataset.examples[30])['trg'])
-'''
+
 
 # 최소 두번 이상 등장한 단어에 대해서만 vcab 에 추가함
 SRC.build_vocab(train_dataset, min_freq=2)
@@ -65,7 +63,7 @@ TRG.build_vocab(train_dataset, min_freq=2)
 print(f"len(SRC): {len(SRC.vocab)}")
 print(f"len(TRG): {len(TRG.vocab)}")
 
-'''
+
 # 무슨 숫자로 임베딩되는지 볼 수 있음
 print(TRG.vocab.stoi["abcabc"]) # 없는 단어: 0
 print(TRG.vocab.stoi[TRG.pad_token]) # 패딩(padding): 1
@@ -73,7 +71,7 @@ print(TRG.vocab.stoi["<sos>"]) # <sos>: 2
 print(TRG.vocab.stoi["<eos>"]) # <eos>: 3
 print(TRG.vocab.stoi["hello"])
 print(TRG.vocab.stoi["world"])
-'''
+
 
 BATCH_SIZE = 128
 
@@ -84,7 +82,7 @@ train_iterator, valid_iterator, test_iterator = BucketIterator.splits(
     batch_size=BATCH_SIZE, shuffle=False,
     device=device)
 
-for idx, batch in enumerate(train_iterator):
+for idx, batch in enumerate(test_iterator):
     src = batch.src
     trg = batch.trg
 
@@ -104,8 +102,8 @@ class MultiHeadAttentionLayer(nn.Module):
         assert hidden_dim % n_heads == 0
         # hidden_dim 이 n_heads로 나누어 떨어져야만 함. 그래야 n_head x head_dim = hidden_dim
         # n_head : 어텐션 헤드 개수
-        # head_dim : 각 헤드의 임베딩 디멘션
-        # hidden_dim : 모든 어텐션의 디멘션, 임베딩 차원
+        # head_dim : 각 헤드의 디멘션
+        # hidden_dim : 모든 어텐션의 디멘션
 
         self.hidden_dim = hidden_dim # 임베딩 차원
         self.n_heads = n_heads # 헤드(head)의 개수: 서로 다른 어텐션(attention) 컨셉의 수
@@ -115,7 +113,7 @@ class MultiHeadAttentionLayer(nn.Module):
         self.fc_k = nn.Linear(hidden_dim, hidden_dim) # Key 값에 적용될 FC 레이어
         self.fc_v = nn.Linear(hidden_dim, hidden_dim) # Value 값에 적용될 FC 레이어
 
-        self.fc_o = nn.Linear(hidden_dim, hidden_dim) # 임베딩 디멘션, 원래 모양, 피드포워드
+        self.fc_o = nn.Linear(hidden_dim, hidden_dim) # 임베딩 디멘션, 원래 모양
 
         self.dropout = nn.Dropout(dropout_ratio)
 
@@ -826,7 +824,7 @@ def show_bleu(data, src_field, trg_field, model, device, max_len=50):
     pred_trgs = []
     index = 0
 
-    for datum in data:  # 버킷이터레이터로 만든 test_dataset
+    for datum in data:
         src = vars(datum)['src']
         trg = vars(datum)['trg']
 
@@ -868,4 +866,5 @@ def show_bleu(data, src_field, trg_field, model, device, max_len=50):
     print(f'Cumulative BLEU4 score = {cumulative_bleu4_score*100:.2f}') 
     
 show_bleu(test_dataset, SRC, TRG, model, device)
+# dataset은 아직 패딩처리(버킷이터레이터)하기 전. <sos>, <eos> 안붙어있음
 # '''
