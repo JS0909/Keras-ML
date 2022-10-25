@@ -94,7 +94,7 @@ def solution_model():
         tf.keras.layers.Dense(1, activation='sigmoid')
     ])
     
-    model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
     start = time.time()
     model.fit(x_train, np.array(y_train), epochs=10, batch_size=20)
     end = time.time()
@@ -102,8 +102,8 @@ def solution_model():
     loss, acc = model.evaluate(x_test, np.array(y_test))
     print('loss:', loss, 'acc:', acc)
     print(f'took:{end-start:.3} sec.')
-    # loss: 0.15405739843845367 acc: 0.8074228763580322
-    # took:48.1 sec.
+    # loss: 0.6306837797164917 acc: 0.8010135889053345
+    # took:50.4 sec.
 
     return model
 
