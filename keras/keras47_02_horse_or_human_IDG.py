@@ -5,14 +5,14 @@ from sklearn.model_selection import train_test_split
 # 1. 데이터
 train_datagen = ImageDataGenerator(
     rescale=1./255,
-    # horizontal_flip=True,
-    # vertical_flip=True,
-    # width_shift_range=0.1,
-    # height_shift_range=5,
-    # rotation_range=5,
-    # zoom_range=1.2,
-    # shear_range=0.7,
-    # fill_mode='nearest'
+    horizontal_flip=True,
+    vertical_flip=True,
+    width_shift_range=0.1,
+    height_shift_range=5,
+    rotation_range=5,
+    zoom_range=1.2,
+    shear_range=0.7,
+    fill_mode='nearest'
     )
 
 xy_data = train_datagen.flow_from_directory(

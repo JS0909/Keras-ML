@@ -1,7 +1,3 @@
-# an input shape of [1]
-
-# 시험볼때 문제 기억을 위해 start_backup.py 만들어야함
-
 # ======================================================================
 # There are 5 questions in this exam with increasing difficulty from 1-5.
 # Please note that the weight of the grade for the question is relative
@@ -27,8 +23,6 @@
 # an input shape of [1]
 
 import numpy as np
-from tensorflow.python.keras.models import Sequential
-from tensorflow.python.keras.layers import Dense
 
 
 def solution_model():
@@ -36,16 +30,6 @@ def solution_model():
     ys = np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0], dtype=float)
 
     # YOUR CODE HERE
-    model = Sequential()
-    model.add(Dense(16, input_dim=1)) 
-    model.add(Dense(32)) 
-    model.add(Dense(64)) 
-    model.add(Dense(32))
-    model.add(Dense(1))
-    
-    model.compile(loss='mse', optimizer='adam')
-    model.fit(xs, ys, epochs=250) 
-    print(model.predict([10.0]))    # [[10.999916]]
 
     return model
 

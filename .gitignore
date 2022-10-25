@@ -15,6 +15,7 @@ ocr
 ckpt*
 
 checkpoints
+tmp
 image_classifier
 catboost_info
 __pycache__

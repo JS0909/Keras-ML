@@ -1,8 +1,3 @@
-# 그냥 시계열 문제
-# MAE 평가지표 사용해라. 시계열 자르는 함수 제공
-
-# 밑에 주석 볼 필요 없음
-
 # ==============================================================================
 # There are 5 questions in this exam with increasing difficulty from 1-5.
 # Please note that the weight of the grade for the question is relative to its
@@ -81,7 +76,6 @@
 
 import pandas as pd
 import tensorflow as tf
-import time
 
 
 # This function normalizes the dataset using min max scaling.
@@ -176,10 +170,6 @@ def solution_model():
     model = tf.keras.models.Sequential([
 
         # ADD YOUR LAYERS HERE.
-        tf.keras.layers.LSTM(5, input_shape=(N_PAST, N_FEATURES), return_sequences=True),
-        tf.keras.layers.Dense(64, activation='swish'),
-        tf.keras.layers.Dense(32),
-        
 
         # If you don't follow the instructions in the following comments,
         # tests will fail to grade your code:
@@ -201,16 +191,13 @@ def solution_model():
     ])
 
     # Code to train and compile the model
-    optimizer = 'adam'
-    model.compile(loss='mae', optimizer=optimizer)
-    start = time.time()
-    model.fit(train_set, epochs=20)
-    end = time.time()
-    
-    print('loss:',model.evaluate(valid_set))
-    print(f'took:{end-start:.3} sec.')
-    # loss: 0.025263531133532524
-    # took:7.19 sec.
+    optimizer =  # YOUR CODE HERE
+    model.compile(
+        # YOUR CODE HERE
+    )
+    model.fit(
+        # YOUR CODE HERE
+    )
 
     return model
 

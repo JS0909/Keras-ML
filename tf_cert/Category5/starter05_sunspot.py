@@ -1,8 +1,3 @@
-# 그냥 시계열 문제
-# MAE 평가지표 사용해라. 시계열 자르는 함수 제공
-
-# 밑에 주석 볼 필요 없음
-
 # ======================================================================
 # There are 5 questions in this exam with increasing difficulty from 1-5.
 # Please note that the weight of the grade for the question is relative
@@ -33,11 +28,11 @@
 # Note: Do not use lambda layers in your model, they are not supported
 # on the grading infrastructure.
 
+
 import csv
 import tensorflow as tf
 import numpy as np
 import urllib
-import matplotlib.pyplot as plt
 
 # DO NOT CHANGE THIS CODE
 def windowed_dataset(series, window_size, batch_size, shuffle_buffer):
@@ -61,11 +56,10 @@ def solution_model():
       reader = csv.reader(csvfile, delimiter=',')
       next(reader)
       for row in reader:
-        sunspots.append(float(row[2]))
-        time_step.append(int(row[0]))
+        sunspots.append(# YOUR CODE HERE)
+        time_step.append(# YOUR CODE HERE)
 
-    series = np.array(sunspots)
-    time = np.array(time_step)
+    series = # YOUR CODE HERE
 
     # DO NOT CHANGE THIS CODE
     # This is the normalization function
@@ -80,10 +74,10 @@ def solution_model():
     split_time = 3000
 
 
-    time_train = time[:split_time]
-    x_train = series[:split_time]
-    time_valid = time[split_time:]
-    x_valid = series[split_time:]
+    time_train = # YOUR CODE HERE
+    x_train = # YOUR CODE HERE
+    time_valid = # YOUR CODE HERE
+    x_valid = # YOUR CODE HERE
 
     # DO NOT CHANGE THIS CODE
     window_size = 30
@@ -92,14 +86,10 @@ def solution_model():
 
 
     train_set = windowed_dataset(x_train, window_size=window_size, batch_size=batch_size, shuffle_buffer=shuffle_buffer_size)
-    valid_set = windowed_dataset(x_valid, window_size=window_size, batch_size=batch_size, shuffle_buffer=shuffle_buffer_size)
 
 
     model = tf.keras.models.Sequential([
       # YOUR CODE HERE. Whatever your first layer is, the input shape will be [None,1] when using the Windowed_dataset above, depending on the layer type chosen
-      tf.keras.layers.Conv1D(filters=32, kernel_size=5, strides=1, padding='causal', input_shape=[None, 1]),
-      tf.keras.layers.Dense(64),
-      tf.keras.layers.Dense(32, activation='swish'),
       tf.keras.layers.Dense(1)
     ])
     # PLEASE NOTE IF YOU SEE THIS TEXT WHILE TRAINING -- IT IS SAFE TO IGNORE
@@ -109,39 +99,6 @@ def solution_model():
 
 
     # YOUR CODE HERE TO COMPILE AND TRAIN THE MODEL
-    import time
-    model.compile(loss='mae', optimizer='adam')
-    start = time.time()
-    model.fit(train_set, epochs=20)
-    end = time.time()
-    
-    print('loss:',model.evaluate(valid_set))
-    print(f'took:{end-start:.3} sec.')
-    # loss: 0.03604484722018242
-    # took:12.8 sec.
-    
-    def model_forecast(model, series, window_size):
-        ds = tf.data.Dataset.from_tensor_slices(series)
-        ds = ds.window(window_size, shift=1, drop_remainder=True)
-        ds = ds.flat_map(lambda w: w.batch(window_size))
-        ds = ds.batch(32).prefetch(1)
-        forecast = model.predict(ds)
-        return forecast
-
-    rnn_forecast = model_forecast(model, series[..., np.newaxis], window_size)
-    rnn_forecast = rnn_forecast[split_time - window_size:-1, -1, 0]
-    
-    def plot_series(time, series, color, format="-", start=0, end=None): 
-        plt.plot(time[start:end], series[start:end], format, color=color) 
-        plt.xlabel("Time")
-        plt.ylabel("Value")
-        plt.grid(True)
-        
-    plt.figure(figsize=(10, 6))
-    plot_series(time_valid, x_valid, 'blue')
-    plot_series(time_valid, rnn_forecast, 'red')
-    plt.show()
-    
     return model
 
 
