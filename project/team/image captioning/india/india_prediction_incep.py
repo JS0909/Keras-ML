@@ -5,9 +5,10 @@ from tqdm.notebook import tqdm
 import time
 
 from keras.applications.vgg16 import VGG16, preprocess_input
-from keras.preprocessing.image import load_img, img_to_array
+from keras.applications.inception_v3 import InceptionV3
+from tensorflow.keras.preprocessing.image import load_img, img_to_array
 from keras.preprocessing.text import Tokenizer
-from keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 from keras.models import Model, load_model
 from tensorflow.keras.utils import to_categorical
 from keras.layers import Input, Dense, LSTM, Embedding, Dropout, add
@@ -17,9 +18,9 @@ WORKING_DIR = 'D:\study_data\_data/team_project\Flickr8k\working/'
 
 '''
 # load vgg16 model
-model = VGG16()
+model = InceptionV3()
 # restructure the model
-model = Model(inputs=model.inputs, outputs=model.layers[-2].output)
+model = Model(inputs=model.inputs, outputs=model.layers[-1].output)
 # summarize
 # model.summary()
 
@@ -31,7 +32,7 @@ start_time = time.time()
 for img_name in tqdm(os.listdir(directory)):
     # load the image from file
     img_path = directory + '/' + img_name
-    image = load_img(img_path, target_size=(224, 224))
+    image = load_img(img_path, target_size=(299, 299))
     # convert image pixels to numpy array
     image = img_to_array(image)
     # reshape data for model
@@ -55,12 +56,12 @@ print('feature extraction took', end_time-start_time, 'sec.')
 
 
 # store features in pickle
-pickle.dump(features, open(os.path.join(WORKING_DIR, 'features.pkl'), 'wb'))
+pickle.dump(features, open(os.path.join(WORKING_DIR, 'incept_features.pkl'), 'wb'))
 print('img processing done.')
-'''
+# '''
 
 # load features from pickle
-with open(os.path.join(WORKING_DIR, 'features.pkl'), 'rb') as f:
+with open(os.path.join(WORKING_DIR, 'incept_features.pkl'), 'rb') as f:
     features = pickle.load(f)
     
     
@@ -145,11 +146,11 @@ print(all_captions[:3]) # 캡션 아무거나 한개 보기
 tokenizer = Tokenizer()
 tokenizer.fit_on_texts(all_captions)
 vocab_size = len(tokenizer.word_index) + 1 # 패딩토큰 포함
-print('vacab_size:', vocab_size)
+print('vacab_size:', vocab_size) # vacab_size: 8485
 
 # get maximum length of the caption available
 max_length = max(len(caption.split()) for caption in all_captions)
-print('max_len:', max_length)
+print('max_len:', max_length) # max_len: 34
 
 
 image_ids = list(mapping.keys())
@@ -217,30 +218,31 @@ def data_generator(data_keys, mapping, features, tokenizer, max_length, vocab_si
   
 # encoder model
 # image feature layers
-inputs1 = Input(shape=(4096,))
+inputs1 = Input(shape=(1000,))
 fe1 = Dropout(0.4)(inputs1)
-fe2 = Dense(256, activation='relu')(fe1)
+fe2 = Dense(128, activation='relu')(fe1)
 # sequence feature layers
 inputs2 = Input(shape=(max_length,))
 se1 = Embedding(vocab_size, 256, mask_zero=True)(inputs2)
 se2 = Dropout(0.4)(se1)
-se3 = LSTM(256)(se2)
+se3 = Dense(128)(se2)
 
 # decoder model
 decoder1 = add([fe2, se3])
-decoder2 = Dense(256, activation='relu')(decoder1)
-outputs = Dense(vocab_size, activation='softmax')(decoder2)
+decoder2 = LSTM(128)(decoder1)
+decoder3 = Dense(32, activation='relu')(decoder2)
+outputs = Dense(vocab_size, activation='softmax')(decoder3)
 
 model = Model(inputs=[inputs1, inputs2], outputs=outputs)
 model.compile(loss='categorical_crossentropy', optimizer='adam')
 
-
+# '''
 # train the model
 print('start training...')
-epochs = 40
-batch_size = 32
+epochs = 20
+batch_size = 10
 steps = len(train) // batch_size # 1 batch 당 훈련하는 데이터 수
-# len(train): 8091 / steps: 252
+
 # 제너레이터 함수에서 yield로 252개의 [X1, X2], y 묶음이 차곡차곡 쌓여 있고  steps_per_epoch=steps 이 옵션으로
 # epoch 1번짜리 fit을 돌때 252번(정해준steps번) generator 를 호출함. iterating 을 steps번 함
 
@@ -257,8 +259,8 @@ print('training took', round(end_time-start_time), 'sec.')
 print(f'epochs: {epochs}    batch size: {batch_size}')
 
 # save the model
-model.save(WORKING_DIR+'/best_model.h5')
-
+model.save(WORKING_DIR+'/incept_best_model.h5')
+# '''
 
 def idx_to_word(integer, tokenizer):
     for word, index in tokenizer.word_index.items():
@@ -295,21 +297,19 @@ def predict_caption(model, image, tokenizer, max_length): # 여기서 image 자�
     return in_text
 
 
-
-
-image = load_img('D:\study_data\_data/team_project\predict_img/03.jpg', target_size=(224, 224))
+image = load_img('D:\study_data\_data/team_project\predict_img/06.jpg', target_size=(299, 299))
 # convert image pixels to numpy array
 image = img_to_array(image)
 # reshape data for model
 image = image.reshape((1, image.shape[0], image.shape[1], image.shape[2]))
 
 print('extracting features..')
-model = VGG16()
-model = Model(inputs=model.inputs, outputs=model.layers[-2].output)
+model = InceptionV3()
+model = Model(inputs=model.inputs, outputs=model.layers[-1].output)
 predic_features = model.predict(image, verbose=1)
 
 print('prediction..')
-model = load_model(WORKING_DIR+'/best_model.h5')
+model = load_model(WORKING_DIR+'/incept_best_model.h5')
 y_pred = predict_caption(model, predic_features, tokenizer, max_length)
 y_pred = y_pred.replace('start', '')
 y_pred = y_pred.replace('endseq', '')
@@ -320,7 +320,7 @@ from nltk.translate.bleu_score import corpus_bleu
 # validate with test data
 actual, predicted = list(), list()
 
-for key in tqdm(test):
+for key in test:
     # get actual caption
     captions = mapping[key]
     # predict the caption for image
@@ -370,3 +370,10 @@ out: [0. 0. 0. ... 0. 0. 0.]
 
 # training took 1568 sec. 26분
 # epochs: 40    batch size: 32
+
+# inception v3
+# training took 2233 sec.
+# epochs: 20    batch size: 10
+#  climber is riding his bike in the snow
+# BLEU-1: 0.344911
+# BLEU-2: 0.123506

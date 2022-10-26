@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import itertools
 from tqdm.autonotebook import tqdm
-import albumentations as A
+import albumentations as A  # torchvision을 대신할만한 라이브러리. image augmentation 등의 기능이 많고 빠르다
 import matplotlib.pyplot as plt
 
 import torch
@@ -63,7 +63,7 @@ class CFG:
 
     pretrained = True # for both image encoder and text encoder
     trainable = True # for both image encoder and text encoder
-    temperature = 1.0
+    temperature = 1.0 # 
 
     # image size
     size = 224
@@ -422,7 +422,7 @@ def find_matches(model, image_embeddings, query, image_filenames, n=9):
 find_matches(model, 
              image_embeddings,
              query="cats on the grass",
-             image_filenames=valid_df['image'].values,      # valid 데이터셋의 이미지들 중에서 텍스트와 매치되는 놈을 보여줌
+             image_filenames=valid_df['image'].values,      # valid 데이터셋의 이미지들 중에서 텍스트와 매치되는 이미지를 보여줌
              n=9)
 
 # took 2246 sec.

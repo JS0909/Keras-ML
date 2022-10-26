@@ -23,3 +23,6 @@ YOLOv5
 YOLOv7
 .data
 *.log
+
+LICENSE*
+*.csv
