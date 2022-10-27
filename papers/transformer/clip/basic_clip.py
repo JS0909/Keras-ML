@@ -44,7 +44,7 @@ class CFG:
     image_path = image_path
     captions_path = captions_path
     batch_size = 32
-    num_workers = 0
+    num_workers = 0     # 데이터 로더에 사용할 CPU 서브 프로세스 개수. 디폴트 0, 메인 프로세스로 처리하겠다는 뜻
     head_lr = 1e-3
     image_encoder_lr = 1e-4
     text_encoder_lr = 1e-5
@@ -63,7 +63,7 @@ class CFG:
 
     pretrained = True # for both image encoder and text encoder
     trainable = True # for both image encoder and text encoder
-    temperature = 1.0 # 
+    temperature = 1.0 # 템퍼쳐 값이 커질 수록 logits 값이 줄어듦. 기준이 빡세짐
 
     # image size
     size = 224
@@ -104,22 +104,54 @@ class CLIPDataset(torch.utils.data.Dataset):
 
         self.image_filenames = image_filenames
         self.captions = list(captions)
-        self.encoded_captions = tokenizer(
+        self.encoded_captions = tokenizer(  # 토크나이징된 텍스트 input
             list(captions), padding=True, truncation=True, max_length=CFG.max_length
         )
         self.transforms = transforms
-
+        # print(self.encoded_captions)
+        
     def __getitem__(self, idx):
         item = {
             key: torch.tensor(values[idx])
             for key, values in self.encoded_captions.items()
         }
-
         image = cv2.imread(f"{CFG.image_path}/{self.image_filenames[idx]}")
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image = self.transforms(image=image)['image']
-        item['image'] = torch.tensor(image).permute(2, 0, 1).float()
+        item['image'] = torch.tensor(image).permute(2, 0, 1).float()    # 채널 앞으로 뺌
         item['caption'] = self.captions[idx]
+        
+        # print(item)
+        '''{'input_ids': tensor([ 101, 2019, 2137, 4362, 1999, 1037, 2317, 1998, 6379, 6167, 2003, 2437,
+        1037, 2448, 2007, 1996, 3608, 1012,  102,    0,    0,    0,    0,    0,     # input_ids : 토크나이징된 텍스트, encoded_captions로 나온 키밸류값
+           0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     # id 0인 곳에 어텐션마스크도 0
+           0,    0,    0,    0,    0,    0]),
+        'attention_mask': tensor([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+        'image': tensor([[[-0.5082, -1.0048, -0.1314,  ..., -1.0219, -1.3473, -1.0390],     # 이미지
+         [ 0.5193, -0.9020, -0.4397,  ..., -1.1418, -1.0219, -0.8849],
+         [ 1.8722,  0.8276, -0.4739,  ..., -1.2103, -1.2445, -1.0733],
+         ...,
+         [-0.6452, -0.6281, -0.7650,  ...,  0.2282, -0.5767, -0.8335],
+         [-0.7650, -1.0219, -1.0562,  ...,  0.0741,  0.3994,  0.0569],
+         [-0.8849, -0.9877, -1.0219,  ..., -0.4226,  0.0227,  0.2282]],
+
+        [[-0.8978, -1.0553, -0.2150,  ..., -0.8803, -1.1253, -0.7577],
+         [ 0.6429, -0.7577, -0.4601,  ..., -0.9853, -0.8277, -0.7052],
+         [ 1.9909,  0.9230, -0.5476,  ..., -1.0378, -1.0028, -0.9153],
+         ...,
+         [-0.2850, -0.3025, -0.4951,  ...,  0.5728, -0.1450, -0.4076],
+         [-0.3375, -0.5826, -0.6001,  ...,  0.3978,  0.7304,  0.4153],
+         [-0.3725, -0.4251, -0.5301,  ..., -0.0749,  0.3627,  0.5728]],
+
+        [[-0.2532, -0.1487,  0.1999,  ..., -1.0376, -1.2293, -0.8981],
+         [ 1.0017, -0.0790,  0.0779,  ..., -1.1073, -1.0027, -0.8981],
+         [ 2.2914,  1.5245,  0.2348,  ..., -1.1596, -1.1247, -1.0201],
+         ...,
+         [-0.7936, -0.7413, -0.9853,  ...,  0.5311, -0.2881, -0.6541],
+         [-0.8110, -1.0201, -1.0724,  ...,  0.3742,  0.7228,  0.3568],
+         [-0.8981, -0.9330, -0.9853,  ..., -0.3753,  0.3219,  0.5834]]]),
+         'caption': 'An American footballer in a white and purple strip is making a run with the ball .'}   # 원래 캡션'''
 
         return item
 
@@ -258,7 +290,7 @@ batch_size = 4
 dim = 256
 embeddings = torch.randn(batch_size, dim)
 out = embeddings @ embeddings.T
-print(F.softmax(out, dim=-1))
+print('sample softmax: ', F.softmax(out, dim=-1))
 
 def make_train_valid_dfs():
     dataframe = pd.read_csv(f"{CFG.captions_path}/captions.csv")
@@ -267,7 +299,7 @@ def make_train_valid_dfs():
     np.random.seed(42)
     valid_ids = np.random.choice(
         image_ids, size=int(0.2 * len(image_ids)), replace=False
-    )
+    )   # 전체 데이터의 20% 만큼을 valid 데이터셋으로 만듦
     train_ids = [id_ for id_ in image_ids if id_ not in valid_ids]
     train_dataframe = dataframe[dataframe["id"].isin(train_ids)].reset_index(drop=True)
     valid_dataframe = dataframe[dataframe["id"].isin(valid_ids)].reset_index(drop=True)
@@ -285,7 +317,7 @@ def build_loaders(dataframe, tokenizer, mode):
     dataloader = torch.utils.data.DataLoader(
         dataset,
         batch_size=CFG.batch_size,
-        num_workers=CFG.num_workers,
+        num_workers=CFG.num_workers,   
         shuffle=True if mode == "train" else False,
     )
     return dataloader
