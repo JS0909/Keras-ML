@@ -49,7 +49,6 @@ print(f"학습 데이터셋(training dataset) 크기: {len(train_dataset.example
 print(f"평가 데이터셋(validation dataset) 크기: {len(valid_dataset.examples)}개")
 print(f"테스트 데이터셋(testing dataset) 크기: {len(test_dataset.examples)}개")
 
-
 # 학습 데이터 중 하나를 선택해 출력
 print(vars(train_dataset.examples[30])['src'])
 print(vars(train_dataset.examples[30])['trg'])
