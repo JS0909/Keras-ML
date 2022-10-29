@@ -21,7 +21,6 @@ tokenized = spacy_en.tokenizer("I am a graduate student.")
 for i, token in enumerate(tokenized):
     print(f"인덱스 {i}: {token.text}")
 
-
 # 독일어(Deutsch) 문장을 토큰화 하는 함수 (순서를 뒤집지 않음)
 def tokenize_de(text):
     return [token.text for token in spacy_de.tokenizer(text)]
