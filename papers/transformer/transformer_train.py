@@ -216,7 +216,7 @@ class PositionwiseFeedforwardLayer(nn.Module):
         # x: [batch_size, seq_len, hidden_dim]
         
         # 걍 렐루한번, 리니어한번 때려 나감. 포지션 벡터 차원을 하나 정해주고 그 벡터에 맞춰서 각 값의 자리별로 서로 다른 값을 갖도록 한 후
-        # 다시 원래 모양으로 되돌려 나감. 그러면 각 자리의 값들에는 위치벡터값을 간직하고 있는 채로 모양만 원래 모양으로 변경됨
+        # 다시 원래 모양으로 되돌려 나감. 그러면 각 자리의 값들은 위치벡터값을 간직하고 있는 채로 모양만 원래 모양으로 변경됨
 
         return x
 
@@ -250,11 +250,10 @@ class EncoderLayer(nn.Module):
 
         # position-wise feedforward
         _src = self.positionwise_feedforward(src)
-        # 단순 렐루 리니어 한번, 리니어 한번 거침
 
         # dropout, residual and layer norm
         src = self.ff_layer_norm(src + self.dropout(_src))
-        # 마찬가지로 리니어 두번 때리기 전 후를 더했으니까 값의 차이가 심할까봐 레이어 노말 한번 때림
+        # 마찬가지로 피드포워드 통과 전 후를 더했으니까 값의 차이가 심할까봐 레이어 노말 한번
         
         # src: [batch_size, src_len, hidden_dim]
 
@@ -363,7 +362,7 @@ class DecoderLayer(nn.Module):
 
         # trg: [batch_size, trg_len, hidden_dim]
         # attention: [batch_size, n_heads, trg_len, src_len]
-
+        
         return trg, attention
     
     
@@ -398,7 +397,7 @@ class Decoder(nn.Module):
 
         # pos: [batch_size, trg_len]
 
-        # 문장의 입력값에 임베딩 내용을 더한 것을 사용
+        # output embedding + positional encoding
         trg = self.dropout((self.tok_embedding(trg) * self.scale) + self.pos_embedding(pos))
 
         # trg: [batch_size, trg_len, hidden_dim]
@@ -410,8 +409,10 @@ class Decoder(nn.Module):
         # trg: [batch_size, trg_len, hidden_dim]
         # attention: [batch_size, n_heads, trg_len, src_len]
 
-        output = self.fc_out(trg)
-
+        # output = self.fc_out(trg)
+        output = torch.log_softmax(self.fc_out(trg), dim=-1)    # 그냥 소프트맥스하면 값 a 만 나오고 성능 개구리됨
+        # print(sum(output[0,0,:]))
+        
         # output: [batch_size, trg_len, output_dim]
 
         return output, attention
@@ -518,13 +519,13 @@ class Transformer(nn.Module):
 
         # output: [batch_size, trg_len, output_dim]
         # attention: [batch_size, n_heads, trg_len, src_len]
-
+        
         return output, attention
 
 
 ######## Training ########
-INPUT_DIM = len(SRC.vocab)
-OUTPUT_DIM = len(TRG.vocab)
+INPUT_DIM = len(SRC.vocab)  # 독일어 단어사전 개수
+OUTPUT_DIM = len(TRG.vocab) # 영어 단어사전 개수
 HIDDEN_DIM = 256    # 전체 디멘션
 ENC_LAYERS = 3      # 인코더 레이어 개수
 DEC_LAYERS = 3      # 디코더 레이어 개수
@@ -585,7 +586,7 @@ def train(model, iterator, optimizer, criterion, clip):
         # 출력 단어의 마지막 인덱스(<eos>)는 제외
         # 입력을 할 때는 <sos>부터 시작하도록 처리
         output, _ = model(src, trg[:,:-1])
-
+        
         # output: [배치 크기, trg_len - 1, output_dim]
         # trg: [배치 크기, trg_len]
         # torch.Size([128, 27, 5920])
@@ -631,7 +632,7 @@ def evaluate(model, iterator, criterion):
             # 출력 단어의 마지막 인덱스(<eos>)는 제외
             # 입력을 할 때는 <sos>부터 시작하도록 처리
             output, _ = model(src, trg[:,:-1])
-
+            
             # output: [배치 크기, trg_len - 1, output_dim=vocab_size]
             # trg: [배치 크기, trg_len]
 
@@ -659,8 +660,8 @@ def epoch_time(start_time, end_time):
     elapsed_secs = int(elapsed_time - (elapsed_mins * 60))
     return elapsed_mins, elapsed_secs
 
-
-N_EPOCHS = 2
+'''
+N_EPOCHS = 10
 CLIP = 1
 best_valid_loss = float('inf') # 양의 무한대부터 시작
 
@@ -697,7 +698,7 @@ print(f'Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):.3f}')
 # 따라서 같은 테스트 데이터셋에서 언어 모델 간의 PPL 값을 비교하면 어떤 언어 모델이 우수한 성능을 보이는지 알 수 있음
 # 크로스엔트로피를 지수화하면 perplexity가 됨
 #=============================================================================================================================
-
+'''
 
 
 
@@ -798,15 +799,11 @@ def display_attention(sentence, translation, attention, n_heads=8, n_rows=4, n_c
 
     plt.show()
     
-    
 example_idx = 10
 # src = vars(test_dataset.examples[example_idx])['src']
-# src = tokenize_de('Ich liebe dich.') # 원하는 문장
-# src = tokenize_de('eine mutter und ihr kleiner sohn genießen einen schönen tag im freien.')
-src = tokenize_de('eine Mutter ist freundlich.')
+src = tokenize_de('eine Mutter ist freundlich.')    # 번역할 문장
 
 # trg = vars(test_dataset.examples[example_idx])['trg']
-# trg = tokenize_en('I love you.')
 
 print(f'소스 문장: {src}')
 # print(f'타겟 문장: {trg}')
@@ -814,6 +811,8 @@ print(f'소스 문장: {src}')
 translation, attention = translate_sentence(src, SRC, TRG, model, device, logging=True)
 
 print("모델 출력 결과:", " ".join(translation))
+
+display_attention(src, translation, attention)
 
 # '''
 # inference 및 bleu 스코어
@@ -868,3 +867,34 @@ def show_bleu(data, src_field, trg_field, model, device, max_len=50):
 show_bleu(test_dataset, SRC, TRG, model, device)
 # dataset은 아직 패딩처리(버킷이터레이터)하기 전. <sos>, <eos> 안붙어있음
 # '''
+
+
+# Total BLEU Score = 35.21  log_softmax 결과적으로 가장 좋음
+# Individual BLEU1 score = 67.90
+# Individual BLEU2 score = 43.13
+# Individual BLEU3 score = 27.96
+# Individual BLEU4 score = 18.76
+# Cumulative BLEU1 score = 67.90
+# Cumulative BLEU2 score = 54.12
+# Cumulative BLEU3 score = 43.43
+# Cumulative BLEU4 score = 35.21
+
+# Total BLEU Score = 34.97  without softmax
+# Individual BLEU1 score = 67.59
+# Individual BLEU2 score = 42.84
+# Individual BLEU3 score = 27.76
+# Individual BLEU4 score = 18.61
+# Cumulative BLEU1 score = 67.59
+# Cumulative BLEU2 score = 53.81
+# Cumulative BLEU3 score = 43.16
+# Cumulative BLEU4 score = 34.97
+
+# Total BLEU Score = 0.00   with softmax
+# Individual BLEU1 score = 0.00
+# Individual BLEU2 score = 0.00
+# Individual BLEU3 score = 0.00
+# Individual BLEU4 score = 0.00
+# Cumulative BLEU1 score = 0.00
+# Cumulative BLEU2 score = 0.00
+# Cumulative BLEU3 score = 0.00
+# Cumulative BLEU4 score = 0.00
