@@ -239,8 +239,8 @@ model.compile(loss='categorical_crossentropy', optimizer='adam')
 # '''
 # train the model
 print('start training...')
-epochs = 20
-batch_size = 10
+epochs = 30
+batch_size = 16
 steps = len(train) // batch_size # 1 batch 당 훈련하는 데이터 수
 
 # 제너레이터 함수에서 yield로 252개의 [X1, X2], y 묶음이 차곡차곡 쌓여 있고  steps_per_epoch=steps 이 옵션으로
