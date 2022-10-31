@@ -4,5 +4,3 @@ import numpy as np
 im = Image.open('05.jpg')
 im = np.array(im)
 print(im)
-
-
