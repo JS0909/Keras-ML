@@ -14,9 +14,7 @@ img = np.array(Image.open('D:\study_data\_data/team_project\predict_img/02.jpg')
 # print(np.max(img), np.min(img))
 
 img2 = (img - np.mean(img)*1) / np.std(img)*1
-# img3 = (img - np.mean(img)) / np.std(img)
-# print(img3[-1,-1,-1])
-# test=(255-np.mean(img)) / np.std(img)
+
 print(np.mean(img))
 print(np.std(img))
 
@@ -25,5 +23,3 @@ img = trans(image=img)
 
 print('수동정규화', img2[-1,-1,-1])
 print('A정규화',img['image'][-1,-1,-1])
-# print()
-# print(test)
