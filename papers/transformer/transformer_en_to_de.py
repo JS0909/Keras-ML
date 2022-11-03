@@ -655,11 +655,12 @@ def epoch_time(start_time, end_time):
     elapsed_secs = int(elapsed_time - (elapsed_mins * 60))
     return elapsed_mins, elapsed_secs
 
-'''
-N_EPOCHS = 10
+# '''
+N_EPOCHS = 20
 CLIP = 1
 best_valid_loss = float('inf') # 양의 무한대부터 시작
 
+start = time.time()
 for epoch in range(N_EPOCHS):
     start_time = time.time() # 시작 시간 기록
 
@@ -676,7 +677,8 @@ for epoch in range(N_EPOCHS):
     print(f'Epoch: {epoch + 1:02} | Time: {epoch_mins}m {epoch_secs}s')
     print(f'\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):.3f}')
     print(f'\tValidation Loss: {valid_loss:.3f} | Validation PPL: {math.exp(valid_loss):.3f}')
-    
+end = time.time()
+print(f'Total time: {int(start-end)}s')
     
 # 학습된 모델 저장
 torch.save(model.state_dict(), 'transformer_german_to_english.pt')
