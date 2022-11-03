@@ -22,5 +22,3 @@ print(obj_list)
 
 read_obj = random.sample(obj_list, 3) if len(obj_list)>3 else obj_list # 그중에서 랜덤으로 3개 물체 정도 뽑음, 3개보다 적으면 안뽑음
 print(read_obj)
-
-
