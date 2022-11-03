@@ -672,7 +672,7 @@ for epoch in range(N_EPOCHS):
 
     if valid_loss < best_valid_loss:
         best_valid_loss = valid_loss
-        torch.save(model.state_dict(), 'transformer_german_to_english.pt')
+        torch.save(model.state_dict(), 'transformer_en_to_de.pt')
 
     print(f'Epoch: {epoch + 1:02} | Time: {epoch_mins}m {epoch_secs}s')
     print(f'\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):.3f}')
@@ -681,9 +681,9 @@ end = time.time()
 print(f'Total time: {int(start-end)}s')
     
 # 학습된 모델 저장
-torch.save(model.state_dict(), 'transformer_german_to_english.pt')
+torch.save(model.state_dict(), 'transformer_en_to_de.pt')
 
-model.load_state_dict(torch.load('transformer_german_to_english.pt'))
+model.load_state_dict(torch.load('transformer_en_to_de.pt'))
 
 test_loss = evaluate(model, test_iterator, criterion)
 
@@ -708,7 +708,7 @@ print(f'Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):.3f}')
 
 # 학습된 모델 불러오기
 model = Transformer(enc, dec, SRC_PAD_IDX, TRG_PAD_IDX, device).to(device)
-model.load_state_dict(torch.load('transformer_german_to_english.pt'))
+model.load_state_dict(torch.load('transformer_en_to_de.pt'))
 
 test_loss = evaluate(model, test_iterator, criterion)
 
