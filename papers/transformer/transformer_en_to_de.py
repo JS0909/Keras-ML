@@ -678,7 +678,7 @@ for epoch in range(N_EPOCHS):
     print(f'\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):.3f}')
     print(f'\tValidation Loss: {valid_loss:.3f} | Validation PPL: {math.exp(valid_loss):.3f}')
 end = time.time()
-print(f'Total time: {int(start-end)}s')
+print(f'Total time: {int(end-start)}s')
     
 # 학습된 모델 저장
 torch.save(model.state_dict(), 'transformer_en_to_de.pt')
