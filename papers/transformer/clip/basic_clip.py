@@ -37,7 +37,7 @@ elif dataset == "30k":
     image_path = "D:\study_data\_data/team_project\Flickr30k\Images"
     captions_path = "D:\study_data\_data/team_project\Flickr30k"
 
-print(df.head())
+# print(df.head(10))
 
 class CFG:
     debug = False
@@ -51,7 +51,7 @@ class CFG:
     weight_decay = 1e-3 # 가중치가 너무 커져서 함수가 복잡해지는 경우(복잡도 과도한 증가=overfitting), loss를 최소화하기보다 가중치를 줄이는 것을 더 우선시 한다
     patience = 1
     factor = 0.8
-    epochs = 1
+    epochs = 5
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     model_name = 'resnet50'
@@ -395,7 +395,7 @@ def main():
         
         if valid_loss.avg < best_loss:
             best_loss = valid_loss.avg
-            torch.save(model.state_dict(), "best.pt")
+            torch.save(model.state_dict(), "C:\study\papers/transformer\clip/img_embeddings.pt")
             print("Saved Best Model!")
         
         lr_scheduler.step(valid_loss.avg)
@@ -424,7 +424,7 @@ def get_image_embeddings(valid_df, model_path):
     return model, torch.cat(valid_image_embeddings)
 
 _, valid_df = make_train_valid_dfs()
-model, image_embeddings = get_image_embeddings(valid_df, "best.pt")                 # inference용 이미지는 valid 세트에서 가져옴
+model, image_embeddings = get_image_embeddings(valid_df, "C:\study\papers/transformer\clip/img_embeddings.pt")                 # inference용 이미지는 valid 세트에서 가져옴
 
 def find_matches(model, image_embeddings, query, image_filenames, n=9):
     tokenizer = DistilBertTokenizer.from_pretrained(CFG.text_tokenizer)
@@ -440,8 +440,8 @@ def find_matches(model, image_embeddings, query, image_filenames, n=9):
     image_embeddings_n = F.normalize(image_embeddings, p=2, dim=-1)         # 이미지는 get_image_embeddings에서 프로젝션했음
     text_embeddings_n = F.normalize(text_embeddings, p=2, dim=-1)           # 이미지는 채널값에 대해, 텍스트는 토큰값에 대해 L2norm, 하는 이유는 두 임베딩값 곱할때 값의 편차를 줄이기 위해
     dot_similarity = text_embeddings_n @ image_embeddings_n.T               # (1, 256) @ (8090, 256).T = (1, 8090)
-    # print(text_embeddings, text_embeddings_n)
-    
+    # print(text_embeddings_n.size(), image_embeddings_n.size())
+
     values, indices = torch.topk(dot_similarity.squeeze(0), n * 5) # (8090,)만든 후 argmax 인데 제일 큰거부터 (n=)9*5개 인덱스 반환함
     matches = [image_filenames[idx] for idx in indices[::5]]       # 45개 중 5개씩 건너뛰어가며 뽑아 냄 (결국 9개 이미지 반환하는 것)
     '''indices tensor([5330, 5334, 5331, 5333, 5332, 1403, 1404, 1401, 1402, 1400,  362,  361,
@@ -458,11 +458,11 @@ def find_matches(model, image_embeddings, query, image_filenames, n=9):
     
     plt.show()
     
-find_matches(model, 
-             image_embeddings,
-             query="surfers in the ocean",
-             image_filenames=valid_df['image'].values,      # valid 데이터셋의 이미지들 중에서 텍스트와 매치되는 이미지를 보여줌
-             n=9)
+# find_matches(model, 
+#              image_embeddings,
+#              query="surfers in the ocean",
+#              image_filenames=valid_df['image'].values,      # valid 데이터셋의 이미지들 중에서 텍스트와 매치되는 이미지를 보여줌
+#              n=9)
 
 # took 2246 sec.
 # epochs: 5    batch size: 32
@@ -470,3 +470,30 @@ find_matches(model,
 # 구조를 쉽게 요약하면 어텐션 기법을 사용하여 이미지 피처와 텍스트 피처의 유사도를 계속 구하는 방식으로 훈련하고
 # 예측의 경우 텍스트 피처를 넣으면 이미지 피처를 클래시파이어 클래스로 두고
 # 그 중에서 topk - 5 의 방식으로 5장을 해당 텍스트에 관련된 이미지라고 예측
+
+
+def get_acc_score(model, image_embeddings, valid_df, image_filenames):
+    tokenizer = DistilBertTokenizer.from_pretrained(CFG.text_tokenizer)
+    matched_sum = 0
+    for i in range(len(valid_df)):
+        encoded_query = tokenizer([valid_df['caption'][i]])
+        batch = {key: torch.tensor(values).to(CFG.device)for key, values in encoded_query.items()}
+        
+        with torch.no_grad():
+            text_features = model.text_encoder(
+                input_ids=batch["input_ids"], attention_mask=batch["attention_mask"]
+            )
+            text_embeddings = model.text_projection(text_features)              
+        
+        image_embeddings_n = F.normalize(image_embeddings, p=2, dim=-1)         
+        text_embeddings_n = F.normalize(text_embeddings, p=2, dim=-1)          
+        dot_similarity = text_embeddings_n @ image_embeddings_n.T               
+        
+        predict_idx = torch.argmax(dot_similarity.squeeze(0), -1)
+        if image_filenames[predict_idx] == image_filenames[i]:
+            # print(image_filenames[predict_idx], image_filenames[i])
+            matched_sum += 1.
+    
+    return matched_sum / len(image_filenames)
+
+print(get_acc_score(model, image_embeddings, valid_df, valid_df['image'].values))
