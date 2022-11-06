@@ -280,7 +280,7 @@ class CLIPModel(nn.Module):
             (images_similarity + texts_similarity) / 2 * self.temperature, dim=-1
         ) # images_similarity: (32, 32)   texts_similarity: (32, 32)  tartgets: (32, 32)
         
-        texts_loss = cross_entropy(logits, targets, reduction='none')
+        texts_loss = cross_entropy(logits, targets, reduction='none')   # logits에 targets을 맞춰나감
         images_loss = cross_entropy(logits.T, targets, reduction='none')
         loss =  (images_loss + texts_loss) / 2.0 # shape: (batch_size)
         return loss.mean()
@@ -363,7 +363,7 @@ def valid_epoch(model, valid_loader):
         tqdm_object.set_postfix(valid_loss=loss_meter.avg)
     return loss_meter
 
-# '''
+'''
 def main():
     train_df, valid_df = make_train_valid_dfs()
     tokenizer = DistilBertTokenizer.from_pretrained(CFG.text_tokenizer)
@@ -407,6 +407,9 @@ print('took', round(end_time), 'sec.')
 print(f'epochs: {CFG.epochs}    batch size: {CFG.batch_size}')
 # '''
 
+
+
+#======= prediction =======
 def get_image_embeddings(valid_df, model_path):
     tokenizer = DistilBertTokenizer.from_pretrained(CFG.text_tokenizer)
     valid_loader = build_loaders(valid_df, tokenizer, mode="valid")
@@ -489,10 +492,14 @@ def get_acc_score(model, image_embeddings, valid_df, image_filenames):
         text_embeddings_n = F.normalize(text_embeddings, p=2, dim=-1)          
         dot_similarity = text_embeddings_n @ image_embeddings_n.T               
         
-        predict_idx = torch.argmax(dot_similarity.squeeze(0), -1)
-        if image_filenames[predict_idx] == image_filenames[i]:
-            # print(image_filenames[predict_idx], image_filenames[i])
-            matched_sum += 1.
+        # predict_idx = torch.argmax(dot_similarity.squeeze(0), -1)
+        values, indices = torch.topk(dot_similarity.squeeze(0), 10)
+        # matches = [image_filenames[idx] for idx in indices[::5]] 
+        for predict_idx in indices:
+            if image_filenames[predict_idx] == image_filenames[i]:
+                # print(image_filenames[predict_idx], image_filenames[i])
+                matched_sum += 1.
+                break
     
     return matched_sum / len(image_filenames)
 
