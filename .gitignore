@@ -13,6 +13,8 @@ ocr
 *.json
 *.index
 ckpt*
+*.xml
+*.iml
 
 checkpoints
 tmp
