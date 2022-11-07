@@ -494,7 +494,7 @@ def get_acc_score(model, image_embeddings, valid_df, image_filenames):
         
         # predict_idx = torch.argmax(dot_similarity.squeeze(0), -1)
         values, indices = torch.topk(dot_similarity.squeeze(0), 10)
-        # matches = [image_filenames[idx] for idx in indices[::5]] 
+
         for predict_idx in indices:
             if image_filenames[predict_idx] == image_filenames[i]:
                 # print(image_filenames[predict_idx], image_filenames[i])
