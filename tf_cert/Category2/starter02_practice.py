@@ -27,7 +27,7 @@
 # (28,28) as the input shape only. If you amend this, the tests will fail.
 #
 from tensorflow.python.keras.models import Sequential
-from tensorflow.python.keras.layers import Dense, Conv1D, Flatten
+from tensorflow.python.keras.layers import Dense, Conv1D, Flatten, Conv2D
 import numpy as np
 import tensorflow as tf
 from keras.utils import to_categorical
@@ -40,11 +40,15 @@ def solution_model():
     # YOUR CODE HERE
     (x_train, y_train), (x_test, y_test) = fashion_mnist.load_data()
     
+    x_train = np.array(x_train).reshape(-1, 28, 28, 1)    
+    x_test = np.array(x_test).reshape(-1, 28, 28, 1)    
+    
     y_train= to_categorical(y_train)
     y_test= to_categorical(y_test)
     
     model = Sequential()
-    model.add(Conv1D(filters=64, kernel_size=2, strides=1, padding='valid', input_shape=(28, 28)))
+    model.add(Conv2D(filters=64, kernel_size=2, strides=1, padding='valid', input_shape=(28, 28, 1)))
+    # model.add(LSTM(6, input_shape=(28,28)))
     model.add(Flatten())
     model.add(Dense(64, activation='relu'))
     model.add(Dense(128, activation='relu'))
