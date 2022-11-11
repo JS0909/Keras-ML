@@ -17,6 +17,7 @@ ckpt*
 *.iml
 
 checkpoints
+checkpoint
 tmp
 image_classifier
 catboost_info
