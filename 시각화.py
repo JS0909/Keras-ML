@@ -22,3 +22,4 @@ plt.show()
 
 # 월별 평균 dataframe 새로 만들기
 # groupby 활용
+
