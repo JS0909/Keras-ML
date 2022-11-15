@@ -20,6 +20,6 @@ plt.show()
 sns.lineplot(data=data, x='month', y='Series ID: PET.EMD_EPD2D_PTE_NUS_DPG.W Dollars per Gallon')
 plt.show()
 
-# 월별 평균 dataframe 새로 만들기
+
 # groupby 활용
 
