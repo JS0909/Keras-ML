@@ -11,10 +11,10 @@ from keras.optimizer_v2.adam import Adam # tf 2.8.2
 x_train, x_test = x_train/255., x_test/255.
 
 def get_model(hp):
-    hp_unit1 = hp.Int('units1', min_value=16, max_value=512, step=15)
-    hp_unit2 = hp.Int('units2', min_value=16, max_value=512, step=15)
-    hp_unit3 = hp.Int('units3', min_value=16, max_value=512, step=15)
-    hp_unit4 = hp.Int('units4', min_value=16, max_value=512, step=15)
+    hp_unit1 = hp.Int('units1', min_value=16, max_value=512, step=16)   # step=건너가는 개수
+    hp_unit2 = hp.Int('units2', min_value=16, max_value=512, step=16)
+    hp_unit3 = hp.Int('units3', min_value=16, max_value=512, step=16)
+    hp_unit4 = hp.Int('units4', min_value=16, max_value=512, step=16)
     
     hp_drop1 = hp.Choice('dropout1', values=[0.0, 0.2, 0.3, 0.4, 0.5])
     hp_drop2 = hp.Choice('dropout2', values=[0.0, 0.2, 0.3, 0.4, 0.5])
