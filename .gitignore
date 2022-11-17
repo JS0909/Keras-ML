@@ -26,6 +26,7 @@ YOLOv5
 YOLOv7
 .data
 *.log
+my_dir
 
 LICENSE*
 *.csv
