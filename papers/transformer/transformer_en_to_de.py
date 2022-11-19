@@ -526,7 +526,7 @@ ENC_LAYERS = 4      # 인코더 레이어 개수
 DEC_LAYERS = 4      # 디코더 레이어 개수
 ENC_HEADS = 8       # 헤드 개수
 DEC_HEADS = 8
-ENC_PF_DIM = 512    # 포지션 임베딩 차원
+ENC_PF_DIM = 512   
 DEC_PF_DIM = 512
 ENC_DROPOUT = 0.1
 DEC_DROPOUT = 0.1
@@ -575,7 +575,7 @@ def train(model, iterator, optimizer, criterion, clip):
     for i, batch in enumerate(iterator):
         src = batch.src
         trg = batch.trg
-        
+
         optimizer.zero_grad()
 
         # 출력 단어의 마지막 인덱스(<eos>)는 제외
@@ -656,11 +656,10 @@ def epoch_time(start_time, end_time):
     return elapsed_mins, elapsed_secs
 
 # '''
-N_EPOCHS = 20
+N_EPOCHS = 10
 CLIP = 1
 best_valid_loss = float('inf') # 양의 무한대부터 시작
 
-start = time.time()
 for epoch in range(N_EPOCHS):
     start_time = time.time() # 시작 시간 기록
 
@@ -672,18 +671,17 @@ for epoch in range(N_EPOCHS):
 
     if valid_loss < best_valid_loss:
         best_valid_loss = valid_loss
-        torch.save(model.state_dict(), 'transformer_en_to_de.pt')
+        torch.save(model.state_dict(), 'transformer_german_to_english.pt')
 
     print(f'Epoch: {epoch + 1:02} | Time: {epoch_mins}m {epoch_secs}s')
     print(f'\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):.3f}')
     print(f'\tValidation Loss: {valid_loss:.3f} | Validation PPL: {math.exp(valid_loss):.3f}')
-end = time.time()
-print(f'Total time: {int(end-start)}s')
+    
     
 # 학습된 모델 저장
-torch.save(model.state_dict(), 'transformer_en_to_de.pt')
+torch.save(model.state_dict(), 'transformer_german_to_english.pt')
 
-model.load_state_dict(torch.load('transformer_en_to_de.pt'))
+model.load_state_dict(torch.load('transformer_german_to_english.pt'))
 
 test_loss = evaluate(model, test_iterator, criterion)
 
@@ -703,11 +701,12 @@ print(f'Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):.3f}')
 
 
 
+
 #==================================================== 평가 및 예측 ===========================================================
 
 # 학습된 모델 불러오기
 model = Transformer(enc, dec, SRC_PAD_IDX, TRG_PAD_IDX, device).to(device)
-model.load_state_dict(torch.load('transformer_en_to_de.pt'))
+model.load_state_dict(torch.load('transformer_german_to_english.pt'))
 
 test_loss = evaluate(model, test_iterator, criterion)
 
