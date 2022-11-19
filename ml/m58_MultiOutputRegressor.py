@@ -23,4 +23,3 @@ model = MultiOutputRegressor(estimator=lg)
 model.fit(x, y)
 
 print(model.predict([[2, 110, 43]]))
-
