@@ -49,9 +49,9 @@ kerastuner = kt.Hyperband(get_model,
                           )
 
 kerastuner.search(x_train, y_train,
-                  validation_data=(x_test, y_test), epochs=5)    
+                  validation_data=(x_test, y_test))    
 
-best_hps = kerastuner.get_best_hyperparameters(num_trials=2)[0]
+best_hps = kerastuner.get_best_hyperparameters(num_trials=1)[0]
 
 print('best parameter - units1 : ', best_hps.get('units1'))
 print('best parameter - units2 : ', best_hps.get('units2'))
