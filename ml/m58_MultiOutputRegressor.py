@@ -19,7 +19,6 @@ print(y.shape) # (20, 3)
 lg = LGBMRegressor()
 model = MultiOutputRegressor(estimator=lg)
 
-
 model.fit(x, y)
 
 print(model.predict([[2, 110, 43]]))
