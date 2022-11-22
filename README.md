@@ -1,2 +1,1 @@
-# study
-# 수업 자료
+# What I have studied
