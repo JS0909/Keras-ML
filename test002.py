@@ -23,4 +23,3 @@ img = trans(image=img)
 
 print('수동정규화', img2[-1,-1,-1])
 print('A정규화',img['image'][-1,-1,-1])
-
